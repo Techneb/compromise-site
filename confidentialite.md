@@ -13,10 +13,15 @@ n'est envoyé au développeur.
   le géocodage inversé et les itinéraires, comme pour tout usage de
   Plans, et à personne d'autre.
 - **Les adresses et coordonnées du groupe.** Gardées en mémoire pendant
-  l'utilisation ; tes six dernières adresses restent sur l'appareil pour
-  ne pas les retaper. Elles sont envoyées à Apple pour calculer les temps
-  de trajet, et à personne d'autre. Réglages › Confidentialité › *Effacer
-  les adresses récentes* les supprime.
+  l'utilisation ; tes six dernières adresses, et la dernière adresse
+  donnée à chaque ami nommé, restent sur l'appareil pour ne pas les
+  retaper. Elles sont envoyées à Apple pour calculer les temps de trajet,
+  et à personne d'autre. Réglages › Confidentialité › *Effacer les
+  adresses mémorisées* les supprime.
+- **Tes contacts.** Avec ton accord, l'app lit ton carnet d'adresses sur
+  l'appareil pour te proposer des prénoms quand tu nommes un ami. Seul le
+  prénom choisi est gardé, avec l'adresse que tu donnes ensuite ; aucun
+  contact, numéro ou adresse postale ne quitte ton téléphone.
 - **Les temps de trajet.** En cache sur l'appareil quelques heures.
 - **Un lieu que tu partages ou ouvres.** Le nom et la position du lieu
   vont là où tu les envoies : la feuille de partage, ou Google Maps,
@@ -37,9 +42,11 @@ Rien n'est lié à une identité, rien ne sert au pistage.
 ## Tes choix
 
 L'autorisation de localisation peut être refusée ou retirée dans les
-Réglages iOS ; l'app fonctionne avec des adresses saisies. Le filtre
-terrasse au soleil peut rester désactivé ; rien n'est alors demandé aux
-portails des villes. Les adresses récentes s'effacent à tout moment.
+Réglages iOS ; l'app fonctionne avec des adresses saisies. L'accès aux
+contacts peut aussi être refusé ou retiré ; les prénoms se tapent alors.
+Le filtre terrasse au soleil peut rester désactivé ; rien n'est alors
+demandé aux portails des villes. Les adresses mémorisées s'effacent à
+tout moment.
 
 ## Licences des données
 

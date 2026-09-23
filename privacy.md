@@ -13,10 +13,14 @@ sent to the developer.
   Apple for reverse geocoding and routing, as any use of Apple Maps is,
   and to no one else.
 - **Addresses and coordinates of your group.** Kept in memory while the
-  app runs; your six most recent picks are kept on the device so you do
-  not retype them. They are sent to Apple to compute travel times, and
-  to no one else. Settings › Privacy › *Clear recent addresses* erases
-  them.
+  app runs; your six most recent picks, and the last address you gave
+  each named friend, are kept on the device so you do not retype them.
+  They are sent to Apple to compute travel times, and to no one else.
+  Settings › Privacy › *Clear remembered addresses* erases them.
+- **Your contacts.** With your permission, the app reads your address
+  book on the device to suggest first names while you name a friend.
+  Only the name you pick is kept, with the address you then give; no
+  contact, phone number or postal address ever leaves your phone.
 - **Travel times.** Cached on the device for a few hours.
 - **A meeting spot you share or open.** The venue's name and position
   go where you send them: the share sheet, or Google Maps, Citymapper
@@ -36,9 +40,10 @@ Nothing is linked to an identity and nothing is used for tracking.
 ## Your choices
 
 Location permission can be refused or withdrawn in iOS Settings; the
-app works with typed addresses. The sunny-terrace filter can be left
-off; nothing is fetched from city portals then. Recent addresses can be
-cleared at any time.
+app works with typed addresses. Contacts permission can be refused or
+withdrawn too; names are then typed. The sunny-terrace filter can be
+left off; nothing is fetched from city portals then. Remembered
+addresses can be cleared at any time.
 
 ## Data licences
 

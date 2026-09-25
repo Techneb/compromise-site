@@ -1,57 +1,42 @@
 # Compromise — Privacy policy
 
-*Last updated: 20 September 2026.*
+*Last updated: 25 September 2026.*
 
 Compromise does not collect your data. There is no account, no
 analytics, no advertising and no third-party SDK. Nothing you enter is
-sent to the developer.
+sent to the developer, and nothing is linked to your identity or used
+for tracking.
 
-## What the app handles, and where it goes
+## What leaves your device
 
-- **Your location.** With your permission, one fix at about 100 m
-  accuracy, used only to fill in your own starting point. It is sent to
-  Apple for reverse geocoding and routing, as any use of Apple Maps is,
-  and to no one else.
-- **Addresses and coordinates of your group.** Kept in memory while the
-  app runs; your six most recent picks, and the last address you gave
-  each named friend, are kept on the device so you do not retype them.
-  They are sent to Apple to compute travel times, and to no one else.
-  Settings › Privacy › *Clear remembered addresses* erases them.
-- **Your contacts.** With your permission, the app reads your address
-  book on the device to suggest first names while you name a friend.
-  Only the name you pick is kept, with the address you then give; no
-  contact, phone number or postal address ever leaves your phone.
-- **Travel times.** Cached on the device for a few hours.
-- **A meeting spot you share or open.** The venue's name and position
-  go where you send them: the share sheet, or Google Maps, Citymapper
-  or Waze when you tap "Open in". Only the venue, never anyone's
-  starting point.
-- **Public city data for the sunny-terrace filter.** When that filter is
-  on, the app fetches building footprints, terrace permits, outdoor
-  seating venues and the commune for a map area around the *venues* it
-  considers, from public open-data services: IGN (France), the cities'
-  own portals (Paris, Toulouse, Strasbourg, Anglet, Melbourne),
-  OpenStreetMap through Overpass, and Etalab's geo API. These requests
-  describe a public map area of about 400 m, never a person's address,
-  and are cached on the device.
+- **To Apple:** your location (with your permission) and the starting
+  points of your group, to find places and compute travel times, as any
+  use of Apple Maps does.
+- **To public map and open-data services** (OpenStreetMap, city and
+  national open-data portals, and a public data store on GitHub): map
+  areas near where your group will meet, to find more places and
+  information about them. Never anyone's address or starting point.
+- **To the app or service you choose** (the share sheet, Google Maps,
+  Citymapper, Waze): the name and position of a meeting place, only when
+  you share or open it.
 
-Nothing is linked to an identity and nothing is used for tracking.
+## What stays on your device
+
+Your settings, your most recent addresses, the last address you gave
+each named friend, and cached map data. Your contacts are read on the
+device, with your permission, to suggest names; only the name you pick
+is kept. Settings › Privacy › *Clear remembered addresses* erases the
+addresses.
 
 ## Your choices
 
-Location permission can be refused or withdrawn in iOS Settings; the
-app works with typed addresses. Contacts permission can be refused or
-withdrawn too; names are then typed. The sunny-terrace filter can be
-left off; nothing is fetched from city portals then. Remembered
-addresses can be cleared at any time.
+Location and Contacts permissions can be refused or withdrawn in iOS
+Settings; the app then works with typed addresses and names.
 
-## Data licences
+## Data sources
 
-The city data above is used under its own licences and credited in the
-app, in Settings › Data sources: IGN BD TOPO and the cities' terrace
-permits under Licence Ouverte 2.0, the City of Paris under ODbL, the
-City of Melbourne under CC BY, and OpenStreetMap data © OpenStreetMap
-contributors under ODbL.
+Map and place data come from Apple and from open-data providers, each
+credited with its licence in the app under Settings › Data sources.
 
 ## Contact
 

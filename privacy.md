@@ -12,7 +12,7 @@ for tracking.
 - **To Apple:** your location (with your permission) and the starting
   points of your group, to find places and compute travel times, as any
   use of Apple Maps does.
-- **To a public data store** (a static file host; GitHub today): the
+- **To a public data store** (a static file host, Cloudflare R2): the
   rounded map cells near where your group will meet, to read pre-cut
   open map data — more places, and what is needed to tell a sunny
   terrace. Never anyone's address or starting point.

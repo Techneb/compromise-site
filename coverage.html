@@ -8,54 +8,78 @@ layout: null
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
-:root{--bg:#fbfcfc;--fg:#1d2a2d;--muted:#5b6b6f;--line:#dde3e4;--pass:#1f9d55;--gate:#7f8c90;--accent:#368B9C;--panel:#fff}
+:root{--bg:#fbfcfc;--fg:#1d2a2d;--muted:#5b6b6f;--line:#dde3e4;--accent:#368B9C;--panel:#fff}
 @media (prefers-color-scheme:dark){:root{--bg:#15191a;--fg:#e6ecec;--muted:#9aa8ab;--line:#2b3336;--accent:#16B9DB;--panel:#1c2224;color-scheme:dark}}
 *{box-sizing:border-box}html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,system-ui,sans-serif;display:flex}
 #map{flex:1;height:100%;min-width:0}
-aside{width:340px;height:100%;overflow:auto;border-left:1px solid var(--line);padding:16px;background:var(--panel)}
+aside{width:360px;height:100%;overflow:auto;border-left:1px solid var(--line);padding:16px;background:var(--panel)}
 h1{font-size:18px;margin:0 0 6px}p{margin:0 0 10px;color:var(--muted)}
 .sw{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:-1px;border-radius:2px}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
 th,td{text-align:left;padding:5px 4px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500}
 td:not(:first-child),th:not(:first-child){text-align:right;white-space:nowrap}
 tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}
-small{color:var(--muted)}
+small{color:var(--muted)}#legend p{margin:0 0 4px}
+.leaflet-popup-content{font:13px/1.4 -apple-system,system-ui,sans-serif}
 @media (max-width:700px){body{flex-direction:column}#map{flex:none;height:58vh}aside{width:100%;height:auto;border:0;border-top:1px solid var(--line)}}
 </style></head><body>
 <div id="map"></div>
 <aside>
 <h1>Compromise coverage</h1>
-<p id="status">Loading coverage…</p>
-<p><span class="sw" style="background:var(--pass)"></span>sunny-terrace filter available<br>
-<span class="sw" style="background:var(--gate)"></span>covered, filter not available yet</p>
-<p>Tap an area to fly to it. Zoom in to see the 200 m blocks.</p>
-<table><thead><tr><th>Area</th><th>Built</th></tr></thead><tbody id="list"></tbody></table>
+<p id="status">Loading the feed…</p>
+<div id="legend"></div>
+<p>Pick a layer top-right. Tap a block for its numbers, an area to fly to it.</p>
+<table><thead><tr><th>Area</th><th>km²</th><th>Blocks</th><th>Terraces known</th><th>Built</th></tr></thead><tbody id="list"></tbody></table>
 </aside>
 <script>
 const FEEDS=['https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json','https://pub-c7dde6811086418585889c3e30cf9880.r2.dev/coverage.json','coverage.json'];
+const FLOOR=20, RATIO=0.30, MINIMUM=5;   // the reader's rules: buildings for availability; terraces vs nearby venues for "known"
 const css=getComputedStyle(document.documentElement), v=n=>css.getPropertyValue(n).trim();
 const map=L.map('map',{preferCanvas:true,worldCopyJump:true}).setView([48.86,2.35],5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,
   attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
-const edge=k=>[k/500,(k+(k<0?-1:1))/500];
-const status=document.getElementById('status'), list=document.getElementById('list');
-// The feed from the tile repository first (the store's host refuses browser preflights), then the store, then the snapshot published with this page.
+const edge=(k,scale)=>{const a=k/scale,b=(k+(k<0?-1:1))/scale;return [Math.min(a,b),Math.max(a,b)];};
+const rect=(ky,kx,scale,style)=>{const la=edge(ky,scale),lo=edge(kx,scale);return L.rectangle([[la[0],lo[0]],[la[1],lo[1]]],Object.assign({stroke:false},style));};
+const status=document.getElementById('status'), list=document.getElementById('list'), legend=document.getElementById('legend');
 const get=u=>fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
+const ramp=['#e0e7e8','#a8d5b5','#5fbf85','#1f9d55','#0f6b38'];   // none, few, some, many, dense
+const bucket=(x,steps)=>{let i=0;while(i<steps.length&&x>=steps[i])i++;return ramp[Math.min(i,ramp.length-1)];};
 get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
-  const pass=v('--pass'), gate=v('--gate'), cells=L.layerGroup().addTo(map);
-  for(const c of d.cells){const a=edge(c[0]),b=edge(c[1]),ok=c[3]>=20;
-    L.rectangle([[Math.min(a[0],a[1]),Math.min(b[0],b[1])],[Math.max(a[0],a[1]),Math.max(b[0],b[1])]],
-      {stroke:false,fillColor:ok?pass:gate,fillOpacity:ok?.5:.35,interactive:false}).addTo(cells);}
+  const dates=d.dates||[], day=i=>(i>=0&&dates[i])||'';
+  const venues=new Map(); for(const w of d.venueCells) venues.set(w[0]+','+w[1],w);
+  const near=(ky,kx)=>{let sum=0,any=false;for(const i of[-1,0,1])for(const j of[-1,0,1]){const w=venues.get(Math.trunc((ky+i)/10)+','+Math.trunc((kx+j)/10));if(w){any=true;sum+=w[2]/100;}}return any?sum:null;};
+  const known=c=>{const n=near(c[0],c[1]);return n===null?c[2]>=FLOOR:(c[2]>=MINIMUM&&c[2]>=RATIO*n);};
+  const popup=c=>'<b>Block '+c[0]+','+c[1]+'</b><br>terraces on record: '+c[2]+'<br>buildings: '+c[3]+' ('+c[4]+' with a measured height)'+
+    '<br>venues within ~600 m: '+(near(c[0],c[1])===null?'no venue tile':Math.round(near(c[0],c[1])))+'<br>terraces known: '+(known(c)?'yes (terrace test)':'no (sun-side test)')+
+    '<br>filter available: '+(c[3]>=FLOOR?'yes':'no, too few buildings')+'<br>terraces built '+day(c[5])+', buildings built '+day(c[6])+(c[7]?'<br>commune '+c[7]:'');
+  const layers={
+    'Availability (buildings ≥ '+FLOOR+')':{legend:[['#1f9d55','available'],['#7f8c90','covered, not available']],style:c=>({fillColor:c[3]>=FLOOR?'#1f9d55':'#7f8c90',fillOpacity:c[3]>=FLOOR?.5:.35})},
+    'Which test (terraces known)':{legend:[['#1f9d55','terrace test'],['#e0a030','sun-side test'],['#7f8c90','not available']],style:c=>({fillColor:c[3]<FLOOR?'#7f8c90':known(c)?'#1f9d55':'#e0a030',fillOpacity:.5})},
+    'Terraces on record':{legend:[['#e0e7e8','0'],['#a8d5b5','1–4'],['#5fbf85','5–19'],['#1f9d55','20–49'],['#0f6b38','50+']],style:c=>({fillColor:bucket(c[2],[1,5,20,50]),fillOpacity:.6})},
+    'Buildings':{legend:[['#e0e7e8','0'],['#a8d5b5','1–19'],['#5fbf85','20–99'],['#1f9d55','100–299'],['#0f6b38','300+']],style:c=>({fillColor:bucket(c[3],[1,20,100,300]),fillOpacity:.6})},
+    'Measured heights (share)':{legend:[['#e0e7e8','none'],['#a8d5b5','< 25 %'],['#5fbf85','25–75 %'],['#1f9d55','75–99 %'],['#0f6b38','all']],style:c=>({fillColor:c[3]?bucket(c[4]/c[3],[0.0001,0.25,0.75,0.999]):ramp[0],fillOpacity:.6})},
+  };
+  const groups={}, built={};
+  const build=name=>{if(built[name])return;built[name]=true;const g=groups[name];
+    for(const c of d.cells) rect(c[0],c[1],500,layers[name].style(c)).bindPopup(()=>popup(c)).addTo(g);};
+  for(const name in layers) groups[name]=L.layerGroup();
+  const venueGroup=L.layerGroup();
+  for(const w of d.venueCells) rect(w[0],w[1],50,{fillColor:bucket(w[2],[1,20,100,400]),fillOpacity:.35,color:'#368B9C',weight:.5,stroke:true})
+    .bindPopup('<b>Venue tile '+w[0]+','+w[1]+'</b><br>bars, cafés and restaurants: '+w[2]+'<br>with outdoor seating in OpenStreetMap: '+w[3]+'<br>built '+day(w[4])).addTo(venueGroup);
+  const first=Object.keys(layers)[0]; build(first); groups[first].addTo(map);
+  const showLegend=name=>{legend.innerHTML=(layers[name]?layers[name].legend:[['#368B9C','venue tiles (2 km): shade by count']]).map(([col,txt])=>'<p><span class="sw" style="background:'+col+'"></span>'+txt+'</p>').join('');};
+  showLegend(first);
+  L.control.layers(groups,{'Venue tiles (2 km)':venueGroup},{collapsed:false,position:'topright'}).addTo(map);
+  map.on('baselayerchange',e=>{build(e.name);showLegend(e.name);});
   const areas=(d.areas||[]).slice().sort((x,y)=>(y.km2||0)-(x.km2||0));
-  for(const a of areas){
-    const [s,w,n,e]=a.box;
+  for(const a of areas){const [s,w,n,e]=a.box;
     L.circleMarker([(s+n)/2,(w+e)/2],{radius:Math.max(4,Math.sqrt(a.km2||0)*2.2),color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.45})
-      .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'})
-      .on('click',()=>map.fitBounds([[s,w],[n,e]]));
+      .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));
     const tr=document.createElement('tr');tr.className='c';
-    tr.innerHTML='<td>'+a.city+(a.name&&a.name!==a.city?'<br><small>'+a.name+'</small>':'')+'</td><td>'+(a.lastBuilt||'')+'</td>';
+    tr.innerHTML='<td>'+a.city+(a.name&&a.name!==a.city?'<br><small>'+a.name+'</small>':'')+'</td><td>'+(a.km2!=null?Number(a.km2).toFixed(1):'')+'</td><td>'+
+      (a.passing||0).toLocaleString()+'/'+(a.tiled||0).toLocaleString()+'</td><td>'+(a.terracesKnown||0).toLocaleString()+'</td><td>'+(a.lastBuilt||'')+'</td>';
     tr.onclick=()=>map.fitBounds([[s,w],[n,e]]);list.appendChild(tr);}
-  status.textContent='Updated '+(d.updated||'')+'.';
-}).catch(err=>{status.textContent='The coverage feed did not answer ('+err.message+'); try again later.';});
+  status.textContent='Feed updated '+(d.updated||'')+': '+d.cells.length.toLocaleString()+' blocks, '+d.venueCells.length+' venue tiles, '+areas.length+' areas. "Terraces known" is recomputed here with the current rule; the published column may lag.';
+}).catch(err=>{status.textContent='The feed did not answer ('+err.message+'); try again later.';});
 </script></body></html>

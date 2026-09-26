@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <p><span class="sw" style="background:var(--pass)"></span>sunny-terrace filter available<br>
 <span class="sw" style="background:var(--gate)"></span>covered, filter not available yet</p>
 <p>Tap an area to fly to it. Zoom in to see the 200 m blocks.</p>
-<table><thead><tr><th>Area</th><th>km²</th><th>Blocks</th><th>Built</th></tr></thead><tbody id="list"></tbody></table>
+<table><thead><tr><th>Area</th><th>Built</th></tr></thead><tbody id="list"></tbody></table>
 </aside>
 <script>
 const FEEDS=['https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json','https://pub-c7dde6811086418585889c3e30cf9880.r2.dev/coverage.json','coverage.json'];
@@ -40,7 +40,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,
   attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 const edge=k=>[k/500,(k+(k<0?-1:1))/500];
 const status=document.getElementById('status'), list=document.getElementById('list');
-// The feed from the tile repository (GitHub's raw host, CORS-friendly), then the store, then the snapshot published with this page.
+// The feed from the tile repository first (the store's host refuses browser preflights), then the store, then the snapshot published with this page.
 const get=u=>fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
 get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   const pass=v('--pass'), gate=v('--gate'), cells=L.layerGroup().addTo(map);
@@ -54,9 +54,8 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
       .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'})
       .on('click',()=>map.fitBounds([[s,w],[n,e]]));
     const tr=document.createElement('tr');tr.className='c';
-    const cellsTxt=(a.passing||0).toLocaleString()+'/'+(a.tiled||0).toLocaleString();
-    tr.innerHTML='<td>'+a.city+(a.name&&a.name!==a.city?'<br><small>'+a.name+'</small>':'')+'</td><td>'+(a.km2!=null?Number(a.km2).toFixed(1):'')+'</td><td>'+cellsTxt+'</td><td>'+(a.lastBuilt||'')+'</td>';
+    tr.innerHTML='<td>'+a.city+(a.name&&a.name!==a.city?'<br><small>'+a.name+'</small>':'')+'</td><td>'+(a.lastBuilt||'')+'</td>';
     tr.onclick=()=>map.fitBounds([[s,w],[n,e]]);list.appendChild(tr);}
-  status.textContent='Updated '+(d.updated||'')+'. '+d.cells.length.toLocaleString()+' blocks in '+areas.length+' areas.';
+  status.textContent='Updated '+(d.updated||'')+'.';
 }).catch(err=>{status.textContent='The coverage feed did not answer ('+err.message+'); try again later.';});
 </script></body></html>

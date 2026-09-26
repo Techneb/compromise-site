@@ -1,6 +1,6 @@
 # Compromise — Privacy policy
 
-*Last updated: 26 September 2026.*
+*Last updated: 27 September 2026.*
 
 Compromise does not collect your data. There is no account, no
 analytics, no advertising and no third-party SDK. Nothing you enter is
@@ -16,8 +16,8 @@ for tracking.
   rounded map cells near where your group will meet, to read pre-cut
   open map data — more places, and what is needed to tell a sunny
   terrace. Never anyone's address or starting point.
-- **To the app or service you choose** (the share sheet, Google Maps,
-  Citymapper, Waze): the name and position of a meeting place, only when
+- **To the app or service you choose** (the share sheet, Apple Maps,
+  Google Maps, Citymapper, Waze): the name and position of a meeting place, only when
   you share or open it.
 
 ## What stays on your device

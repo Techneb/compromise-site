@@ -1,6 +1,6 @@
 # Compromise — Privacy policy
 
-*Last updated: 25 September 2026.*
+*Last updated: 26 September 2026.*
 
 Compromise does not collect your data. There is no account, no
 analytics, no advertising and no third-party SDK. Nothing you enter is
@@ -12,10 +12,10 @@ for tracking.
 - **To Apple:** your location (with your permission) and the starting
   points of your group, to find places and compute travel times, as any
   use of Apple Maps does.
-- **To public map and open-data services** (OpenStreetMap, city and
-  national open-data portals, and a public data store on GitHub): map
-  areas near where your group will meet, to find more places and
-  information about them. Never anyone's address or starting point.
+- **To a public data store** (a static file host; GitHub today): the
+  rounded map cells near where your group will meet, to read pre-cut
+  open map data — more places, and what is needed to tell a sunny
+  terrace. Never anyone's address or starting point.
 - **To the app or service you choose** (the share sheet, Google Maps,
   Citymapper, Waze): the name and position of a meeting place, only when
   you share or open it.
@@ -40,4 +40,4 @@ credited with its licence in the app under Settings › Data sources.
 
 ## Contact
 
-*Contact address to be set by the developer before publication.*
+alephb.dev@gmail.com

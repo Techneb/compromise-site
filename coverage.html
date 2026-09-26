@@ -13,25 +13,31 @@ layout: null
 *{box-sizing:border-box}html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,system-ui,sans-serif;display:flex}
 #map{flex:1;height:100%;min-width:0}
-aside{width:480px;height:100%;overflow:auto;border-left:1px solid var(--line);padding:16px;background:var(--panel)}
-h1{font-size:18px;margin:0 0 6px}p{margin:0 0 10px;color:var(--muted)}
+aside{width:500px;height:100%;overflow:auto;border-left:1px solid var(--line);padding:16px;background:var(--panel)}
+h1{font-size:18px;margin:0 0 4px}h2{font-size:15px;margin:14px 0 4px}p{margin:0 0 8px;color:var(--muted)}
 .sw{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:-1px;border-radius:2px}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
-th,td{text-align:left;padding:5px 4px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;cursor:pointer;user-select:none;white-space:nowrap}th.on{color:var(--accent)}th.on::after{content:' ▾'}th.on.asc::after{content:' ▴'}
+#legend p{margin:0 0 3px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;margin-top:8px}
+th,td{text-align:left;padding:5px 4px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;white-space:nowrap}
 td:not(:first-child),th:not(:first-child){text-align:right;white-space:nowrap}
+th .s{cursor:pointer;user-select:none}th.on .s{color:var(--accent)}th.on .s::after{content:' ▾'}th.on.asc .s::after{content:' ▴'}
+th select{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 2px;max-width:150px}
 tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}
-small{color:var(--muted)}#legend p{margin:0 0 4px}
-.leaflet-popup-content{font:13px/1.4 -apple-system,system-ui,sans-serif}
-@media (max-width:900px){body{flex-direction:column}#map{flex:none;height:58vh}aside{width:100%;height:auto;border:0;border-top:1px solid var(--line)}}
+small{color:var(--muted)}
+.leaflet-popup-content{font:13px/1.4 -apple-system,system-ui,sans-serif;margin:10px 12px}
+.leaflet-popup-content h3{font-size:14px;margin:0 0 2px}.leaflet-popup-content h4{font-size:12px;margin:8px 0 2px;color:#5b6b6f;text-transform:uppercase;letter-spacing:.03em}
+.leaflet-popup-content dl{margin:0;display:grid;grid-template-columns:auto auto;gap:1px 10px}.leaflet-popup-content dt{color:#5b6b6f}.leaflet-popup-content dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:900px){body{flex-direction:column}#map{flex:none;height:55vh}aside{width:100%;height:auto;border:0;border-top:1px solid var(--line)}}
 </style></head><body>
 <div id="map"></div>
 <aside>
 <h1>Compromise coverage</h1>
 <p id="status">Loading the feed…</p>
+<h2 id="layerName"></h2>
+<p id="layerAbout"></p>
 <div id="legend"></div>
-<p>Pick a layer top-right. Tap a square for its numbers, an area in the list to fly to it.</p>
-<p><small>A block is one 200 m square of the grid the app reads. "Sunny filter" counts the blocks where it works over the blocks that hold data; km² is the area where it works.</small></p>
-<table><thead><tr><th data-k="city">Area</th><th data-k="km2" class="on">km²</th><th data-k="passing">Sunny filter<br><small>works / has data</small></th><th data-k="terracesKnown">Terrace records<br><small>blocks</small></th><th data-k="lastBuilt">Updated</th></tr></thead><tbody id="list"></tbody></table>
+<p><small>A block is one 200 m square of the grid the app reads; places are counted per 2 km tile. Tap a square for its numbers, an area in the list to fly to it. Pick the two metric columns below; click a header to sort.</small></p>
+<table><thead><tr><th><span class="s" data-k="city">Area</span></th><th><span class="s" data-k="km2">km²</span></th><th id="h1"></th><th id="h2"></th></tr></thead><tbody id="list"></tbody></table>
 </aside>
 <script>
 // The store first (its bucket answers browsers since 2026-09-27), then the tile repository's copy, then the snapshot published beside this page.
@@ -43,60 +49,101 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,
   attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 const edge=(k,scale)=>{const a=k/scale,b=(k+(k<0?-1:1))/scale;return [Math.min(a,b),Math.max(a,b)];};
 const rect=(ky,kx,scale,style)=>{const la=edge(ky,scale),lo=edge(kx,scale);return L.rectangle([[la[0],lo[0]],[la[1],lo[1]]],Object.assign({stroke:false},style));};
-const status=document.getElementById('status'), list=document.getElementById('list'), legend=document.getElementById('legend');
+const $=id=>document.getElementById(id);
 const get=u=>fetch(u+(u.startsWith('http')?'?v='+Date.now():''),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
-const ramp=['#e0e7e8','#a8d5b5','#5fbf85','#1f9d55','#0f6b38'];   // none, few, some, many, dense
-const bucket=(x,steps)=>{let i=0;while(i<steps.length&&x>=steps[i])i++;return ramp[Math.min(i,ramp.length-1)];};
+// One colour family per layer category: places blue, sunny filter green (amber for the street-side test), freshness purple.
+const BLUE=['#e3edf0','#a9cfe0','#5fa9c9','#2b7fa6','#0f5273'], GREEN=['#e0e7e8','#a8d5b5','#5fbf85','#1f9d55','#0f6b38'], PURPLE=['#e6e3ee','#c3b7e0','#9a86cc','#6f57b3','#4a3591'];
+const bucket=(x,steps,ramp)=>{let i=0;while(i<steps.length&&x>=steps[i])i++;return ramp[Math.min(i,ramp.length-1)];};
+const fmt=n=>n==null?'':Number(n).toLocaleString();
 get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   const dates=d.dates||[], day=i=>(i>=0&&dates[i])||'';
   const venues=new Map(); for(const w of d.venueCells) venues.set(w[0]+','+w[1],w);
   const near=(ky,kx)=>{let sum=0,any=false;for(const i of[-1,0,1])for(const j of[-1,0,1]){const w=venues.get(Math.trunc((ky+i)/10)+','+Math.trunc((kx+j)/10));if(w){any=true;sum+=w[2]/100;}}return any?sum:null;};
   const known=c=>{const n=near(c[0],c[1]);return n===null?c[2]>=FLOOR:(c[2]>=MINIMUM&&c[2]>=RATIO*n);};
-  const popup=c=>'<b>Block '+c[0]+','+c[1]+'</b><br>terraces on record: '+c[2]+'<br>buildings: '+c[3]+' ('+c[4]+' with a measured height)'+
-    '<br>venues within ~600 m: '+(near(c[0],c[1])===null?'no venue tile':Math.round(near(c[0],c[1])))+'<br>what the filter judges here: '+(known(c)?'the terrace itself':'the sunny side of the street')+
-    '<br>sunny filter: '+(c[3]>=FLOOR?'works here':'not available, too few buildings')+'<br>terraces built '+day(c[5])+', buildings built '+day(c[6])+(c[7]?'<br>commune '+c[7]:'');
-  // Layers in reading order: the places the app knows, then the sunny filter, then freshness.
-  // `grid` is 'block' (200 m squares) or 'tile' (the 2 km venue tiles).
-  const pct=x=>Math.round(x*100)+' %';
+  const works=c=>c[3]>=FLOOR;
+  const freshest=c=>[c[5],c[6]].map(day).filter(Boolean).sort().pop()||'';
+  const ageDays=dt=>dt?(Date.now()-Date.parse(dt))/864e5:1e9;
+
+  // ---- layers, in reading order
   const layers={
-    'Places: bars, cafés, restaurants (2 km tiles)':{grid:'tile',legend:[['#e0e7e8','none'],['#a8d5b5','1–19'],['#5fbf85','20–99'],['#1f9d55','100–399'],['#0f6b38','400+']],style:w=>({fillColor:bucket(w[2],[1,20,100,400]),fillOpacity:.45})},
-    'Places with outdoor seating (2 km tiles)':{grid:'tile',legend:[['#e0e7e8','none'],['#a8d5b5','1–4'],['#5fbf85','5–19'],['#1f9d55','20–99'],['#0f6b38','100+']],style:w=>({fillColor:bucket(w[3],[1,5,20,100]),fillOpacity:.45})},
-    'Sunny filter: where it works':{grid:'block',legend:[['#1f9d55','works (enough buildings to cast shadows)'],['#7f8c90','has data, too few buildings']],style:c=>({fillColor:c[3]>=FLOOR?'#1f9d55':'#7f8c90',fillOpacity:c[3]>=FLOOR?.5:.35})},
-    'Sunny filter: what it judges':{grid:'block',legend:[['#1f9d55','the terrace itself (records are complete enough)'],['#e0a030','the sunny side of the street (few terrace records)'],['#7f8c90','filter not available']],style:c=>({fillColor:c[3]<FLOOR?'#7f8c90':known(c)?'#1f9d55':'#e0a030',fillOpacity:.5})},
-    'Terrace records per block':{grid:'block',legend:[['#e0e7e8','0'],['#a8d5b5','1–4'],['#5fbf85','5–19'],['#1f9d55','20–49'],['#0f6b38','50+']],style:c=>({fillColor:bucket(c[2],[1,5,20,50]),fillOpacity:.6})},
-    'Buildings per block':{grid:'block',legend:[['#e0e7e8','0'],['#a8d5b5','1–19'],['#5fbf85','20–99'],['#1f9d55','100–299'],['#0f6b38','300+']],style:c=>({fillColor:bucket(c[3],[1,20,100,300]),fillOpacity:.6})},
-    'Building heights: measured or estimated':{grid:'block',legend:[['#e0e7e8','no buildings'],['#a8d5b5','under 25 % measured'],['#5fbf85','25–75 % measured'],['#1f9d55','75–99 % measured'],['#0f6b38','all measured']],style:c=>({fillColor:c[3]?bucket(c[4]/c[3],[0.0001,0.25,0.75,0.999]):ramp[0],fillOpacity:.6})},
-    'Data freshness':{grid:'block',legend:[['#0f6b38','built in the last 7 days'],['#5fbf85','last 30 days'],['#a8d5b5','last 90 days'],['#e0e7e8','older or unknown']],style:c=>{const d=[c[5],c[6]].map(day).filter(Boolean).sort().pop();const age=d?(Date.now()-Date.parse(d))/864e5:1e9;return {fillColor:age<=7?'#0f6b38':age<=30?'#5fbf85':age<=90?'#a8d5b5':'#e0e7e8',fillOpacity:.55};}},
+    'Places on record (OpenStreetMap)':{grid:'tile',about:'Bars, cafés and restaurants OpenStreetMap lists in each 2 km tile: the extra places the app adds to Apple\'s. Apple\'s own places are never stored, so they cannot be counted here.',
+      legend:[[BLUE[0],'none'],[BLUE[1],'1–19'],[BLUE[2],'20–99'],[BLUE[3],'100–399'],[BLUE[4],'400 or more']],style:w=>({fillColor:bucket(w[2],[1,20,100,400],BLUE),fillOpacity:.5})},
+    'Places with outdoor seating':{grid:'tile',about:'Of those places, the ones OpenStreetMap tags as having tables outside, per 2 km tile.',
+      legend:[[BLUE[0],'none'],[BLUE[1],'1–4'],[BLUE[2],'5–19'],[BLUE[3],'20–99'],[BLUE[4],'100 or more']],style:w=>({fillColor:bucket(w[3],[1,5,20,100],BLUE),fillOpacity:.5})},
+    'Sunny filter: where it works':{grid:'block',about:'The filter is offered where a block holds enough buildings to cast reliable shadows. Grey blocks have data but too few buildings: parks, water, open land.',
+      legend:[[GREEN[3],'works'],['#7f8c90','has data, too few buildings']],style:c=>({fillColor:works(c)?GREEN[3]:'#7f8c90',fillOpacity:works(c)?.5:.35})},
+    'Sunny filter: what it judges':{grid:'block',about:'Where terrace records are complete enough, the filter judges the terrace itself. Where they are thin, it judges the sunny side of the street at the venue\'s front instead.',
+      legend:[[GREEN[3],'the terrace itself'],['#e0a030','the sunny side of the street'],['#7f8c90','filter not available']],style:c=>({fillColor:!works(c)?'#7f8c90':known(c)?GREEN[3]:'#e0a030',fillOpacity:.5})},
+    'Terrace records per block':{grid:'block',about:'Terraces on record in each block, from city permits where a city publishes them and from OpenStreetMap everywhere.',
+      legend:[[GREEN[0],'0'],[GREEN[1],'1–4'],[GREEN[2],'5–19'],[GREEN[3],'20–49'],[GREEN[4],'50 or more']],style:c=>({fillColor:bucket(c[2],[1,5,20,50],GREEN),fillOpacity:.6})},
+    'Buildings per block':{grid:'block',about:'Building footprints on record in each block; they cast the shadows the filter computes.',
+      legend:[[GREEN[0],'0'],[GREEN[1],'1–19'],[GREEN[2],'20–99'],[GREEN[3],'100–299'],[GREEN[4],'300 or more']],style:c=>({fillColor:bucket(c[3],[1,20,100,300],GREEN),fillOpacity:.6})},
+    'Building heights: measured or estimated':{grid:'block',about:'The share of footprints with a real measured height. Pale blocks rely on floor counts or a default height, so their shadows are estimates.',
+      legend:[[GREEN[0],'no buildings'],[GREEN[1],'under 25 % measured'],[GREEN[2],'25–75 %'],[GREEN[3],'75–99 %'],[GREEN[4],'all measured']],style:c=>({fillColor:c[3]?bucket(c[4]/c[3],[0.0001,0.25,0.75,0.999],GREEN):GREEN[0],fillOpacity:.6})},
+    'Data freshness':{grid:'block',about:'When each block\'s data was last built. Venues and terraces are rebuilt weekly, buildings yearly.',
+      legend:[[PURPLE[4],'last 7 days'],[PURPLE[3],'last 30 days'],[PURPLE[2],'last 90 days'],[PURPLE[0],'older or unknown']],style:c=>{const a=ageDays(freshest(c));return {fillColor:a<=7?PURPLE[4]:a<=30?PURPLE[3]:a<=90?PURPLE[2]:PURPLE[0],fillOpacity:.55};}},
   };
-  const tilePopup=w=>'<b>Venue tile '+w[0]+','+w[1]+' (2 km)</b><br>bars, cafés and restaurants: '+w[2]+'<br>of which with outdoor seating: '+w[3]+'<br>built '+day(w[4]);
+
+  // ---- popups: a name looked up on click, then the numbers by theme
+  const named=new Map();
+  const nameOf=async(lat,lon)=>{const k=lat.toFixed(3)+','+lon.toFixed(3);if(named.has(k))return named.get(k);
+    try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat='+lat+'&lon='+lon,{headers:{'Accept-Language':'en'}});const j=await r.json();const a=j.address||{};
+      const n=[a.neighbourhood||a.quarter||a.suburb||a.road||a.hamlet,a.city||a.town||a.village||a.municipality].filter(Boolean).join(', ')||j.name||'';named.set(k,n);return n;}catch(e){return '';}};
+  const dl=rows=>'<dl>'+rows.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('')+'</dl>';
+  const blockPopup=c=>{const n=near(c[0],c[1]);const pct=c[3]?Math.round(100*c[4]/c[3])+' %':'–';
+    return '<h3 class="nm">Block '+c[0]+','+c[1]+'</h3><small class="sub">200 m square</small>'
+      +'<h4>Places nearby</h4>'+dl([['bars, cafés, restaurants within ~600 m (OpenStreetMap)',n===null?'no venue tile':Math.round(n)]])
+      +'<h4>Sunny filter</h4>'+dl([['works here',works(c)?'yes':'no, too few buildings'],['judges',works(c)?(known(c)?'the terrace itself':'the sunny side of the street'):'–'],['terrace records',c[2]],['buildings',c[3]],['heights measured',pct]])
+      +'<h4>Data</h4>'+dl([['terraces built',day(c[5])||'–'],['buildings built',day(c[6])||'–']].concat(c[7]?[['commune (INSEE)',c[7]]]:[]));};
+  const tilePopup=w=>'<h3 class="nm">Venue tile '+w[0]+','+w[1]+'</h3><small class="sub">2 km square</small><h4>Places on record (OpenStreetMap)</h4>'+dl([['bars, cafés, restaurants',w[2]],['with outdoor seating',w[3]]])+'<h4>Data</h4>'+dl([['built',day(w[4])||'–']]);
+  const withName=(layer,lat,lon)=>layer.on('popupopen',async e=>{const el=e.popup.getElement();const n=await nameOf(lat,lon);if(n&&el){const h=el.querySelector('.nm'),s=el.querySelector('.sub');if(h){s.textContent=h.textContent+' · '+s.textContent;h.textContent=n;}}});
+
   const groups={}, built={};
   const build=name=>{if(built[name])return;built[name]=true;const g=groups[name], L_=layers[name];
-    if(L_.grid==='tile'){for(const w of d.venueCells) rect(w[0],w[1],50,Object.assign({color:'#368B9C',weight:.5,stroke:true},L_.style(w))).bindPopup(tilePopup(w)).addTo(g);}
-    else {for(const c of d.cells) rect(c[0],c[1],500,L_.style(c)).bindPopup(()=>popup(c)).addTo(g);}};
+    if(L_.grid==='tile'){for(const w of d.venueCells){const la=edge(w[0],50),lo=edge(w[1],50);withName(rect(w[0],w[1],50,Object.assign({color:BLUE[3],weight:.5,stroke:true},L_.style(w))).bindPopup(tilePopup(w)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}}
+    else {for(const c of d.cells){const la=edge(c[0],500),lo=edge(c[1],500);withName(rect(c[0],c[1],500,L_.style(c)).bindPopup(()=>blockPopup(c)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}}};
   for(const name in layers) groups[name]=L.layerGroup();
-  const first='Sunny filter: where it works'; build(first); groups[first].addTo(map);
-  const showLegend=name=>{legend.innerHTML=layers[name].legend.map(([col,txt])=>'<p><span class="sw" style="background:'+col+'"></span>'+txt+'</p>').join('');};
-  showLegend(first);
+  const show=name=>{build(name);$('layerName').textContent=name;$('layerAbout').textContent=layers[name].about;
+    $('legend').innerHTML=layers[name].legend.map(([col,txt])=>'<p><span class="sw" style="background:'+col+'"></span>'+txt+'</p>').join('');};
+  const first='Sunny filter: where it works'; groups[first].addTo(map); show(first);
   L.control.layers(groups,{},{collapsed:false,position:'topright'}).addTo(map);
-  map.on('baselayerchange',e=>{build(e.name);showLegend(e.name);});
+  map.on('baselayerchange',e=>show(e.name));
+
+  // ---- the area list: places are estimated from the 2 km tiles overlapping the area, in proportion to the overlap
   const areas=(d.areas||[]).slice();
-  for(const a of areas){const [s,w,n,e]=a.box;
+  for(const a of areas){const [s,w,n,e]=a.box;let places=0,seats=0;
+    for(const t of d.venueCells){const la=edge(t[0],50),lo=edge(t[1],50);const ov=Math.max(0,Math.min(n,la[1])-Math.max(s,la[0]))*Math.max(0,Math.min(e,lo[1])-Math.max(w,lo[0]));
+      if(ov>0){const f=ov/((la[1]-la[0])*(lo[1]-lo[0]));places+=t[2]*f;seats+=t[3]*f;}}
+    a.places=Math.round(places);a.seats=Math.round(seats);a.worksShare=a.tiled?a.passing/a.tiled:0;a.recordsShare=a.passing?a.terracesKnown/a.passing:0;
     L.circleMarker([(s+n)/2,(w+e)/2],{radius:Math.max(4,Math.sqrt(a.km2||0)*2.2),color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.45})
       .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));}
-  // The area list, sortable by any column: click a header, click again to reverse.
+  const metrics={
+    passing:{label:'Sunny filter works / has data',cell:a=>fmt(a.passing)+' / '+fmt(a.tiled)},
+    worksShare:{label:'Sunny filter works (share)',cell:a=>Math.round(100*a.worksShare)+' %'},
+    terracesKnown:{label:'Blocks with terrace records',cell:a=>fmt(a.terracesKnown)},
+    recordsShare:{label:'Terrace records (share of working blocks)',cell:a=>Math.round(100*a.recordsShare)+' %'},
+    places:{label:'Places on record (OSM, ≈)',cell:a=>'≈ '+fmt(a.places)},
+    seats:{label:'Places with outdoor seating (≈)',cell:a=>'≈ '+fmt(a.seats)},
+    tiled:{label:'Blocks with data',cell:a=>fmt(a.tiled)},
+    lastBuilt:{label:'Last built',cell:a=>a.lastBuilt||''},
+  };
+  const picks=['passing','places'];
   let sortKey='km2', asc=false;
+  const header=(i,th)=>{const sel=document.createElement('select');for(const k in metrics){const o=document.createElement('option');o.value=k;o.textContent=metrics[k].label;if(k===picks[i])o.selected=true;sel.appendChild(o);}
+    sel.onchange=()=>{picks[i]=sel.value;if(sortKey===th.dataset.k)sortKey=sel.value;th.dataset.k=sel.value;render();};
+    const s=document.createElement('span');s.className='s';s.textContent='↕';s.title='sort';s.onclick=()=>{if(sortKey===th.dataset.k)asc=!asc;else{sortKey=th.dataset.k;asc=false;}render();};
+    th.dataset.k=picks[i];th.innerHTML='';th.appendChild(sel);th.appendChild(document.createTextNode(' '));th.appendChild(s);};
+  header(0,$('h1'));header(1,$('h2'));
   const render=()=>{
     const val=a=>sortKey==='city'?(a.city+' '+a.name).toLowerCase():sortKey==='lastBuilt'?(a.lastBuilt||''):(a[sortKey]||0);
     areas.sort((x,y)=>{const p=val(x),q=val(y);return (p<q?-1:p>q?1:0)*(asc?1:-1);});
-    document.querySelectorAll('th[data-k]').forEach(th=>{th.classList.toggle('on',th.dataset.k===sortKey);th.classList.toggle('asc',th.dataset.k===sortKey&&asc);});
-    list.innerHTML='';
-    for(const a of areas){const [s,w,n,e]=a.box;
-      const tr=document.createElement('tr');tr.className='c';
-      tr.innerHTML='<td>'+a.city+(a.name&&a.name!==a.city?'<br><small>'+a.name+'</small>':'')+'</td><td>'+(a.km2!=null?Number(a.km2).toFixed(1):'')+'</td><td>'+
-        (a.passing||0).toLocaleString()+'/'+(a.tiled||0).toLocaleString()+'</td><td>'+(a.terracesKnown||0).toLocaleString()+'</td><td>'+(a.lastBuilt||'')+'</td>';
+    document.querySelectorAll('th').forEach(th=>{const k=th.dataset.k||th.querySelector('.s')?.dataset.k;th.classList.toggle('on',k===sortKey);th.classList.toggle('asc',k===sortKey&&asc);});
+    const list=$('list');list.innerHTML='';
+    for(const a of areas){const [s,w,n,e]=a.box;const tr=document.createElement('tr');tr.className='c';
+      tr.innerHTML='<td>'+a.city+(a.name&&a.name!==a.city?'<br><small>'+a.name+'</small>':'')+'</td><td>'+(a.km2!=null?Number(a.km2).toFixed(1):'')+'</td><td>'+metrics[picks[0]].cell(a)+'</td><td>'+metrics[picks[1]].cell(a)+'</td>';
       tr.onclick=()=>map.fitBounds([[s,w],[n,e]]);list.appendChild(tr);}};
-  document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{if(sortKey===th.dataset.k)asc=!asc;else{sortKey=th.dataset.k;asc=sortKey==='city';}render();});
+  document.querySelectorAll('th .s[data-k]').forEach(s=>s.onclick=()=>{const k=s.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=k==='city';}render();});
   render();
-  status.textContent='Feed updated '+(d.updated||'')+': '+d.cells.length.toLocaleString()+' blocks, '+d.venueCells.length+' venue tiles, '+areas.length+' areas. "Terraces known" is recomputed here with the current rule; the published column may lag.';
-}).catch(err=>{status.textContent='The feed did not answer ('+err.message+'); try again later.';});
+  $('status').textContent='Feed updated '+(d.updated||'')+': '+fmt(d.cells.length)+' blocks, '+fmt(d.venueCells.length)+' venue tiles, '+areas.length+' areas.';
+}).catch(err=>{$('status').textContent='The feed did not answer ('+err.message+'); try again later.';});
 </script></body></html>

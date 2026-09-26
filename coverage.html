@@ -33,15 +33,16 @@ small{color:var(--muted)}
 <table><thead><tr><th>Area</th><th>km²</th><th>Blocks</th><th>Built</th></tr></thead><tbody id="list"></tbody></table>
 </aside>
 <script>
-const FEED='https://pub-c7dde6811086418585889c3e30cf9880.r2.dev/coverage.json';
+const FEEDS=['https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json','https://pub-c7dde6811086418585889c3e30cf9880.r2.dev/coverage.json','coverage.json'];
 const css=getComputedStyle(document.documentElement), v=n=>css.getPropertyValue(n).trim();
 const map=L.map('map',{preferCanvas:true,worldCopyJump:true}).setView([48.86,2.35],5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,
   attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 const edge=k=>[k/500,(k+(k<0?-1:1))/500];
 const status=document.getElementById('status'), list=document.getElementById('list');
-// The live feed on the store first; the copy published with this page (a snapshot) when the store has none yet.
-fetch(FEED,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();}).catch(()=>fetch('coverage.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})).then(d=>{
+// The feed from the tile repository (GitHub's raw host, CORS-friendly), then the store, then the snapshot published with this page.
+const get=u=>fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
+get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   const pass=v('--pass'), gate=v('--gate'), cells=L.layerGroup().addTo(map);
   for(const c of d.cells){const a=edge(c[0]),b=edge(c[1]),ok=c[3]>=20;
     L.rectangle([[Math.min(a[0],a[1]),Math.min(b[0],b[1])],[Math.max(a[0],a[1]),Math.max(b[0],b[1])]],

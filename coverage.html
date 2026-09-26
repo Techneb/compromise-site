@@ -13,16 +13,16 @@ layout: null
 *{box-sizing:border-box}html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,system-ui,sans-serif;display:flex}
 #map{flex:1;height:100%;min-width:0}
-aside{width:360px;height:100%;overflow:auto;border-left:1px solid var(--line);padding:16px;background:var(--panel)}
+aside{width:480px;height:100%;overflow:auto;border-left:1px solid var(--line);padding:16px;background:var(--panel)}
 h1{font-size:18px;margin:0 0 6px}p{margin:0 0 10px;color:var(--muted)}
 .sw{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:-1px;border-radius:2px}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
-th,td{text-align:left;padding:5px 4px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500}
+th,td{text-align:left;padding:5px 4px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;cursor:pointer;user-select:none;white-space:nowrap}th.on{color:var(--accent)}th.on::after{content:' ▾'}th.on.asc::after{content:' ▴'}
 td:not(:first-child),th:not(:first-child){text-align:right;white-space:nowrap}
 tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}
 small{color:var(--muted)}#legend p{margin:0 0 4px}
 .leaflet-popup-content{font:13px/1.4 -apple-system,system-ui,sans-serif}
-@media (max-width:700px){body{flex-direction:column}#map{flex:none;height:58vh}aside{width:100%;height:auto;border:0;border-top:1px solid var(--line)}}
+@media (max-width:900px){body{flex-direction:column}#map{flex:none;height:58vh}aside{width:100%;height:auto;border:0;border-top:1px solid var(--line)}}
 </style></head><body>
 <div id="map"></div>
 <aside>
@@ -30,7 +30,7 @@ small{color:var(--muted)}#legend p{margin:0 0 4px}
 <p id="status">Loading the feed…</p>
 <div id="legend"></div>
 <p>Pick a layer top-right. Tap a block for its numbers, an area to fly to it.</p>
-<table><thead><tr><th>Area</th><th>km²</th><th>Blocks</th><th>Terraces known</th><th>Built</th></tr></thead><tbody id="list"></tbody></table>
+<table><thead><tr><th data-k="city">Area</th><th data-k="km2" class="on">km²</th><th data-k="passing">Blocks</th><th data-k="terracesKnown">Terraces known</th><th data-k="lastBuilt">Built</th></tr></thead><tbody id="list"></tbody></table>
 </aside>
 <script>
 // The store first (its bucket answers browsers since 2026-09-27), then the tile repository's copy, then the snapshot published beside this page.
@@ -73,14 +73,24 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   showLegend(first);
   L.control.layers(groups,{'Venue tiles (2 km)':venueGroup},{collapsed:false,position:'topright'}).addTo(map);
   map.on('baselayerchange',e=>{build(e.name);showLegend(e.name);});
-  const areas=(d.areas||[]).slice().sort((x,y)=>(y.km2||0)-(x.km2||0));
+  const areas=(d.areas||[]).slice();
   for(const a of areas){const [s,w,n,e]=a.box;
     L.circleMarker([(s+n)/2,(w+e)/2],{radius:Math.max(4,Math.sqrt(a.km2||0)*2.2),color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.45})
-      .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));
-    const tr=document.createElement('tr');tr.className='c';
-    tr.innerHTML='<td>'+a.city+(a.name&&a.name!==a.city?'<br><small>'+a.name+'</small>':'')+'</td><td>'+(a.km2!=null?Number(a.km2).toFixed(1):'')+'</td><td>'+
-      (a.passing||0).toLocaleString()+'/'+(a.tiled||0).toLocaleString()+'</td><td>'+(a.terracesKnown||0).toLocaleString()+'</td><td>'+(a.lastBuilt||'')+'</td>';
-    tr.onclick=()=>map.fitBounds([[s,w],[n,e]]);list.appendChild(tr);}
+      .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));}
+  // The area list, sortable by any column: click a header, click again to reverse.
+  let sortKey='km2', asc=false;
+  const render=()=>{
+    const val=a=>sortKey==='city'?(a.city+' '+a.name).toLowerCase():sortKey==='lastBuilt'?(a.lastBuilt||''):(a[sortKey]||0);
+    areas.sort((x,y)=>{const p=val(x),q=val(y);return (p<q?-1:p>q?1:0)*(asc?1:-1);});
+    document.querySelectorAll('th[data-k]').forEach(th=>{th.classList.toggle('on',th.dataset.k===sortKey);th.classList.toggle('asc',th.dataset.k===sortKey&&asc);});
+    list.innerHTML='';
+    for(const a of areas){const [s,w,n,e]=a.box;
+      const tr=document.createElement('tr');tr.className='c';
+      tr.innerHTML='<td>'+a.city+(a.name&&a.name!==a.city?'<br><small>'+a.name+'</small>':'')+'</td><td>'+(a.km2!=null?Number(a.km2).toFixed(1):'')+'</td><td>'+
+        (a.passing||0).toLocaleString()+'/'+(a.tiled||0).toLocaleString()+'</td><td>'+(a.terracesKnown||0).toLocaleString()+'</td><td>'+(a.lastBuilt||'')+'</td>';
+      tr.onclick=()=>map.fitBounds([[s,w],[n,e]]);list.appendChild(tr);}};
+  document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{if(sortKey===th.dataset.k)asc=!asc;else{sortKey=th.dataset.k;asc=sortKey==='city';}render();});
+  render();
   status.textContent='Feed updated '+(d.updated||'')+': '+d.cells.length.toLocaleString()+' blocks, '+d.venueCells.length+' venue tiles, '+areas.length+' areas. "Terraces known" is recomputed here with the current rule; the published column may lag.';
 }).catch(err=>{status.textContent='The feed did not answer ('+err.message+'); try again later.';});
 </script></body></html>

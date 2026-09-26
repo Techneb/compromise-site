@@ -54,7 +54,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     '<br>venues within ~600 m: '+(near(c[0],c[1])===null?'no venue tile':Math.round(near(c[0],c[1])))+'<br>terraces known: '+(known(c)?'yes (terrace test)':'no (sun-side test)')+
     '<br>filter available: '+(c[3]>=FLOOR?'yes':'no, too few buildings')+'<br>terraces built '+day(c[5])+', buildings built '+day(c[6])+(c[7]?'<br>commune '+c[7]:'');
   const layers={
-    'Availability (buildings ≥ '+FLOOR+')':{legend:[['#1f9d55','available'],['#7f8c90','covered, not available']],style:c=>({fillColor:c[3]>=FLOOR?'#1f9d55':'#7f8c90',fillOpacity:c[3]>=FLOOR?.5:.35})},
+    'Availability (enough buildings)':{legend:[['#1f9d55','available'],['#7f8c90','covered, not available']],style:c=>({fillColor:c[3]>=FLOOR?'#1f9d55':'#7f8c90',fillOpacity:c[3]>=FLOOR?.5:.35})},
     'Which test (terraces known)':{legend:[['#1f9d55','terrace test'],['#e0a030','sun-side test'],['#7f8c90','not available']],style:c=>({fillColor:c[3]<FLOOR?'#7f8c90':known(c)?'#1f9d55':'#e0a030',fillOpacity:.5})},
     'Terraces on record':{legend:[['#e0e7e8','0'],['#a8d5b5','1–4'],['#5fbf85','5–19'],['#1f9d55','20–49'],['#0f6b38','50+']],style:c=>({fillColor:bucket(c[2],[1,5,20,50]),fillOpacity:.6})},
     'Buildings':{legend:[['#e0e7e8','0'],['#a8d5b5','1–19'],['#5fbf85','20–99'],['#1f9d55','100–299'],['#0f6b38','300+']],style:c=>({fillColor:bucket(c[3],[1,20,100,300]),fillOpacity:.6})},

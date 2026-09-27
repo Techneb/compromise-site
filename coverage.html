@@ -24,6 +24,7 @@ th .s{cursor:pointer;user-select:none}th.on .s{color:var(--accent)}th.on .s::aft
 th select{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 2px;max-width:200px}
 tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}
 small{color:var(--muted)}
+.leaflet-control-layers .grp{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#5b6b6f;margin:6px 0 2px}.leaflet-control-layers .grp:first-child{margin-top:0}
 .leaflet-popup-content{font:13px/1.4 -apple-system,system-ui,sans-serif;margin:10px 12px}
 .leaflet-popup-content h3{font-size:14px;margin:0 0 2px}.leaflet-popup-content h4{font-size:12px;margin:8px 0 2px;color:#5b6b6f;text-transform:uppercase;letter-spacing:.03em}
 .leaflet-popup-content dl{margin:0;display:grid;grid-template-columns:auto auto;gap:1px 10px}.leaflet-popup-content dt{color:#5b6b6f}.leaflet-popup-content dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
@@ -36,7 +37,7 @@ small{color:var(--muted)}
 <h2 id="layerName"></h2>
 <p id="layerAbout"></p>
 <div id="legend"></div>
-<p><small>A block is one 200 m square of the grid the app reads; places are counted per 2 km tile. Tap a square for its numbers, an area in the list to fly to it. Pick the two metric columns below; click a header to sort.</small></p>
+<p><small>A block is one 200 m square of the grid the app reads. Tap a square for its numbers, an area in the list to fly to it. Pick the two metric columns below; click a header to sort.</small></p>
 <table><thead><tr><th><span class="s" data-k="city">Area</span></th><th><span class="s" data-k="km2">km²</span></th><th id="h1"></th><th id="h2"></th></tr></thead><tbody id="list"></tbody></table>
 </aside>
 <script>
@@ -66,11 +67,13 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
 
   // ---- layers, in reading order
   const layers={
-    'Places':{grid:'tile',about:'Bars, cafés and restaurants on record in each 2 km tile (from OpenStreetMap): the extra places the app adds to Apple\'s. Apple\'s own places are never stored, so they cannot be counted here.',
-      legend:[[BLUE[0],'none'],[BLUE[1],'1–19'],[BLUE[2],'20–99'],[BLUE[3],'100–399'],[BLUE[4],'400 or more']],style:w=>({fillColor:bucket(w[2],[1,20,100,400],BLUE),fillOpacity:.5})},
-    'Places with outdoor seating':{grid:'tile',about:'Of those places, the ones OpenStreetMap tags as having tables outside, per 2 km tile.',
-      legend:[[BLUE[0],'none'],[BLUE[1],'1–4'],[BLUE[2],'5–19'],[BLUE[3],'20–99'],[BLUE[4],'100 or more']],style:w=>({fillColor:bucket(w[3],[1,5,20,100],BLUE),fillOpacity:.5})},
-    'Sunny filter: what it judges':{grid:'block',about:'Where terrace records are complete enough, the filter judges the terrace itself. Where they are thin, it judges the sunny side of the street at the venue\'s front instead.',
+    'Places':{grid:'places',about:'Bars, cafés and restaurants on record (from OpenStreetMap): the extra places the app adds to Apple\'s, per 200 m block where the feed has them, else per 2 km tile. Apple\'s own places are never stored, so they cannot be counted here.',
+      legend:[[BLUE[0],'none'],[BLUE[1],'1–2'],[BLUE[2],'3–9'],[BLUE[3],'10–29'],[BLUE[4],'30 or more']],legendTile:[[BLUE[0],'none'],[BLUE[1],'1–19'],[BLUE[2],'20–99'],[BLUE[3],'100–399'],[BLUE[4],'400 or more']],
+      style:c=>({fillColor:bucket(c[8],[1,3,10,30],BLUE),fillOpacity:.55}),styleTile:w=>({fillColor:bucket(w[2],[1,20,100,400],BLUE),fillOpacity:.5})},
+    'Places with outdoor seating (share)':{grid:'places',about:'Of the places on record, the share OpenStreetMap tags as having tables outside.',
+      legend:[[BLUE[0],'no places'],[BLUE[1],'under 10 %'],[BLUE[2],'10–25 %'],[BLUE[3],'25–50 %'],[BLUE[4],'over 50 %']],legendTile:null,
+      style:c=>({fillColor:c[8]?bucket(c[9]/c[8],[0.0001,0.10,0.25,0.50],BLUE):BLUE[0],fillOpacity:.55}),styleTile:w=>({fillColor:w[2]?bucket(w[3]/w[2],[0.0001,0.10,0.25,0.50],BLUE):BLUE[0],fillOpacity:.5})},
+    'Sunny filter':{grid:'block',about:'Where terrace records are complete enough, the filter judges the terrace itself. Where they are thin, it judges the sunny side of the street at the venue\'s front instead.',
       legend:[[GREEN[3],'the terrace itself'],['#e0a030','the sunny side of the street'],['#7f8c90','filter not available']],style:c=>({fillColor:!works(c)?'#7f8c90':known(c)?GREEN[3]:'#e0a030',fillOpacity:.5})},
     'Terrace records per block':{grid:'block',about:'Terraces on record in each block, from city permits where a city publishes them and from OpenStreetMap everywhere.',
       legend:[[GREEN[0],'0'],[GREEN[1],'1–4'],[GREEN[2],'5–19'],[GREEN[3],'20–49'],[GREEN[4],'50 or more']],style:c=>({fillColor:bucket(c[2],[1,5,20,50],GREEN),fillOpacity:.6})},
@@ -90,21 +93,27 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   const dl=rows=>'<dl>'+rows.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('')+'</dl>';
   const blockPopup=c=>{const n=near(c[0],c[1]);const pct=c[3]?Math.round(100*c[4]/c[3])+' %':'–';
     return '<h3 class="nm">Block '+c[0]+','+c[1]+'</h3><small class="sub">200 m square</small>'
-      +'<h4>Places nearby</h4>'+dl([['bars, cafés, restaurants within ~600 m (OpenStreetMap)',n===null?'no venue tile':Math.round(n)]])
+      +'<h4>Places</h4>'+dl((c.length>9?[['in this block',c[8]],['with outdoor seating',c[8]?c[9]+' ('+Math.round(100*c[9]/c[8])+' %)':'0']]:[]).concat([['within ~600 m (estimate)',n===null?'no venue tile':Math.round(n)]]))
       +'<h4>Sunny filter</h4>'+dl([['works here',works(c)?'yes':'no, too few buildings'],['judges',works(c)?(known(c)?'the terrace itself':'the sunny side of the street'):'–'],['terrace records',c[2]],['buildings',c[3]],['heights measured',pct]])
       +'<h4>Data</h4>'+dl([['terraces built',day(c[5])||'–'],['buildings built',day(c[6])||'–']].concat(c[7]?[['commune (INSEE)',c[7]]]:[]));};
   const tilePopup=w=>'<h3 class="nm">Venue tile '+w[0]+','+w[1]+'</h3><small class="sub">2 km square</small><h4>Places on record (OpenStreetMap)</h4>'+dl([['bars, cafés, restaurants',w[2]],['with outdoor seating',w[3]]])+'<h4>Data</h4>'+dl([['built',day(w[4])||'–']]);
   const withName=(layer,lat,lon)=>layer.on('popupopen',async e=>{const el=e.popup.getElement();const n=await nameOf(lat,lon);if(n&&el){const h=el.querySelector('.nm'),s=el.querySelector('.sub');if(h){s.textContent=h.textContent+' · '+s.textContent;h.textContent=n;}}});
 
   const groups={}, built={};
+  const perBlock=d.cells.some(c=>c.length>9);
   const build=name=>{if(built[name])return;built[name]=true;const g=groups[name], L_=layers[name];
-    if(L_.grid==='tile'){for(const w of d.venueCells){const la=edge(w[0],50),lo=edge(w[1],50);withName(rect(w[0],w[1],50,Object.assign({color:BLUE[3],weight:.5,stroke:true},L_.style(w))).bindPopup(tilePopup(w)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}}
+    if(L_.grid==='places'&&perBlock){for(const c of d.cells){const la=edge(c[0],500),lo=edge(c[1],500);withName(rect(c[0],c[1],500,L_.style(c)).bindPopup(()=>blockPopup(c)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}}
+    else if(L_.grid==='places'||L_.grid==='tile'){const st=L_.styleTile||L_.style;for(const w of d.venueCells){const la=edge(w[0],50),lo=edge(w[1],50);withName(rect(w[0],w[1],50,Object.assign({color:BLUE[3],weight:.5,stroke:true},st(w))).bindPopup(tilePopup(w)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}}
     else {for(const c of d.cells){const la=edge(c[0],500),lo=edge(c[1],500);withName(rect(c[0],c[1],500,L_.style(c)).bindPopup(()=>blockPopup(c)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}}};
   for(const name in layers) groups[name]=L.layerGroup();
-  const show=name=>{build(name);$('layerName').textContent=name;$('layerAbout').textContent=layers[name].about;
-    $('legend').innerHTML=layers[name].legend.map(([col,txt])=>'<p><span class="sw" style="background:'+col+'"></span>'+txt+'</p>').join('');};
-  const first='Sunny filter: what it judges'; groups[first].addTo(map); show(first);
-  L.control.layers(groups,{},{collapsed:false,position:'topright'}).addTo(map);
+  const show=name=>{build(name);$('layerName').textContent=name;$('layerAbout').textContent=layers[name].about+(layers[name].grid==='places'&&!perBlock?' (This feed has no per-block places yet: shown per 2 km tile.)':'');
+    $('legend').innerHTML=((layers[name].grid==='places'&&!perBlock&&layers[name].legendTile)||layers[name].legend).map(([col,txt])=>'<p><span class="sw" style="background:'+col+'"></span>'+txt+'</p>').join('');};
+  const first='Sunny filter'; groups[first].addTo(map); show(first);
+  const control=L.control.layers(groups,{},{collapsed:false,position:'topright'}).addTo(map);
+  // Category headers in the layer menu (Leaflet has none of its own).
+  const cats={'Places':'Places','Sunny filter':'Sunny filter','Data freshness':'Data'};
+  for(const label of control.getContainer().querySelectorAll('.leaflet-control-layers-base label')){const t=label.textContent.trim();
+    if(cats[t]){const h=document.createElement('div');h.className='grp';h.textContent=cats[t];label.parentNode.insertBefore(h,label);}}
   map.on('baselayerchange',e=>show(e.name));
 
   // ---- the area list: places are estimated from the 2 km tiles overlapping the area, in proportion to the overlap
@@ -112,12 +121,14 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   for(const a of areas){const [s,w,n,e]=a.box;let places=0,seats=0;
     for(const t of d.venueCells){const la=edge(t[0],50),lo=edge(t[1],50);const ov=Math.max(0,Math.min(n,la[1])-Math.max(s,la[0]))*Math.max(0,Math.min(e,lo[1])-Math.max(w,lo[0]));
       if(ov>0){const f=ov/((la[1]-la[0])*(lo[1]-lo[0]));places+=t[2]*f;seats+=t[3]*f;}}
-    a.places=Math.round(places);a.seats=Math.round(seats);a.worksShare=a.tiled?a.passing/a.tiled:0;a.recordsShare=a.passing?a.terracesKnown/a.passing:0;
+    a.exact=a.places!=null;if(!a.exact){a.places=Math.round(places);a.seats=Math.round(seats);}
+    a.seatShare=a.places?a.seats/a.places:0;a.worksShare=a.tiled?a.passing/a.tiled:0;a.recordsShare=a.passing?a.terracesKnown/a.passing:0;
     L.circleMarker([(s+n)/2,(w+e)/2],{radius:Math.max(4,Math.sqrt(a.km2||0)*2.2),color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.45})
       .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));}
   const metrics={
-    places:{group:'Places',label:'Places (≈)',cell:a=>'≈ '+fmt(a.places)},
-    seats:{group:'Places',label:'Places with outdoor seating (≈)',cell:a=>'≈ '+fmt(a.seats)},
+    places:{group:'Places',label:'Places',cell:a=>(a.exact?'':'≈ ')+fmt(a.places)},
+    seats:{group:'Places',label:'Places with outdoor seating',cell:a=>(a.exact?'':'≈ ')+fmt(a.seats)},
+    seatShare:{group:'Places',label:'Places with outdoor seating (share)',cell:a=>Math.round(100*a.seatShare)+' %'},
     passing:{group:'Sunny filter',label:'Works in… blocks / blocks with data',cell:a=>fmt(a.passing)+' / '+fmt(a.tiled)},
     worksShare:{group:'Sunny filter',label:'Works in… share of blocks',cell:a=>Math.round(100*a.worksShare)+' %'},
     terracesKnown:{group:'Sunny filter',label:'Judges the terrace itself in… blocks',cell:a=>fmt(a.terracesKnown)},

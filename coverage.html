@@ -134,7 +134,12 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   const flyTo=()=>{const want=decodeURIComponent(location.hash.slice(1));if(!want)return;const a=areas.find(x=>x.city===want||x.name===want);if(a){const [s,w,n,e]=a.box;map.fitBounds([[s,w],[n,e]]);}};
   flyTo(); window.addEventListener('hashchange',flyTo);
   // The cities looked at but not tiled, as hollow grey dots sized by their going-out blocks (the status feed).
+  // The status feed also gives each city's area, counts.json its going-out blocks in the wide square: the two shares below.
+  const share=(n,d)=>n!=null&&d?n/d:null, pct=x=>x==null?'':(x<0.1?(100*x).toFixed(1):Math.round(100*x))+' %';
+  get('https://pub-c7dde6811086418585889c3e30cf9880.r2.dev/counts.json').then(ct=>{const wide={};for(const c of ct.cities||[])wide[c.city]=c.goingOutCellsWide;
+    for(const a of areas)a.outShare=share(a.goingOut,wide[a.city]);render();}).catch(()=>{});
   get('https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json').then(st=>{
+    const size={};for(const c of st.cities)size[c.city]=c.cityAreaKm2;for(const a of areas)a.areaShare=share(a.km2,size[a.city]);render();
     const covered=new Set(areas.map(a=>a.city));
     for(const c of st.cities){if(!c.lat||covered.has(c.city)||!c.goingOut)continue;
       L.circleMarker([c.lat,c.lon],{radius:4,color:'#7f8c90',weight:1.5,fill:false,dashArray:'3 3'})
@@ -148,6 +153,8 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     worksShare:{group:'Sunny filter',label:'Works in… share of blocks',cell:a=>Math.round(100*a.worksShare)+' %'},
     terracesKnown:{group:'Sunny filter',label:'Judges the terrace itself in… blocks',cell:a=>fmt(a.terracesKnown)},
     recordsShare:{group:'Sunny filter',label:'Judges the terrace itself in… share',cell:a=>Math.round(100*a.recordsShare)+' %'},
+    areaShare:{group:'Sunny filter',label:'Filter works, % of city area',cell:a=>pct(a.areaShare)},
+    outShare:{group:'Sunny filter',label:'Going-out blocks covered, %',cell:a=>pct(a.outShare)},
     tiled:{group:'Data',label:'Blocks with data',cell:a=>fmt(a.tiled)},
     lastBuilt:{group:'Data',label:'Last built',cell:a=>a.lastBuilt||''},
   };

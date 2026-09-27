@@ -15,7 +15,7 @@ body{background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,system-ui
 #map{flex:1;height:100%;min-width:0}
 aside{width:620px;height:100%;overflow:auto;border-left:1px solid var(--line);padding:16px;background:var(--panel)}
 h1{font-size:18px;margin:0 0 4px}h2{font-size:15px;margin:14px 0 4px}p{margin:0 0 8px;color:var(--muted)}
-.sw{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:-1px;border-radius:2px}
+.sw{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:-1px;border-radius:2px;border:1px solid var(--line)}
 #legend p{margin:0 0 3px}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;margin-top:8px}
 th,td{text-align:left;padding:5px 4px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;white-space:nowrap}
@@ -54,7 +54,7 @@ const rect=(ky,kx,scale,style)=>{const la=edge(ky,scale),lo=edge(kx,scale);retur
 const $=id=>document.getElementById(id);
 const get=u=>fetch(u+(u.startsWith('http')?'?v='+Date.now():''),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
 // One colour family per layer category: places blue, sunny filter green (amber for the street-side test), freshness purple.
-const BLUE=['#e3edf0','#a9cfe0','#5fa9c9','#2b7fa6','#0f5273'], GREEN=['#e0e7e8','#a8d5b5','#5fbf85','#1f9d55','#0f6b38'], PURPLE=['#e6e3ee','#c3b7e0','#9a86cc','#6f57b3','#4a3591'];
+const BLUE=['#e3edf0','#8fc1d9','#4f9ec4','#1f6f9a','#0b3f5e'], GREEN=['#e0e7e8','#a8d5b5','#5fbf85','#1f9d55','#0f6b38'], PURPLE=['#e6e3ee','#c3b7e0','#9a86cc','#6f57b3','#4a3591'];
 const bucket=(x,steps,ramp)=>{let i=0;while(i<steps.length&&x>=steps[i])i++;return ramp[Math.min(i,ramp.length-1)];};
 const fmt=n=>n==null?'':Number(n).toLocaleString();
 get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
@@ -69,11 +69,11 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   // ---- layers, in reading order
   const layers={
     'Places':{grid:'places',about:'Bars, cafés and restaurants on record (from OpenStreetMap): the extra places the app adds to Apple\'s, per 200 m block where the feed has them, else per 2 km tile. Apple\'s own places are never stored, so they cannot be counted here.',
-      legend:[[BLUE[0],'none'],[BLUE[1],'1–2'],[BLUE[2],'3–9'],[BLUE[3],'10–29'],[BLUE[4],'30 or more'],['#7f8c90','not counted per block yet']],legendTile:[[BLUE[0],'none'],[BLUE[1],'1–19'],[BLUE[2],'20–99'],[BLUE[3],'100–399'],[BLUE[4],'400 or more']],
-      style:c=>counted(c)?{fillColor:bucket(c[8],[1,3,10,30],BLUE),fillOpacity:.55}:{fillColor:'#7f8c90',fillOpacity:.25},styleTile:w=>({fillColor:bucket(w[2],[1,20,100,400],BLUE),fillOpacity:.5})},
+      legend:[['transparent','none (unpainted)'],[BLUE[1],'1–2'],[BLUE[2],'3–9'],[BLUE[3],'10–29'],[BLUE[4],'30 or more'],['#7f8c90','not counted per block yet']],legendTile:[[BLUE[0],'none'],[BLUE[1],'1–19'],[BLUE[2],'20–99'],[BLUE[3],'100–399'],[BLUE[4],'400 or more']],
+      style:c=>!counted(c)?{fillColor:'#7f8c90',fillOpacity:.25}:c[8]===0?{fillOpacity:0}:{fillColor:bucket(c[8],[1,3,10,30],BLUE),fillOpacity:.75},styleTile:w=>({fillColor:bucket(w[2],[1,20,100,400],BLUE),fillOpacity:.5})},
     'Places with outdoor seating (share)':{grid:'places',about:'Of the places on record, the share OpenStreetMap tags as having tables outside.',
-      legend:[[BLUE[0],'no places'],[BLUE[1],'under 10 %'],[BLUE[2],'10–25 %'],[BLUE[3],'25–50 %'],[BLUE[4],'over 50 %'],['#7f8c90','not counted per block yet']],legendTile:null,
-      style:c=>counted(c)?{fillColor:c[8]?bucket(c[9]/c[8],[0.0001,0.10,0.25,0.50],BLUE):BLUE[0],fillOpacity:.55}:{fillColor:'#7f8c90',fillOpacity:.25},styleTile:w=>({fillColor:w[2]?bucket(w[3]/w[2],[0.0001,0.10,0.25,0.50],BLUE):BLUE[0],fillOpacity:.5})},
+      legend:[['transparent','no places (unpainted)'],[BLUE[0],'none with seating'],[BLUE[1],'under 10 %'],[BLUE[2],'10–25 %'],[BLUE[3],'25–50 %'],[BLUE[4],'over 50 %'],['#7f8c90','not counted per block yet']],legendTile:null,
+      style:c=>!counted(c)?{fillColor:'#7f8c90',fillOpacity:.25}:!c[8]?{fillOpacity:0}:{fillColor:bucket(c[9]/c[8],[0.0001,0.10,0.25,0.50],BLUE),fillOpacity:.75},styleTile:w=>({fillColor:w[2]?bucket(w[3]/w[2],[0.0001,0.10,0.25,0.50],BLUE):BLUE[0],fillOpacity:.5})},
     'Sunny filter':{grid:'block',about:'Where terrace records are complete enough, the filter judges the terrace itself. Where they are thin, it judges the sunny side of the street at the venue\'s front instead.',
       legend:[[GREEN[3],'the terrace itself'],['#e0a030','the sunny side of the street'],['#7f8c90','filter not available']],style:c=>({fillColor:!works(c)?'#7f8c90':known(c)?GREEN[3]:'#e0a030',fillOpacity:.5})},
     'Terrace records per block':{grid:'block',about:'Terraces on record in each block, from city permits where a city publishes them and from OpenStreetMap everywhere.',
@@ -131,8 +131,8 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     L.circleMarker([(s+n)/2,(w+e)/2],{radius:5,color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.7})
       .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));}
   // #City in the address flies to that area (the cities page links here).
-  const want=decodeURIComponent(location.hash.slice(1));
-  if(want){const a=areas.find(x=>x.city===want||x.name===want);if(a){const [s,w,n,e]=a.box;map.fitBounds([[s,w],[n,e]]);}}
+  const flyTo=()=>{const want=decodeURIComponent(location.hash.slice(1));if(!want)return;const a=areas.find(x=>x.city===want||x.name===want);if(a){const [s,w,n,e]=a.box;map.fitBounds([[s,w],[n,e]]);}};
+  flyTo(); window.addEventListener('hashchange',flyTo);
   // The cities looked at but not tiled, as hollow grey dots sized by their going-out blocks (the status feed).
   get('https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json').then(st=>{
     const covered=new Set(areas.map(a=>a.city));

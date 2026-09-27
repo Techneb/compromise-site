@@ -95,7 +95,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     return '<h3 class="nm">Block '+c[0]+','+c[1]+'</h3><small class="sub">200 m square</small>'
       +'<h4>Places</h4>'+dl((c.length>9?[['in this block',c[8]],['with outdoor seating',c[8]?c[9]+' ('+Math.round(100*c[9]/c[8])+' %)':'0']]:[]).concat([['within ~600 m (estimate)',n===null?'no venue tile':Math.round(n)]]))
       +'<h4>Sunny filter</h4>'+dl([['works here',works(c)?'yes':'no, too few buildings'],['judges',works(c)?(known(c)?'the terrace itself':'the sunny side of the street'):'–'],['terrace records',c[2]],['buildings',c[3]],['heights measured',pct]])
-      +'<h4>Data</h4>'+dl([['terraces built',day(c[5])||'–'],['buildings built',day(c[6])||'–']].concat(c[7]?[['commune (INSEE)',c[7]]]:[]));};
+      +'<h4>Data</h4>'+dl([['terraces built',day(c[5])||'–'],['buildings built',day(c[6])||'–']].concat(c[7]?[['commune',c[7].split(' ').map(k=>(d.communes||{})[k]||k).join(', ')]]:[]));};
   const tilePopup=w=>'<h3 class="nm">Venue tile '+w[0]+','+w[1]+'</h3><small class="sub">2 km square</small><h4>Places on record (OpenStreetMap)</h4>'+dl([['bars, cafés, restaurants',w[2]],['with outdoor seating',w[3]]])+'<h4>Data</h4>'+dl([['built',day(w[4])||'–']]);
   const withName=(layer,lat,lon)=>layer.on('popupopen',async e=>{const el=e.popup.getElement();const n=await nameOf(lat,lon);if(n&&el){const h=el.querySelector('.nm'),s=el.querySelector('.sub');if(h){s.textContent=h.textContent+' · '+s.textContent;h.textContent=n;}}});
 

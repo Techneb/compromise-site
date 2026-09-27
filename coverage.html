@@ -13,7 +13,7 @@ layout: null
 *{box-sizing:border-box}html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,system-ui,sans-serif;display:flex}
 #map{flex:1;height:100%;min-width:0}
-aside{width:500px;height:100%;overflow:auto;border-left:1px solid var(--line);padding:16px;background:var(--panel)}
+aside{width:620px;height:100%;overflow:auto;border-left:1px solid var(--line);padding:16px;background:var(--panel)}
 h1{font-size:18px;margin:0 0 4px}h2{font-size:15px;margin:14px 0 4px}p{margin:0 0 8px;color:var(--muted)}
 .sw{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:-1px;border-radius:2px}
 #legend p{margin:0 0 3px}
@@ -21,13 +21,13 @@ table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font
 th,td{text-align:left;padding:5px 4px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;white-space:nowrap}
 td:not(:first-child),th:not(:first-child){text-align:right;white-space:nowrap}
 th .s{cursor:pointer;user-select:none}th.on .s{color:var(--accent)}th.on .s::after{content:' ▾'}th.on.asc .s::after{content:' ▴'}
-th select{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 2px;max-width:150px}
+th select{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 2px;max-width:200px}
 tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}
 small{color:var(--muted)}
 .leaflet-popup-content{font:13px/1.4 -apple-system,system-ui,sans-serif;margin:10px 12px}
 .leaflet-popup-content h3{font-size:14px;margin:0 0 2px}.leaflet-popup-content h4{font-size:12px;margin:8px 0 2px;color:#5b6b6f;text-transform:uppercase;letter-spacing:.03em}
 .leaflet-popup-content dl{margin:0;display:grid;grid-template-columns:auto auto;gap:1px 10px}.leaflet-popup-content dt{color:#5b6b6f}.leaflet-popup-content dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
-@media (max-width:900px){body{flex-direction:column}#map{flex:none;height:55vh}aside{width:100%;height:auto;border:0;border-top:1px solid var(--line)}}
+@media (max-width:1000px){body{flex-direction:column}#map{flex:none;height:55vh}aside{width:100%;height:auto;border:0;border-top:1px solid var(--line)}}
 </style></head><body>
 <div id="map"></div>
 <aside>
@@ -66,12 +66,10 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
 
   // ---- layers, in reading order
   const layers={
-    'Places on record (OpenStreetMap)':{grid:'tile',about:'Bars, cafés and restaurants OpenStreetMap lists in each 2 km tile: the extra places the app adds to Apple\'s. Apple\'s own places are never stored, so they cannot be counted here.',
+    'Places':{grid:'tile',about:'Bars, cafés and restaurants on record in each 2 km tile (from OpenStreetMap): the extra places the app adds to Apple\'s. Apple\'s own places are never stored, so they cannot be counted here.',
       legend:[[BLUE[0],'none'],[BLUE[1],'1–19'],[BLUE[2],'20–99'],[BLUE[3],'100–399'],[BLUE[4],'400 or more']],style:w=>({fillColor:bucket(w[2],[1,20,100,400],BLUE),fillOpacity:.5})},
     'Places with outdoor seating':{grid:'tile',about:'Of those places, the ones OpenStreetMap tags as having tables outside, per 2 km tile.',
       legend:[[BLUE[0],'none'],[BLUE[1],'1–4'],[BLUE[2],'5–19'],[BLUE[3],'20–99'],[BLUE[4],'100 or more']],style:w=>({fillColor:bucket(w[3],[1,5,20,100],BLUE),fillOpacity:.5})},
-    'Sunny filter: where it works':{grid:'block',about:'The filter is offered where a block holds enough buildings to cast reliable shadows. Grey blocks have data but too few buildings: parks, water, open land.',
-      legend:[[GREEN[3],'works'],['#7f8c90','has data, too few buildings']],style:c=>({fillColor:works(c)?GREEN[3]:'#7f8c90',fillOpacity:works(c)?.5:.35})},
     'Sunny filter: what it judges':{grid:'block',about:'Where terrace records are complete enough, the filter judges the terrace itself. Where they are thin, it judges the sunny side of the street at the venue\'s front instead.',
       legend:[[GREEN[3],'the terrace itself'],['#e0a030','the sunny side of the street'],['#7f8c90','filter not available']],style:c=>({fillColor:!works(c)?'#7f8c90':known(c)?GREEN[3]:'#e0a030',fillOpacity:.5})},
     'Terrace records per block':{grid:'block',about:'Terraces on record in each block, from city permits where a city publishes them and from OpenStreetMap everywhere.',
@@ -105,7 +103,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   for(const name in layers) groups[name]=L.layerGroup();
   const show=name=>{build(name);$('layerName').textContent=name;$('layerAbout').textContent=layers[name].about;
     $('legend').innerHTML=layers[name].legend.map(([col,txt])=>'<p><span class="sw" style="background:'+col+'"></span>'+txt+'</p>').join('');};
-  const first='Sunny filter: where it works'; groups[first].addTo(map); show(first);
+  const first='Sunny filter: what it judges'; groups[first].addTo(map); show(first);
   L.control.layers(groups,{},{collapsed:false,position:'topright'}).addTo(map);
   map.on('baselayerchange',e=>show(e.name));
 
@@ -118,18 +116,20 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     L.circleMarker([(s+n)/2,(w+e)/2],{radius:Math.max(4,Math.sqrt(a.km2||0)*2.2),color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.45})
       .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));}
   const metrics={
-    passing:{label:'Sunny filter works / has data',cell:a=>fmt(a.passing)+' / '+fmt(a.tiled)},
-    worksShare:{label:'Sunny filter works (share)',cell:a=>Math.round(100*a.worksShare)+' %'},
-    terracesKnown:{label:'Blocks with terrace records',cell:a=>fmt(a.terracesKnown)},
-    recordsShare:{label:'Terrace records (share of working blocks)',cell:a=>Math.round(100*a.recordsShare)+' %'},
-    places:{label:'Places on record (OSM, ≈)',cell:a=>'≈ '+fmt(a.places)},
-    seats:{label:'Places with outdoor seating (≈)',cell:a=>'≈ '+fmt(a.seats)},
-    tiled:{label:'Blocks with data',cell:a=>fmt(a.tiled)},
-    lastBuilt:{label:'Last built',cell:a=>a.lastBuilt||''},
+    places:{group:'Places',label:'Places (≈)',cell:a=>'≈ '+fmt(a.places)},
+    seats:{group:'Places',label:'Places with outdoor seating (≈)',cell:a=>'≈ '+fmt(a.seats)},
+    passing:{group:'Sunny filter',label:'Works in… blocks / blocks with data',cell:a=>fmt(a.passing)+' / '+fmt(a.tiled)},
+    worksShare:{group:'Sunny filter',label:'Works in… share of blocks',cell:a=>Math.round(100*a.worksShare)+' %'},
+    terracesKnown:{group:'Sunny filter',label:'Judges the terrace itself in… blocks',cell:a=>fmt(a.terracesKnown)},
+    recordsShare:{group:'Sunny filter',label:'Judges the terrace itself in… share',cell:a=>Math.round(100*a.recordsShare)+' %'},
+    tiled:{group:'Data',label:'Blocks with data',cell:a=>fmt(a.tiled)},
+    lastBuilt:{group:'Data',label:'Last built',cell:a=>a.lastBuilt||''},
   };
   const picks=['passing','places'];
   let sortKey='km2', asc=false;
-  const header=(i,th)=>{const sel=document.createElement('select');for(const k in metrics){const o=document.createElement('option');o.value=k;o.textContent=metrics[k].label;if(k===picks[i])o.selected=true;sel.appendChild(o);}
+  const header=(i,th)=>{const sel=document.createElement('select');const og={};
+    for(const k in metrics){const g=metrics[k].group;if(!og[g]){og[g]=document.createElement('optgroup');og[g].label=g;sel.appendChild(og[g]);}
+      const o=document.createElement('option');o.value=k;o.textContent=metrics[k].label;if(k===picks[i])o.selected=true;og[g].appendChild(o);}
     sel.onchange=()=>{picks[i]=sel.value;if(sortKey===th.dataset.k)sortKey=sel.value;th.dataset.k=sel.value;render();};
     const s=document.createElement('span');s.className='s';s.textContent='↕';s.title='sort';s.onclick=()=>{if(sortKey===th.dataset.k)asc=!asc;else{sortKey=th.dataset.k;asc=false;}render();};
     th.dataset.k=picks[i];th.innerHTML='';th.appendChild(sel);th.appendChild(document.createTextNode(' '));th.appendChild(s);};

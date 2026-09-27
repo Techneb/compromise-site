@@ -1,0 +1,68 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>Compromise cities</title>
+<style>
+:root{--bg:#fbfcfc;--fg:#1d2a2d;--muted:#5b6b6f;--line:#dde3e4;--accent:#368B9C;--panel:#fff;--ok:#1f9d55;--part:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#15191a;--fg:#e6ecec;--muted:#9aa8ab;--line:#2b3336;--accent:#16B9DB;--panel:#1c2224;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:16px}
+nav{display:flex;gap:14px;align-items:center;margin-bottom:10px}nav a{color:var(--muted);text-decoration:none;font-weight:600}nav a.on{color:var(--accent);border-bottom:2px solid var(--accent)}
+h1{font-size:18px;margin:0 0 4px}p{margin:0 0 8px;color:var(--muted)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}select,input{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+th,td{text-align:left;padding:6px 6px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--bg)}
+th.on{color:var(--accent)}th.on::after{content:' ▾'}th.on.asc::after{content:' ▴'}
+td.n,th.n{text-align:right;white-space:nowrap}
+.tag{display:inline-block;padding:1px 6px;border-radius:10px;font-size:12px;background:var(--line)}.tag.ok{background:var(--ok);color:#fff}.tag.part{background:var(--part);color:#fff}
+a{color:var(--accent)}small{color:var(--muted)}
+@media (max-width:700px){.hide{display:none}}
+</style></head><body><main>
+<nav><a href="coverage.html">Map</a><a class="on" href="cities.html">Cities</a></nav>
+<h1>Cities: covered, and what the others are waiting for</h1>
+<p id="status">Loading…</p>
+<p><small>Every city the project has looked at. A city missing here has not been looked at yet. Going-out blocks are 200 m squares with at least 10 bars, cafés and restaurants nearby; the terrace share is the part of them whose outdoor seating is on record. Coverage comes from the live feed: whole city, centre only, or none.</small></p>
+<div class="bar">
+  <select id="reason"><option value="">Every reason</option></select>
+  <select id="cov"><option value="">Any coverage</option><option value="none" selected>Not covered</option><option value="centre">Centre only</option><option value="whole">Whole city</option></select>
+  <select id="country"><option value="">Every country</option></select>
+  <input id="q" type="search" placeholder="Search a city">
+  <select id="recent"><option value="">Any date</option><option value="7">Changed in the last 7 days</option><option value="30">Last 30 days</option></select>
+</div>
+<table><thead><tr>
+<th data-k="city">City</th><th data-k="country" class="hide">Country</th><th data-k="goingOut" class="n">Going-out blocks</th><th data-k="terraceShare" class="n hide">Terrace share</th><th data-k="covRank">Coverage</th><th data-k="km2" class="n">Filter works, km²</th><th data-k="reason">Why not (yet)</th><th data-k="next" class="hide">Next step</th><th data-k="updated" class="n hide">Changed</th>
+</tr></thead><tbody id="list"></tbody></table>
+</main>
+<script>
+const STATUS=['https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json'];
+const FEEDS=['https://pub-c7dde6811086418585889c3e30cf9880.r2.dev/coverage.json','https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json'];
+const get=u=>fetch(u+'?v='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
+const $=id=>document.getElementById(id), fmt=n=>n==null?'':Number(n).toLocaleString();
+Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({areas:[]}))]).then(([s,feed])=>{
+  // Coverage per city from the feed's areas: a municipality or commune entry is the whole city, a core or district the centre.
+  const cov={};
+  for(const a of feed.areas||[]){const whole=/whole|intra-muros|municipality/i.test(a.name)||a.name===a.city;const c=cov[a.city]||(cov[a.city]={rank:0,km2:0,label:'none'});
+    c.km2+=a.km2||0; if(whole&&c.rank<2){c.rank=2;c.label='whole';} else if(!whole&&c.rank<1){c.rank=1;c.label='centre';}}
+  const rows=s.cities.map(c=>{const v=cov[c.city]||{rank:0,km2:0,label:'none'};return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2});});
+  const reasons=[...new Set(rows.map(r=>r.reason))].sort(); for(const r of reasons){const o=document.createElement('option');o.value=r;o.textContent=r;$('reason').appendChild(o);}
+  const countries=[...new Set(rows.map(r=>r.country))].sort(); for(const c of countries){const o=document.createElement('option');o.value=c;o.textContent=c;$('country').appendChild(o);}
+  let sortKey='goingOut', asc=false;
+  const render=()=>{
+    const q=$('q').value.trim().toLowerCase(), reason=$('reason').value, cv=$('cov').value, ctry=$('country').value, rec=$('recent').value;
+    const since=rec?Date.now()-rec*864e5:0;
+    const shown=rows.filter(r=>(!q||r.city.toLowerCase().includes(q))&&(!reason||r.reason===reason)&&(!cv||r.covLabel===cv)&&(!ctry||r.country===ctry)&&(!since||(r.updated&&Date.parse(r.updated)>=since)));
+    const val=r=>typeof r[sortKey]==='string'?r[sortKey].toLowerCase():(r[sortKey]==null?-1:r[sortKey]);
+    shown.sort((x,y)=>{const p=val(x),q2=val(y);return (p<q2?-1:p>q2?1:0)*(asc?1:-1);});
+    document.querySelectorAll('th[data-k]').forEach(th=>{th.classList.toggle('on',th.dataset.k===sortKey);th.classList.toggle('asc',th.dataset.k===sortKey&&asc);});
+    $('list').innerHTML=shown.map(r=>'<tr><td>'+(r.covRank?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+r.city+'</a>':r.city)+'</td><td class="hide">'+r.country+'</td><td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut))+'</td><td class="n hide">'+(r.terraceShare==null?'':Math.round(100*r.terraceShare)+' %')+'</td>'
+      +'<td><span class="tag '+(r.covRank===2?'ok':r.covRank===1?'part':'')+'">'+(r.covRank===2?'whole city':r.covRank===1?'centre only':'none')+'</span></td><td class="n">'+(r.km2?r.km2.toFixed(1):'')+'</td><td>'+(r.covRank===2?'':r.reason)+'</td><td class="hide"><small>'+(r.next||'')+'</small></td><td class="n hide"><small>'+(r.updated||'')+'</small></td></tr>').join('');
+    $('status').textContent=shown.length+' of '+rows.length+' cities shown. Status feed '+(s.updated||'')+', coverage feed '+(feed.updated||'')+'.';
+  };
+  document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=(k==='city'||k==='country'||k==='reason');}render();});
+  for(const id of ['q','reason','cov','country','recent']) $(id).oninput=render;
+  render();
+}).catch(err=>{$('status').textContent='The feeds did not answer ('+err.message+'); try again later.';});
+</script></body></html>

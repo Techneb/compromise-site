@@ -128,7 +128,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
       if(ov>0){const f=ov/((la[1]-la[0])*(lo[1]-lo[0]));places+=t[2]*f;seats+=t[3]*f;}}
     a.exact=a.places!=null&&(a.places>0||places===0);if(!a.exact){a.places=Math.round(places);a.seats=Math.round(seats);}
     a.seatShare=a.places?a.seats/a.places:0;a.worksShare=a.tiled?a.passing/a.tiled:0;a.recordsShare=a.passing?a.terracesKnown/a.passing:0;
-    L.circleMarker([(s+n)/2,(w+e)/2],{radius:Math.max(4,Math.sqrt(a.km2||0)*2.2),color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.45})
+    L.circleMarker([(s+n)/2,(w+e)/2],{radius:5,color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.7})
       .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));}
   // #City in the address flies to that area (the cities page links here).
   const want=decodeURIComponent(location.hash.slice(1));
@@ -137,7 +137,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   get('https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json').then(st=>{
     const covered=new Set(areas.map(a=>a.city));
     for(const c of st.cities){if(!c.lat||covered.has(c.city)||!c.goingOut)continue;
-      L.circleMarker([c.lat,c.lon],{radius:Math.min(18,Math.max(3,Math.sqrt(c.goingOut)/4)),color:'#7f8c90',weight:1.5,fill:false,dashArray:'3 3'})
+      L.circleMarker([c.lat,c.lon],{radius:4,color:'#7f8c90',weight:1.5,fill:false,dashArray:'3 3'})
         .addTo(map).bindTooltip(c.city+' · not covered: '+c.reason.toLowerCase(),{direction:'top'}).on('click',()=>{location.href='cities.html#'+encodeURIComponent(c.city);});}
   }).catch(()=>{});
   const metrics={

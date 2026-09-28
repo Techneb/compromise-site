@@ -43,7 +43,7 @@ small{color:var(--muted)}
 </aside>
 <script>
 // The store first (its bucket answers browsers since 2026-09-27), then the tile repository's copy, then the snapshot published beside this page.
-const FEEDS=['https://pub-c7dde6811086418585889c3e30cf9880.r2.dev/coverage.json','https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json','coverage.json'];
+const FEEDS=['https://tiles.alephb.uk/coverage.json','https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json','coverage.json'];
 const FLOOR=20, RATIO=0.30, MINIMUM=5;   // the reader's rules: buildings for availability; terraces vs nearby venues for "known"
 const css=getComputedStyle(document.documentElement), v=n=>css.getPropertyValue(n).trim();
 const map=L.map('map',{preferCanvas:true,worldCopyJump:true}).setView([48.86,2.35],5);
@@ -136,7 +136,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   // The cities looked at but not tiled, as hollow grey dots sized by their going-out blocks (the status feed).
   // The status feed also gives each city's area, counts.json its going-out blocks in the wide square: the two shares below.
   const share=(n,d)=>n!=null&&d?n/d:null, pct=x=>x==null?'':(x<0.1?(100*x).toFixed(1):Math.round(100*x))+' %';
-  get('https://pub-c7dde6811086418585889c3e30cf9880.r2.dev/counts.json').then(ct=>{const wide={};for(const c of ct.cities||[])wide[c.city]=c.goingOutCellsWide;
+  get('https://tiles.alephb.uk/counts.json').then(ct=>{const wide={};for(const c of ct.cities||[])wide[c.city]=c.goingOutCellsWide;
     for(const a of areas)a.outShare=share(a.goingOut,wide[a.city]);render();}).catch(()=>{});
   get('https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json').then(st=>{
     const size={};for(const c of st.cities)size[c.city]=c.cityAreaKm2;for(const a of areas)a.areaShare=share(a.km2,size[a.city]);render();

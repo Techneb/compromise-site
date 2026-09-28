@@ -40,4 +40,4 @@ credited with its licence in the app under Settings › Data sources.
 
 ## Contact
 
-alephb.dev@gmail.com
+contact@alephb.uk

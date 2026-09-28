@@ -1,6 +1,6 @@
 # Compromise — Privacy policy
 
-*Last updated: 27 September 2026.*
+*Last updated: 28 September 2026.*
 
 Compromise does not collect your data. There is no account, no
 analytics, no advertising and no third-party SDK. Nothing you enter is

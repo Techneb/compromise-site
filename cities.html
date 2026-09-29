@@ -25,7 +25,7 @@ a{color:var(--accent)}small{color:var(--muted)}
 <nav><a href="coverage.html">Map</a><a class="on" href="cities.html">Cities</a></nav>
 <h1>Cities: covered, and what the others are waiting for</h1>
 <p id="status">Loading…</p>
-<p><small>Every city the project has looked at. A city missing here has not been looked at yet. Going-out blocks are 200 m squares with at least 10 bars, cafés and restaurants nearby; the terrace share is the part of them whose outdoor seating is on record. Coverage comes from the live feed: whole city, core (the part of the city where people go out), or none. The two shares compare where the filter works with the whole municipality, and the going-out blocks covered with those in a 24 km square around the city.</small></p>
+<p><small>Every city the project has looked at. A city missing here has not been looked at yet. Going-out blocks are 200 m squares with at least 10 bars, cafés and restaurants nearby; the terrace share is the part of them whose outdoor seating is on record. Coverage comes from the live feed: whole city, core (the part of the city where people go out), or none. The two shares compare where the filter works with the whole municipality, and the going-out blocks where it works with all of the city's going-out blocks (its municipality or commune, else a 24 km square around it).</small></p>
 <div class="bar">
   <select id="reason"><option value="">Every reason</option></select>
   <select id="cov"><option value="">Any coverage</option><option value="none" selected>Not covered</option><option value="core">Core</option><option value="whole">Whole city</option></select>
@@ -45,13 +45,14 @@ const get=u=>fetch(u+'?v='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)thro
 const $=id=>document.getElementById(id), fmt=n=>n==null?'':Number(n).toLocaleString(), pct=x=>x==null?'':(x<0.1?(100*x).toFixed(1):Math.round(100*x))+' %';
 Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({areas:[]})), get(COUNTS).catch(()=>({cities:[]}))]).then(([s,feed,counts])=>{
   // Coverage per city from the feed's areas: a municipality or commune entry is the whole city, a district the core.
-  // goingOut is summed over a city's areas; one area without it (an older feed) leaves the sum unknown.
   const cov={};
-  for(const a of feed.areas||[]){const whole=/whole|intra-muros|municipality/i.test(a.name)||a.name===a.city;const c=cov[a.city]||(cov[a.city]={rank:0,km2:0,out:0,label:'none'});
-    c.km2+=a.km2||0; c.out=(c.out==null||a.goingOut==null)?null:c.out+a.goingOut; if(whole&&c.rank<2){c.rank=2;c.label='whole';} else if(!whole&&c.rank<1){c.rank=1;c.label='core';}}
-  const wide={}; for(const c of counts.cities||[]) if(c.goingOutCellsWide) wide[c.city]=c.goingOutCellsWide;
+  for(const a of feed.areas||[]){const whole=/whole|intra-muros|municipality/i.test(a.name)||a.name===a.city;const c=cov[a.city]||(cov[a.city]={rank:0,km2:0,label:'none'});
+    c.km2+=a.km2||0; if(whole&&c.rank<2){c.rank=2;c.label='whole';} else if(!whole&&c.rank<1){c.rank=1;c.label='core';}}
+  // Both going-out numbers from the counts job, one method and one extent: covered = going-out blocks where the filter works.
+  const out={}; for(const c of counts.cities||[]) if(c.goingOutCells&&c.goingOutCovered!=null) out[c.city]=c.goingOutCovered/c.goingOutCells;
+  // Whole blocks overhang a small commune's border, and some tiled boxes pass the municipality: at most 100 %.
   const rows=s.cities.map(c=>{const v=cov[c.city]||{rank:0,km2:0,label:'none'};return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2,
-    areaShare:v.rank&&c.cityAreaKm2?v.km2/c.cityAreaKm2:null, outShare:v.rank&&v.out!=null&&wide[c.city]?v.out/wide[c.city]:null});});
+    areaShare:v.rank&&c.cityAreaKm2?Math.min(1,v.km2/c.cityAreaKm2):null, outShare:v.rank&&out[c.city]!=null?out[c.city]:null});});
   const reasons=[...new Set(rows.map(r=>r.reason))].sort(); for(const r of reasons){const o=document.createElement('option');o.value=r;o.textContent=r;$('reason').appendChild(o);}
   const countries=[...new Set(rows.map(r=>r.country))].sort(); for(const c of countries){const o=document.createElement('option');o.value=c;o.textContent=c;$('country').appendChild(o);}
   let sortKey='goingOut', asc=false;

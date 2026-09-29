@@ -20,6 +20,7 @@ td.n,th.n{text-align:right;white-space:nowrap}
 .tag{display:inline-block;padding:1px 6px;border-radius:10px;font-size:12px;background:var(--line)}.tag.ok{background:var(--ok);color:#fff}.tag.part{background:var(--part);color:#fff}
 a{color:var(--accent)}small{color:var(--muted)}
 @media (max-width:700px){.hide{display:none}}
+.empty{display:none}
 </style></head><body><main>
 <nav><a href="coverage.html">Map</a><a class="on" href="cities.html">Cities</a></nav>
 <h1>Cities: covered, and what the others are waiting for</h1>
@@ -63,6 +64,10 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({
     document.querySelectorAll('th[data-k]').forEach(th=>{th.classList.toggle('on',th.dataset.k===sortKey);th.classList.toggle('asc',th.dataset.k===sortKey&&asc);});
     $('list').innerHTML=shown.map(r=>'<tr><td>'+(r.covRank?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+r.city+'</a>':r.city)+'</td><td class="hide">'+r.country+'</td><td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut))+'</td><td class="n hide">'+(r.terraceShare==null?'':Math.round(100*r.terraceShare)+' %')+'</td>'
       +'<td><span class="tag '+(r.covRank===2?'ok':r.covRank===1?'part':'')+'">'+(r.covRank===2?'whole city':r.covRank===1?'core':'none')+'</span></td><td class="n">'+(r.km2?r.km2.toFixed(1):'')+'</td><td class="n">'+pct(r.areaShare)+'</td><td class="n">'+pct(r.outShare)+'</td><td>'+(r.covRank===2?'':r.reason)+'</td><td class="hide"><small>'+(r.next||'')+'</small></td><td class="n hide"><small>'+(r.updated||'')+'</small></td></tr>').join('');
+    // A column empty for every row shown (the shares for uncovered cities, the reason for whole ones) is hidden.
+    const trs=[...$('list').rows];
+    document.querySelectorAll('thead th').forEach((th,i)=>{const empty=trs.length>0&&trs.every(tr=>{const t=tr.cells[i].textContent.trim();return !t||t==='NaN';});
+      th.classList.toggle('empty',empty); for(const tr of trs) tr.cells[i].classList.toggle('empty',empty);});
     $('status').textContent=shown.length+' of '+rows.length+' cities shown. Status feed '+(s.updated||'')+', coverage feed '+(feed.updated||'')+'.';
   };
   document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=(k==='city'||k==='country'||k==='reason');}render();});

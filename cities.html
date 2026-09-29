@@ -4,38 +4,51 @@ layout: null
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-<title>Compromise cities</title>
+<title>Compromise city coverage</title>
 <style>
 :root{--bg:#fbfcfc;--fg:#1d2a2d;--muted:#5b6b6f;--line:#dde3e4;--accent:#368B9C;--panel:#fff;--ok:#1f9d55;--part:#e0a030}
 @media (prefers-color-scheme:dark){:root{--bg:#15191a;--fg:#e6ecec;--muted:#9aa8ab;--line:#2b3336;--accent:#16B9DB;--panel:#1c2224;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,system-ui,sans-serif}
-main{max-width:1100px;margin:0 auto;padding:16px}
+main{max-width:1400px;margin:0 auto;padding:16px}
 nav{display:flex;gap:14px;align-items:center;margin-bottom:10px}nav a{color:var(--muted);text-decoration:none;font-weight:600}nav a.on{color:var(--accent);border-bottom:2px solid var(--accent)}
 h1{font-size:18px;margin:0 0 4px}p{margin:0 0 8px;color:var(--muted)}
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}select,input{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
-th,td{text-align:left;padding:6px 6px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--bg)}
+th,td{text-align:left;padding:6px 6px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;vertical-align:bottom;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--bg)}
 th.on{color:var(--accent)}th.on::after{content:' ▾'}th.on.asc::after{content:' ▴'}
-td.n,th.n{text-align:right;white-space:nowrap}
-.tag{display:inline-block;padding:1px 6px;border-radius:10px;font-size:12px;background:var(--line)}.tag.ok{background:var(--ok);color:#fff}.tag.part{background:var(--part);color:#fff}
+td.n,th.n{text-align:right}td.n{white-space:nowrap}
+.tag{display:inline-block;white-space:nowrap;padding:1px 6px;border-radius:10px;font-size:12px;background:var(--line)}.tag.ok{background:var(--ok);color:#fff}.tag.part{background:var(--part);color:#fff}
 a{color:var(--accent)}small{color:var(--muted)}
-@media (max-width:700px){.hide{display:none}}
+details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;font-weight:600}dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;margin:6px 0 0}dt{color:var(--fg)}dd{margin:0}
+@media (max-width:700px){dl{grid-template-columns:1fr}dd{margin-bottom:4px}.hide{display:none}.scroll{overflow-x:auto}select{max-width:100%}}
 .empty{display:none}
 </style></head><body><main>
 <nav><a href="coverage.html">Map</a><a class="on" href="cities.html">Cities</a></nav>
-<h1>Cities: covered, and what the others are waiting for</h1>
+<h1>City coverage</h1>
+<p>Every city we have looked at for the sunny filter, and how much of it the sunny filter covers. A city missing from the list has not been looked at yet. For the others, the list says what they are waiting for.</p>
 <p id="status">Loading…</p>
-<p><small>Every city the project has looked at. A city missing here has not been looked at yet. Inhabitants and surface are the municipality's own; blocks are the 200 m squares its surface holds. Going-out blocks are 200 m squares with at least 10 bars, cafés and restaurants nearby; the terrace share is the part of them whose outdoor seating is on record. Coverage comes from the live feed: whole city, core (the part of the city where people go out), or none. The two shares compare where the filter works with the whole municipality, and the going-out blocks where it works with all of the city's going-out blocks (its municipality or commune, else a 24 km square around it).</small></p>
+<details open><summary>How to read it</summary><dl>
+<dt>Block</dt><dd>A square of about 200 m.</dd>
+<dt>Going-out block</dt><dd>A block with at least 10 bars, cafés and restaurants within 400 m.</dd>
+<dt>Inhabitants, Surface, Blocks</dt><dd>The municipality's own.</dd>
+<dt>Going-out blocks</dt><dd>Counted in the municipality (the commune in France). Marked *: counted in a 24 km square around the city's centre instead, for a city covered only in its core or not yet covered.</dd>
+<dt>Terraces (%)</dt><dd>The going-out blocks where outdoor seating is on record. Left blank for a city covered only in its core.</dd>
+<dt>Coverage</dt><dd>Whole city, core (the part where people go out) or none.</dd>
+<dt>Covered (km²)</dt><dd>The surface where the sunny filter works.</dd>
+<dt>Covered (% of area)</dt><dd>That surface, as a share of the city's surface.</dd>
+<dt>Covered (% of going-out)</dt><dd>The going-out blocks where the sunny filter works, as a share of the Going-out blocks column.</dd>
+<dt>Waiting for</dt><dd>What a city not yet covered whole needs first.</dd>
+</dl></details>
 <div class="bar">
-  <select id="reason"><option value="">Every reason</option></select>
-  <select id="cov"><option value="">Any coverage</option><option value="none" selected>Not covered</option><option value="core">Core</option><option value="whole">Whole city</option></select>
-  <select id="country"><option value="">Every country</option></select>
+  <select id="reason"><option value="">Waiting for anything</option></select>
+  <select id="cov"><option value="">Any coverage</option><option value="none" selected>Not covered</option><option value="core">Core only</option><option value="whole">Whole city</option></select>
+  <select id="country"><option value="">Any country</option></select>
   <input id="q" type="search" placeholder="Search a city">
-  <select id="recent"><option value="">Any date</option><option value="7">Changed in the last 7 days</option><option value="30">Last 30 days</option></select>
+  <select id="recent"><option value="">Updated any time</option><option value="7">Updated in the last 7 days</option><option value="30">Updated in the last 30 days</option></select>
 </div>
-<table><thead><tr>
-<th data-k="city">City</th><th data-k="country" class="hide">Country</th><th data-k="population" class="n">Inhabitants</th><th data-k="cityAreaKm2" class="n">Surface, km²</th><th data-k="blocks" class="n hide">Blocks</th><th data-k="goingOut" class="n">Going-out blocks</th><th data-k="terraceShare" class="n hide">Terrace share</th><th data-k="covRank">Coverage</th><th data-k="km2" class="n">Filter works, km²</th><th data-k="areaShare" class="n">Filter works, % of city area</th><th data-k="outShare" class="n">Going-out blocks covered, %</th><th data-k="reason">Why not (yet)</th><th data-k="next" class="hide">Next step</th><th data-k="updated" class="n hide">Changed</th>
-</tr></thead><tbody id="list"></tbody></table>
+<div class="scroll"><table><thead><tr>
+<th data-k="city">City</th><th data-k="country" class="hide">Country</th><th data-k="population" class="n">Inhabitants</th><th data-k="cityAreaKm2" class="n">Surface (km²)</th><th data-k="blocks" class="n hide">Blocks</th><th data-k="goingOut" class="n">Going-out blocks</th><th data-k="terraceShare" class="n hide">Terraces (%)</th><th data-k="covRank">Coverage</th><th data-k="km2" class="n">Covered (km²)</th><th data-k="areaShare" class="n">Covered (% of area)</th><th data-k="outShare" class="n">Covered (% of going-out)</th><th data-k="reason">Waiting for</th><th data-k="next" class="hide">Next step</th><th data-k="updated" class="n hide">Updated</th>
+</tr></thead><tbody id="list"></tbody></table></div>
 </main>
 <script>
 const STATUS=['https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json'];
@@ -48,11 +61,19 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({
   const cov={};
   for(const a of feed.areas||[]){const whole=/whole|intra-muros|municipality/i.test(a.name)||a.name===a.city;const c=cov[a.city]||(cov[a.city]={rank:0,km2:0,label:'none'});
     c.km2+=a.km2||0; if(whole&&c.rank<2){c.rank=2;c.label='whole';} else if(!whole&&c.rank<1){c.rank=1;c.label='core';}}
-  // Both going-out numbers from the counts job, one method and one extent: covered = going-out blocks where the filter works.
-  const out={}; for(const c of counts.cities||[]) if(c.goingOutCells&&c.goingOutCovered!=null) out[c.city]=c.goingOutCovered/c.goingOutCells;
+  // Going-out numbers from the counts job. Its goingOutCells is counted over the city's extent: the municipality or
+  // commune for a whole city, but the tiled box for a core city (so its share read ~100 %). A core city is measured
+  // against the going-out blocks of the 24 km square instead (goingOutCellsWide); its covered blocks all lie inside it.
+  const cnt={}; for(const c of counts.cities||[]) cnt[c.city]=c;
+  const going=(c,rank)=>{const k=cnt[c.city], sq=k&&/square/.test(k.extent);
+    if(!k) return {goingOut:c.goingOut,terraceShare:c.terraceShare,sq:false,outShare:null};
+    if(rank===1) return {goingOut:k.goingOutCellsWide,sq:true,terraceShare:null,  // the terrace share is the box's: blank rather than mixed
+      outShare:k.goingOutCellsWide&&k.goingOutCovered!=null?k.goingOutCovered/k.goingOutCellsWide:null};
+    if(rank===2&&sq) return {goingOut:null,terraceShare:null,sq:false,outShare:null};  // a whole city not yet counted in its own contour
+    return {goingOut:k.goingOutCells,terraceShare:k.terraceShare,sq,outShare:rank&&k.goingOutCells&&k.goingOutCovered!=null?k.goingOutCovered/k.goingOutCells:null};};
   // Whole blocks overhang a small commune's border, and some tiled boxes pass the municipality: at most 100 %.
   const rows=s.cities.map(c=>{const v=cov[c.city]||{rank:0,km2:0,label:'none'};return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2,
-    areaShare:v.rank&&c.cityAreaKm2?Math.min(1,v.km2/c.cityAreaKm2):null, outShare:v.rank&&out[c.city]!=null?out[c.city]:null});});
+    areaShare:v.rank&&c.cityAreaKm2?Math.min(1,v.km2/c.cityAreaKm2):null},going(c,v.rank));});
   const reasons=[...new Set(rows.map(r=>r.reason))].sort(); for(const r of reasons){const o=document.createElement('option');o.value=r;o.textContent=r;$('reason').appendChild(o);}
   const countries=[...new Set(rows.map(r=>r.country))].sort(); for(const c of countries){const o=document.createElement('option');o.value=c;o.textContent=c;$('country').appendChild(o);}
   let sortKey='goingOut', asc=false;
@@ -63,16 +84,16 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({
     const val=r=>typeof r[sortKey]==='string'?r[sortKey].toLowerCase():(r[sortKey]==null?-1:r[sortKey]);
     shown.sort((x,y)=>{const p=val(x),q2=val(y);return (p<q2?-1:p>q2?1:0)*(asc?1:-1);});
     document.querySelectorAll('th[data-k]').forEach(th=>{th.classList.toggle('on',th.dataset.k===sortKey);th.classList.toggle('asc',th.dataset.k===sortKey&&asc);});
-    $('list').innerHTML=shown.map(r=>'<tr><td>'+(r.covRank?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+r.city+'</a>':r.city)+'</td><td class="hide">'+r.country+'</td><td class="n">'+fmt(r.population)+'</td><td class="n">'+km(r.cityAreaKm2)+'</td><td class="n hide">'+fmt(r.blocks)+'</td><td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut))+'</td><td class="n hide">'+(r.terraceShare==null?'':Math.round(100*r.terraceShare)+' %')+'</td>'
-      +'<td><span class="tag '+(r.covRank===2?'ok':r.covRank===1?'part':'')+'">'+(r.covRank===2?'whole city':r.covRank===1?'core':'none')+'</span></td><td class="n">'+(r.km2?r.km2.toFixed(1):'')+'</td><td class="n">'+pct(r.areaShare)+'</td><td class="n">'+pct(r.outShare)+'</td><td>'+(r.covRank===2?'':r.reason)+'</td><td class="hide"><small>'+(r.next||'')+'</small></td><td class="n hide"><small>'+(r.updated||'')+'</small></td></tr>').join('');
+    $('list').innerHTML=shown.map(r=>'<tr><td>'+(r.covRank?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+r.city+'</a>':r.city)+'</td><td class="hide">'+r.country+'</td><td class="n">'+fmt(r.population)+'</td><td class="n">'+km(r.cityAreaKm2)+'</td><td class="n hide">'+fmt(r.blocks)+'</td><td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut)+(r.sq?'<small>*</small>':''))+'</td><td class="n hide">'+(r.terraceShare==null?'':Math.round(100*r.terraceShare)+' %')+'</td>'
+      +'<td><span class="tag '+(r.covRank===2?'ok':r.covRank===1?'part':'')+'">'+(r.covRank===2?'whole city':r.covRank===1?'core':'none')+'</span></td><td class="n">'+(r.km2?r.km2.toFixed(1):'')+'</td><td class="n">'+pct(r.areaShare)+'</td><td class="n">'+pct(r.outShare)+'</td><td>'+(r.covRank===2||r.reason==='Covered'?'':r.reason)+'</td><td class="hide"><small>'+(r.next||'')+'</small></td><td class="n hide"><small>'+(r.updated||'')+'</small></td></tr>').join('');
     // A column empty for every row shown (the shares for uncovered cities, the reason for whole ones) is hidden.
     const trs=[...$('list').rows];
     document.querySelectorAll('thead th').forEach((th,i)=>{const empty=trs.length>0&&trs.every(tr=>{const t=tr.cells[i].textContent.trim();return !t||t==='NaN';});
       th.classList.toggle('empty',empty); for(const tr of trs) tr.cells[i].classList.toggle('empty',empty);});
-    $('status').textContent=shown.length+' of '+rows.length+' cities shown. Status feed '+(s.updated||'')+', coverage feed '+(feed.updated||'')+'.';
+    $('status').textContent=shown.length+' of '+rows.length+' cities shown. Updated '+([s.updated,feed.updated].filter(Boolean).sort().pop()||'').slice(0,10)+'.';
   };
   document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=(k==='city'||k==='country'||k==='reason');}render();});
   for(const id of ['q','reason','cov','country','recent']) $(id).oninput=render;
   render();
-}).catch(err=>{$('status').textContent='The feeds did not answer ('+err.message+'); try again later.';});
+}).catch(err=>{$('status').textContent='The data did not load ('+err.message+'). Try again later.';});
 </script></body></html>

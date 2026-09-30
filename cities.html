@@ -61,16 +61,15 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({
   const cov={};
   for(const a of feed.areas||[]){const whole=/whole|intra-muros|municipality/i.test(a.name)||a.name===a.city;const c=cov[a.city]||(cov[a.city]={rank:0,km2:0,label:'none'});
     c.km2+=a.km2||0; if(whole&&c.rank<2){c.rank=2;c.label='whole';} else if(!whole&&c.rank<1){c.rank=1;c.label='core';}}
-  // Going-out numbers from the counts job. Its goingOutCells is counted over the city's extent: the municipality or
-  // commune for a whole city, but the tiled box for a core city (so its share read ~100 %). A core city is measured
-  // against the going-out blocks of the 24 km square instead (goingOutCellsWide); its covered blocks all lie inside it.
+  // Going-out numbers from the counts job, read by each row's extent: a municipality or commune is counted over the
+  // city itself; a tiled box (a city covered only in its core) and a 24 km square are shown over the square (marked *).
   const cnt={}; for(const c of counts.cities||[]) cnt[c.city]=c;
-  const going=(c,rank)=>{const k=cnt[c.city], sq=k&&/square/.test(k.extent);
+  const going=(c,rank)=>{const k=cnt[c.city];
     if(!k) return {goingOut:c.goingOut,terraceShare:c.terraceShare,sq:false,outShare:null};
-    if(rank===1) return {goingOut:k.goingOutCellsWide,sq:true,terraceShare:null,  // the terrace share is the box's: blank rather than mixed
-      outShare:k.goingOutCellsWide&&k.goingOutCovered!=null?k.goingOutCovered/k.goingOutCellsWide:null};
-    if(rank===2&&sq) return {goingOut:null,terraceShare:null,sq:false,outShare:null};  // a whole city not yet counted in its own contour
-    return {goingOut:k.goingOutCells,terraceShare:k.terraceShare,sq,outShare:rank&&k.goingOutCells&&k.goingOutCovered!=null?k.goingOutCovered/k.goingOutCells:null};};
+    if(k.extent==='tiled box') return {goingOut:k.goingOutCellsWide,sq:true,terraceShare:null,  // the terrace share is the box's: blank rather than mixed
+      outShare:k.goingOutCellsWide&&k.goingOutCoveredWide!=null?k.goingOutCoveredWide/k.goingOutCellsWide:null};
+    return {goingOut:k.goingOutCells,terraceShare:k.terraceShare,sq:!/^(municipality|commune)$/.test(k.extent),
+      outShare:rank&&k.goingOutCells&&k.goingOutCovered!=null?k.goingOutCovered/k.goingOutCells:null};};
   // Whole blocks overhang a small commune's border, and some tiled boxes pass the municipality: at most 100 %.
   const rows=s.cities.map(c=>{const v=cov[c.city]||{rank:0,km2:0,label:'none'};return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2,
     areaShare:v.rank&&c.cityAreaKm2?Math.min(1,v.km2/c.cityAreaKm2):null},going(c,v.rank));});

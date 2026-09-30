@@ -136,14 +136,19 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   // The cities looked at but not tiled, as hollow grey dots sized by their going-out blocks (the status feed).
   // The status feed also gives each city's area, counts.json its going-out blocks in the wide square: the two shares below.
   const share=(n,d)=>n!=null&&d?n/d:null, pct=x=>x==null?'':(x<0.1?(100*x).toFixed(1):Math.round(100*x))+' %';
-  get('https://tiles.alephb.uk/counts.json').then(ct=>{const wide={};for(const c of ct.cities||[])wide[c.city]=c.goingOutCellsWide;
-    for(const a of areas)a.outShare=share(a.goingOut,wide[a.city]);render();}).catch(()=>{});
+  // Joined by name and place: a counts row or a status row belongs to an area when its point lies in the area's box,
+  // give or take 12 km (two cities can share a name, London, Canada). A row without a point joins by name alone.
+  const inBox=(a,c)=>{if(c.lat==null)return true;const [s0,w,n,e]=a.box,dy=12/111.32,dx=dy/Math.cos(c.lat*Math.PI/180);
+    return c.lat>=s0-dy&&c.lat<=n+dy&&c.lon>=w-dx&&c.lon<=e+dx;};
+  const match=(list,a)=>list.find(c=>c.city===a.city&&inBox(a,c));
+  get('https://tiles.alephb.uk/counts.json').then(ct=>{
+    for(const a of areas)a.outShare=share(a.goingOut,(match(ct.cities||[],a)||{}).goingOutCellsWide);render();}).catch(()=>{});
   get('https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json').then(st=>{
-    const size={};for(const c of st.cities)size[c.city]=c.cityAreaKm2;for(const a of areas)a.areaShare=share(a.km2,size[a.city]);render();
-    const covered=new Set(areas.map(a=>a.city));
-    // A city not listed yet (status "candidate", it meets the survey rule) in the complementary orange; its name
-    // may be a covered city's (London, Canada), so it is never hidden by name.
-    for(const c of st.cities){const cand=c.status==='candidate';if(!c.lat||(!cand&&covered.has(c.city))||!c.goingOut)continue;
+    for(const a of areas)a.areaShare=share(a.km2,(match(st.cities.filter(c=>c.status!=='candidate'),a)||{}).cityAreaKm2);render();
+    const covered=c=>areas.some(a=>a.city===c.city&&inBox(a,c));
+    // A city not listed yet (status "candidate", it meets the survey rule) in the complementary orange; a covered
+    // area hides a dot only when it holds the dot's point, never by name alone.
+    for(const c of st.cities){const cand=c.status==='candidate';if(!c.lat||covered(c)||!c.goingOut)continue;
       L.circleMarker([c.lat,c.lon],{radius:4,color:cand?'#DB7116':'#7f8c90',weight:1.5,fill:false,dashArray:'3 3'})
         .addTo(map).bindTooltip(c.city+(cand?', '+c.country+' · not listed yet: meets the survey rule':' · not covered: '+c.reason.toLowerCase()),{direction:'top'}).on('click',()=>{location.href='cities.html#'+encodeURIComponent(c.city);});}
   }).catch(()=>{});

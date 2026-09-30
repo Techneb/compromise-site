@@ -58,24 +58,30 @@ const COUNTS='https://tiles.alephb.uk/counts.json';
 const get=u=>fetch(u+'?v='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
 const $=id=>document.getElementById(id), fmt=n=>n==null?'':Number(n).toLocaleString(), km=n=>n==null?'':Number(n).toLocaleString(undefined,{maximumFractionDigits:n<10?1:0}), pct=x=>x==null?'':(x<0.1?(100*x).toFixed(1):Math.round(100*x))+' %';
 Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({areas:[]})), get(COUNTS).catch(()=>({cities:[]}))]).then(([s,feed,counts])=>{
+  // Two cities can share a name (London, Canada): a join by name also needs the place to agree. An area's box must
+  // hold the city's point, give or take 12 km (the counts job's square), and a counts row's point lie within 12 km.
+  const KM=12, near=(la,lo,lb,lob)=>Math.hypot((la-lb)*111.32,(lo-lob)*111.32*Math.cos(la*Math.PI/180))<=KM;
+  const holds=(box,c)=>{if(c.lat==null)return true;const [s0,w,n,e]=box,dy=KM/111.32,dx=dy/Math.cos(c.lat*Math.PI/180);
+    return c.lat>=s0-dy&&c.lat<=n+dy&&c.lon>=w-dx&&c.lon<=e+dx;};
   // Coverage per city from the feed's areas: a municipality or commune entry is the whole city, a district the core.
-  const cov={};
-  for(const a of feed.areas||[]){const whole=/whole|intra-muros|municipality/i.test(a.name)||a.name===a.city;const c=cov[a.city]||(cov[a.city]={rank:0,km2:0,label:'none'});
-    c.km2+=a.km2||0; if(whole&&c.rank<2){c.rank=2;c.label='whole';} else if(!whole&&c.rank<1){c.rank=1;c.label='core';}}
+  const coverage=c=>{const v={rank:0,km2:0,label:'none'};
+    for(const a of feed.areas||[]){if(a.city!==c.city||!a.box||!holds(a.box,c))continue;const whole=/whole|intra-muros|municipality/i.test(a.name)||a.name===a.city;
+      v.km2+=a.km2||0; if(whole&&v.rank<2){v.rank=2;v.label='whole';} else if(!whole&&v.rank<1){v.rank=1;v.label='core';}}
+    return v;};
   // Going-out numbers from the counts job, read by each row's extent: a municipality or commune is counted over the
   // city itself; a tiled box (a city covered only in its core) and a 24 km square are shown over the square (marked *).
-  const cnt={}; for(const c of counts.cities||[]) cnt[c.city]=c;
-  // A city not listed yet (status "candidate") has its own numbers in the status feed and may share a listed city's name
-  // (London, Canada): it is never joined to the coverage feed or counts.json by name.
+  const cnt={}; for(const c of counts.cities||[]) (cnt[c.city]=cnt[c.city]||[]).push(c);
+  const countsRow=c=>(cnt[c.city]||[]).find(k=>(!k.country||k.country===c.country)&&(k.lat==null||c.lat==null||near(k.lat,k.lon,c.lat,c.lon)));
+  // A city not listed yet (status "candidate") has its own numbers in the status feed: never joined to the others.
   const candidate=c=>c.status==='candidate';
-  const going=(c,rank)=>{const k=candidate(c)?null:cnt[c.city];
+  const going=(c,rank)=>{const k=candidate(c)?null:countsRow(c);
     if(!k) return {goingOut:c.goingOut,terraceShare:c.terraceShare,sq:!!c.extent&&!/^(municipality|commune)$/.test(c.extent),outShare:null};
     if(k.extent==='tiled box') return {goingOut:k.goingOutCellsWide,sq:true,terraceShare:null,  // the terrace share is the box's: blank rather than mixed
       outShare:k.goingOutCellsWide&&k.goingOutCoveredWide!=null?k.goingOutCoveredWide/k.goingOutCellsWide:null};
     return {goingOut:k.goingOutCells,terraceShare:k.terraceShare,sq:!/^(municipality|commune)$/.test(k.extent),
       outShare:rank&&k.goingOutCells&&k.goingOutCovered!=null?k.goingOutCovered/k.goingOutCells:null};};
   // Whole blocks overhang a small commune's border, and some tiled boxes pass the municipality: at most 100 %.
-  const rows=s.cities.map(c=>{const v=(!candidate(c)&&cov[c.city])||{rank:0,km2:0,label:'none'};return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2,
+  const rows=s.cities.map(c=>{const v=candidate(c)?{rank:0,km2:0,label:'none'}:coverage(c);return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2,
     areaShare:v.rank&&c.cityAreaKm2?Math.min(1,v.km2/c.cityAreaKm2):null},going(c,v.rank));});
   const reasons=[...new Set(rows.map(r=>r.reason))].sort(); for(const r of reasons){const o=document.createElement('option');o.value=r;o.textContent=r;$('reason').appendChild(o);}
   const countries=[...new Set(rows.map(r=>r.country))].sort(); for(const c of countries){const o=document.createElement('option');o.value=c;o.textContent=c;$('country').appendChild(o);}

@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Compromise — a fair place to meet</title>
+<meta name="description" content="Compromise finds the bar, café or restaurant where everyone's journey takes about the same time, on foot, by transit, by car or by bike. For iPhone.">
+<meta name="color-scheme" content="light dark">
+<style>
+/* Layout: an app landing page. Hero with the phone, three steps, one section per feature with its own picture, privacy, footer. The app's own palette: one colour per person, amber for the sun. */
+:root {
+  --bg: #F6F9FA; --surface: #FFFFFF; --fg: #0F2328; --muted: #50686E; --hair: #DCE6E8;
+  --tint: #2F7F90; --p1: #368B9C; --p2: #DB7116; --p3: #8E5BB5; --sun: #E8A317; --shade: #37565C;
+  --map: #E9F0EE; --street: #FFFFFF; --park: #D6E8D5; --water: #CFE6EE;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #0B1416; --surface: #132126; --fg: #E4EFF1; --muted: #98B0B6; --hair: #22363B;
+  --tint: #16B9DB; --p1: #16B9DB; --p2: #E8842E; --p3: #C39BE3; --sun: #FFC048; --shade: #8FB5BC;
+  --map: #16252A; --street: #22363C; --park: #1C3328; --water: #173440; } }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.55 var(--font); }
+a { color: var(--tint); }
+a:focus-visible { outline: 2px solid var(--tint); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
+h1 { font-size: clamp(40px, 7vw, 68px); line-height: 1.02; font-weight: 700; }
+h2 { font-size: clamp(28px, 4.2vw, 42px); line-height: 1.08; font-weight: 700; }
+h3 { font-size: 20px; line-height: 1.25; font-weight: 650; letter-spacing: -0.01em; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.kicker { font: 600 13px/1 var(--font); text-transform: uppercase; letter-spacing: 0.09em; color: var(--tint); }
+
+/* Nav */
+nav { display: flex; align-items: center; justify-content: space-between; padding-block: 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 19px/1 var(--display); color: var(--fg); text-decoration: none; letter-spacing: -0.01em; }
+.brand-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--p1); display: grid; place-items: center; }
+nav .links { display: flex; gap: 22px; font-size: 15px; }
+nav .links a { color: var(--muted); text-decoration: none; }
+nav .links a:hover { color: var(--fg); }
+
+/* Hero */
+.hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; padding-block: 36px 72px; }
+.hero > div { min-width: 0; }
+.hero .lede { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 34ch; margin-top: 20px; }
+.status { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; padding: 9px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); font-size: 15px; font-weight: 550; }
+.status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--p2); }
+.modes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.mode { font-size: 14px; padding: 5px 12px; border-radius: 999px; background: color-mix(in srgb, var(--p1) 12%, transparent); color: var(--fg); }
+
+/* Phone */
+.phone { width: min(320px, 100%); aspect-ratio: 320 / 660; margin-inline: auto; border-radius: 46px; background: #0E1A1D; padding: 11px; box-shadow: 0 30px 60px -20px rgba(15, 35, 40, 0.35), 0 0 0 1px rgba(255,255,255,0.06) inset; }
+.screen { position: relative; height: 100%; border-radius: 36px; overflow: hidden; background: var(--map); }
+.screen svg.map { position: absolute; inset: 0; width: 100%; height: 100%; }
+.island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 92px; height: 26px; border-radius: 20px; background: #0E1A1D; z-index: 3; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-radius: 22px 22px 0 0; padding: 8px 14px 16px; box-shadow: 0 -6px 20px rgba(0,0,0,0.08); }
+.grabber { width: 36px; height: 5px; border-radius: 3px; background: var(--hair); margin: 0 auto 10px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; font: 600 11.5px/1 var(--font); padding: 6px 9px; border-radius: 999px; background: var(--bg); }
+.chip i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.spot { padding: 9px 0; border-top: 1px solid var(--hair); }
+.spot-head { display: flex; align-items: center; gap: 8px; }
+.rank { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 700 11px/1 var(--round); color: #fff; background: var(--shade); flex: none; }
+.spot:first-of-type .rank { background: var(--p1); }
+.spot-name { font: 650 13.5px/1.2 var(--font); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gap { font: 600 11px/1 var(--font); color: var(--muted); white-space: nowrap; }
+.sun-cap { display: inline-flex; align-items: center; gap: 4px; font: 600 10.5px/1 var(--font); color: var(--fg); margin: 5px 0 0 28px; }
+.sun-cap::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--sun); }
+.bars { display: grid; gap: 3px; margin: 6px 0 0 28px; }
+.bar { display: grid; grid-template-columns: 34px 1fr 34px; align-items: center; gap: 6px; font: 500 10px/1 var(--font); color: var(--muted); }
+.bar .track { height: 5px; border-radius: 3px; background: var(--hair); position: relative; }
+.bar .fill { position: absolute; inset: 0 auto 0 0; border-radius: 3px; }
+.bar b { font-weight: 600; color: var(--fg); text-align: right; font-variant-numeric: tabular-nums; }
+.illustration { text-align: center; font-size: 13px; color: var(--muted); margin-top: 14px; }
+
+/* Sections */
+section { padding-block: 72px; }
+section + section { border-top: 1px solid var(--hair); }
+.section-head { display: grid; gap: 14px; max-width: 42rem; margin-bottom: 40px; }
+.section-head p { font-size: 19px; color: var(--muted); }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: step; list-style: none; padding: 0; margin: 0; }
+.steps li { background: var(--surface); border-radius: 20px; padding: 26px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.steps li::before { counter-increment: step; content: counter(step); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 700 16px/1 var(--round); color: #fff; background: var(--p1); }
+.steps li:nth-child(2)::before { background: var(--p2); }
+.steps li:nth-child(3)::before { background: var(--p3); }
+.steps p { color: var(--muted); font-size: 16px; }
+
+.feature { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.feature > div { min-width: 0; }
+.feature.flip > :first-child { order: 2; }
+.feature .copy { display: grid; gap: 16px; max-width: 30rem; }
+.feature .copy p { font-size: 18px; color: var(--muted); }
+.feature ul { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.feature li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 16px; }
+.feature li::before { content: ""; width: 10px; height: 10px; margin-top: 8px; border-radius: 50%; background: var(--p1); }
+.panel { background: var(--surface); border-radius: 24px; padding: 28px; }
+.panel svg { display: block; width: 100%; height: auto; }
+
+/* Fair-time comparison */
+.compare { display: grid; gap: 22px; }
+.compare-row { display: grid; gap: 10px; }
+.compare-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-weight: 650; }
+.compare-title span { font-size: 14px; font-weight: 500; color: var(--muted); }
+.cbar { display: grid; grid-template-columns: 52px 1fr 58px; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); }
+.cbar .track { height: 12px; border-radius: 6px; background: var(--hair); position: relative; }
+.cbar .fill { position: absolute; inset: 0 auto 0 0; border-radius: 6px; }
+.cbar b { font-weight: 650; color: var(--fg); text-align: right; font-variant-numeric: tabular-nums; }
+.verdict { font-size: 14px; font-weight: 600; }
+.verdict.bad { color: var(--muted); }
+.verdict.good { color: var(--tint); }
+
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.tile { background: var(--surface); border-radius: 20px; padding: 24px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.tile p { font-size: 15.5px; color: var(--muted); }
+.tile svg { width: 28px; height: 28px; color: var(--tint); }
+
+.privacy { background: var(--surface); border-radius: 28px; padding: clamp(28px, 5vw, 56px); display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+.privacy > div { min-width: 0; }
+.privacy ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.privacy li { display: flex; gap: 12px; align-items: baseline; font-size: 17px; }
+.privacy li::before { content: "✓"; font-weight: 700; color: var(--tint); }
+
+.langs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.lang { padding: 8px 14px; border-radius: 12px; background: var(--surface); font-weight: 550; }
+
+footer { padding-block: 40px 56px; border-top: 1px solid var(--hair); display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; font-size: 15px; color: var(--muted); }
+footer .links { display: flex; flex-wrap: wrap; gap: 20px; }
+footer a { color: var(--muted); }
+.email { user-select: all; color: var(--fg); }
+
+@media (max-width: 860px) {
+  .hero, .feature, .privacy { grid-template-columns: 1fr; gap: 36px; }
+  .feature.flip > :first-child { order: 0; }
+  .steps { grid-template-columns: 1fr; }
+  .grid4 { grid-template-columns: repeat(2, 1fr); }
+  section { padding-block: 56px; }
+}
+@media (max-width: 480px) {
+  .grid4 { grid-template-columns: 1fr; }
+  nav .links { gap: 16px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fill { transform-origin: left; animation: grow 900ms cubic-bezier(.2,.7,.2,1) both; }
+  .bars .bar:nth-child(2) .fill { animation-delay: 120ms; }
+  .bars .bar:nth-child(3) .fill { animation-delay: 240ms; }
+  @keyframes grow { from { transform: scaleX(0.15); } to { transform: scaleX(1); } }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Main">
+    <a class="brand" href="./">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5c-3.3 0-6 2.5-6 5.8 0 4.2 6 9.2 6 9.2s6-5 6-9.2c0-3.3-2.7-5.8-6-5.8z" fill="#fff"/><path d="M5.8 7.6c1-.9 2-.9 3.2 0s2.2.9 3.2 0" fill="none" stroke="#368B9C" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </span>
+      Compromise
+    </a>
+    <div class="links"><a href="#how">How it works</a><a href="privacy">Privacy</a></div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <p class="kicker">For iPhone</p>
+      <h1>Meet halfway in minutes, not miles.</h1>
+      <p class="lede">Compromise finds the bar, café or restaurant where everyone's journey takes about the same time, however each of you travels.</p>
+      <div class="modes" aria-label="Ways to travel"><span class="mode">On foot</span><span class="mode">Transit</span><span class="mode">Car</span><span class="mode">Bike</span></div>
+      <p class="status"><span class="dot" aria-hidden="true"></span>In testing now. Coming to the App Store.</p>
+    </div>
+
+    <div>
+      <div class="phone" role="img" aria-label="Illustration of the app: a map with three friends and a meeting spot, and a list of spots where Nino, Léa and you each travel about 18 minutes.">
+        <div class="screen">
+          <div class="island"></div>
+          <svg class="map" viewBox="0 0 300 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="300" height="640" fill="var(--map)"/>
+            <path d="M-20 250 C 60 220, 120 300, 190 260 S 300 200, 330 230" stroke="var(--water)" stroke-width="26" fill="none"/>
+            <rect x="170" y="90" width="90" height="70" rx="10" fill="var(--park)"/>
+            <g stroke="var(--street)" stroke-linecap="round" fill="none">
+              <path d="M-10 120 L310 150" stroke-width="10"/><path d="M-10 330 L310 300" stroke-width="12"/>
+              <path d="M80 -10 L110 660" stroke-width="10"/><path d="M220 -10 L200 660" stroke-width="9"/>
+              <path d="M-10 60 L150 200 L310 420" stroke-width="7"/><path d="M30 420 L310 380" stroke-width="7"/>
+            </g>
+            <g fill="none" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="1 7">
+              <path d="M52 92 L96 150 L140 196" stroke="var(--p1)"/>
+              <path d="M248 70 L214 140 L150 200" stroke="var(--p2)"/>
+              <path d="M170 330 L150 260 L148 214" stroke="var(--p3)"/>
+            </g>
+            <g stroke="#fff" stroke-width="3">
+              <circle cx="52" cy="92" r="9" fill="var(--p1)"/>
+              <circle cx="248" cy="70" r="9" fill="var(--p2)"/>
+              <circle cx="170" cy="330" r="9" fill="var(--p3)"/>
+            </g>
+            <path d="M146 176c-9 0-16 7-16 15 0 11 16 25 16 25s16-14 16-25c0-8-7-15-16-15z" fill="var(--fg)" stroke="#fff" stroke-width="2.5"/>
+            <circle cx="146" cy="191" r="5" fill="var(--sun)"/>
+          </svg>
+          <div class="sheet">
+            <div class="grabber"></div>
+            <div class="chips">
+              <span class="chip"><i style="background: var(--p1)"></i>You · walk</span>
+              <span class="chip"><i style="background: var(--p2)"></i>Nino · transit</span>
+              <span class="chip"><i style="background: var(--p3)"></i>Léa · bike</span>
+            </div>
+            <div class="spot">
+              <div class="spot-head"><span class="rank">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 min apart</span></div>
+              <div class="sun-cap">In the sun until 18:40</div>
+              <div class="bars">
+                <div class="bar"><span>You</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 min</b></div>
+                <div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div>
+                <div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 min</b></div>
+              </div>
+            </div>
+            <div class="spot">
+              <div class="spot-head"><span class="rank">2</span><span class="spot-name">Bar Mercure</span><span class="gap">≃ 4 min apart</span></div>
+              <div class="bars">
+                <div class="bar"><span>You</span><span class="track"><span class="fill" style="width: 50%; background: var(--p1)"></span></span><b>15 min</b></div>
+                <div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div>
+                <div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 57%; background: var(--p3)"></span></span><b>17 min</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="illustration">Illustration. Names and places are examples.</p>
+    </div>
+  </header>
+</div>
+
+<div class="wrap">
+  <section id="how" aria-labelledby="how-title">
+    <div class="section-head">
+      <p class="kicker">How it works</p>
+      <h2 id="how-title">Three taps to a place everyone can live with.</h2>
+    </div>
+    <ol class="steps">
+      <li><h3>Add everyone</h3><p>Start from where you are, then add friends by name. Two people or a whole group, each with their own starting point.</p></li>
+      <li><h3>Say how each one travels</h3><p>One walks, one takes the metro, one cycles. Every journey is timed the way that person actually travels.</p></li>
+      <li><h3>Pick from the fairest spots</h3><p>Bars, cafés and restaurants are ranked by how close everyone's travel times are. Open the directions or share the spot in one tap.</p></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="fair-title">
+    <div class="feature">
+      <div class="copy">
+        <p class="kicker">Fair means time</p>
+        <h2 id="fair-title">The middle of the map is rarely the fair place.</h2>
+        <p>A point halfway between two addresses can mean a short walk for one of you and a long trip for the other. Compromise compares real travel times, so nobody spends the evening getting there.</p>
+        <ul>
+          <li>Each person's own way of travelling, timed for when you leave.</li>
+          <li>Choose between the fairest spot and the quickest one overall.</li>
+          <li>Set a limit so nobody travels longer than you want.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="panel compare" role="img" aria-label="Example: the point halfway on the map means 35 minutes for one friend and 12 for the other; the spot Compromise picks means 18 and 22 minutes.">
+          <div class="compare-row">
+            <div class="compare-title">Halfway on the map <span>example</span></div>
+            <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 88%; background: var(--p2)"></span></span><b>35 min</b></div>
+            <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 30%; background: var(--p3)"></span></span><b>12 min</b></div>
+            <p class="verdict bad">23 minutes apart</p>
+          </div>
+          <div class="compare-row">
+            <div class="compare-title">The spot Compromise picks</div>
+            <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 45%; background: var(--p2)"></span></span><b>18 min</b></div>
+            <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 55%; background: var(--p3)"></span></span><b>22 min</b></div>
+            <p class="verdict good">4 minutes apart</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sun-title">
+    <div class="feature flip">
+      <div class="copy">
+        <p class="kicker">Sunny terraces</p>
+        <h2 id="sun-title">A terrace still in the sun when everyone arrives.</h2>
+        <p>Turn on the sunny filter and Compromise keeps the spots whose terrace will be in the sun at your meeting time, taking the buildings around it into account. On a hot day, ask for the shade instead.</p>
+        <ul>
+          <li>"In the sun until 18:40" on each spot, so you know how long it lasts.</li>
+          <li>Rooftops count too.</li>
+          <li>Available in a growing list of cities.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="panel" role="img" aria-label="Illustration: the evening sun passes over a building and lights one terrace while the terrace in the building's shadow stays shaded.">
+          <svg viewBox="0 0 420 260" aria-hidden="true">
+            <circle cx="360" cy="54" r="26" fill="var(--sun)"/>
+            <path d="M334 72 L150 214 L240 214 Z" fill="var(--sun)" opacity="0.16"/>
+            <rect x="170" y="104" width="70" height="110" rx="4" fill="var(--shade)" opacity="0.9"/>
+            <g fill="var(--surface)" opacity="0.5"><rect x="184" y="120" width="14" height="14"/><rect x="212" y="120" width="14" height="14"/><rect x="184" y="148" width="14" height="14"/><rect x="212" y="148" width="14" height="14"/><rect x="184" y="176" width="14" height="14"/><rect x="212" y="176" width="14" height="14"/></g>
+            <path d="M170 214 L40 214 L100 150 Z" fill="var(--fg)" opacity="0.10"/>
+            <line x1="10" y1="214" x2="410" y2="214" stroke="var(--muted)" stroke-width="2"/>
+            <g>
+              <rect x="258" y="196" width="60" height="4" rx="2" fill="var(--fg)"/>
+              <rect x="262" y="200" width="3" height="14" fill="var(--fg)"/><rect x="311" y="200" width="3" height="14" fill="var(--fg)"/>
+              <path d="M252 186 Q288 168 324 186 Z" fill="var(--p2)"/>
+              <text x="288" y="238" text-anchor="middle" font-size="13" font-weight="600" fill="var(--fg)" font-family="-apple-system, Segoe UI, sans-serif">In the sun</text>
+            </g>
+            <g opacity="0.7">
+              <rect x="70" y="196" width="60" height="4" rx="2" fill="var(--fg)"/>
+              <rect x="74" y="200" width="3" height="14" fill="var(--fg)"/><rect x="123" y="200" width="3" height="14" fill="var(--fg)"/>
+              <path d="M64 186 Q100 168 136 186 Z" fill="var(--p1)"/>
+              <text x="100" y="238" text-anchor="middle" font-size="13" font-weight="600" fill="var(--muted)" font-family="-apple-system, Segoe UI, sans-serif">In the shade</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="more-title">
+    <div class="section-head">
+      <p class="kicker">Made for real plans</p>
+      <h2 id="more-title">Everything you need to settle on a place.</h2>
+    </div>
+    <div class="grid4">
+      <div class="tile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
+        <h3>Any size of group</h3><p>From two friends to the whole team, each with a colour of their own on the map and in the list.</p>
+      </div>
+      <div class="tile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
+        <h3>Bars, cafés, restaurants</h3><p>Pick the kind of place and a cuisine, then call it or open its website straight from the list.</p>
+      </div>
+      <div class="tile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
+        <h3>Share or go</h3><p>Send the spot to the group, or open the route in Apple Maps, Google Maps, Citymapper or Waze.</p>
+      </div>
+      <div class="tile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+        <h3>Plan for later</h3><p>Choose when you leave, and travel times and sunshine follow that time, not just right now.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="privacy-title">
+    <div class="privacy">
+      <div>
+        <p class="kicker">Privacy</p>
+        <h2 id="privacy-title" style="margin-top: 14px">Your plans stay yours.</h2>
+        <p class="muted" style="margin-top: 16px; font-size: 18px">No sign-up, nothing to configure. Open the app and meet.</p>
+      </div>
+      <ul>
+        <li>No account, no advertising, no tracking.</li>
+        <li>Nothing you enter is sent to us.</li>
+        <li>Addresses you use are remembered only on your phone, and one tap clears them.</li>
+        <li><span>Read the <a href="privacy">privacy policy</a>.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="lang-title">
+    <div class="section-head" style="margin-bottom: 0">
+      <p class="kicker">Languages</p>
+      <h2 id="lang-title">Speaks your language.</h2>
+      <p>English, French, Spanish and German, switched at any time in Settings.</p>
+      <div class="langs"><span class="lang" lang="en">English</span><span class="lang" lang="fr">Français</span><span class="lang" lang="es">Español</span><span class="lang" lang="de">Deutsch</span></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Compromise, by AlephB.</span>
+    <div class="links"><a href="privacy">Privacy policy</a><span>Contact: <span class="email">contact@alephb.uk</span></span></div>
+  </footer>
+</div>
+</body>
+</html>

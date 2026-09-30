@@ -25,8 +25,9 @@ details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;
 </style></head><body><main>
 <nav><a href="coverage.html">Map</a><a class="on" href="cities.html">Cities</a></nav>
 <h1>City coverage</h1>
-<p>Every city we have looked at for the sunny filter, and how much of it the sunny filter covers. A city missing from the list has not been looked at yet. For the others, the list says what they are waiting for.</p>
+<p>Every city we have looked at for the sunny filter, and how much of it the sunny filter covers. A city missing from the list has not been looked at yet. For the others, the list says what they are waiting for. Cities of over 300,000 in Europe, North America and Oceania with enough going-out blocks to be surveyed are listed too, as <em>Meets the survey rule, not listed yet</em>, until they are added.</p>
 <p id="status">Loading…</p>
+<p id="tally"></p>
 <details open><summary>How to read it</summary><dl>
 <dt>Block</dt><dd>A square of about 200 m.</dd>
 <dt>Going-out block</dt><dd>A block with at least 10 bars, cafés and restaurants within 400 m.</dd>
@@ -37,7 +38,7 @@ details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;
 <dt>Covered (km²)</dt><dd>The surface where the sunny filter works.</dd>
 <dt>Covered (% of area)</dt><dd>That surface, as a share of the city's surface.</dd>
 <dt>Covered (% of going-out)</dt><dd>The going-out blocks where the sunny filter works, as a share of the Going-out blocks column.</dd>
-<dt>Waiting for</dt><dd>What a city not yet covered whole needs first.</dd>
+<dt>Waiting for</dt><dd>What a city not yet covered whole needs first. The counts above the table say how many cities wait for each; tap one to show only those.</dd>
 </dl></details>
 <div class="bar">
   <select id="reason"><option value="">Waiting for anything</option></select>
@@ -64,17 +65,24 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({
   // Going-out numbers from the counts job, read by each row's extent: a municipality or commune is counted over the
   // city itself; a tiled box (a city covered only in its core) and a 24 km square are shown over the square (marked *).
   const cnt={}; for(const c of counts.cities||[]) cnt[c.city]=c;
-  const going=(c,rank)=>{const k=cnt[c.city];
-    if(!k) return {goingOut:c.goingOut,terraceShare:c.terraceShare,sq:false,outShare:null};
+  // A city not listed yet (status "candidate") has its own numbers in the status feed and may share a listed city's name
+  // (London, Canada): it is never joined to the coverage feed or counts.json by name.
+  const candidate=c=>c.status==='candidate';
+  const going=(c,rank)=>{const k=candidate(c)?null:cnt[c.city];
+    if(!k) return {goingOut:c.goingOut,terraceShare:c.terraceShare,sq:!!c.extent&&!/^(municipality|commune)$/.test(c.extent),outShare:null};
     if(k.extent==='tiled box') return {goingOut:k.goingOutCellsWide,sq:true,terraceShare:null,  // the terrace share is the box's: blank rather than mixed
       outShare:k.goingOutCellsWide&&k.goingOutCoveredWide!=null?k.goingOutCoveredWide/k.goingOutCellsWide:null};
     return {goingOut:k.goingOutCells,terraceShare:k.terraceShare,sq:!/^(municipality|commune)$/.test(k.extent),
       outShare:rank&&k.goingOutCells&&k.goingOutCovered!=null?k.goingOutCovered/k.goingOutCells:null};};
   // Whole blocks overhang a small commune's border, and some tiled boxes pass the municipality: at most 100 %.
-  const rows=s.cities.map(c=>{const v=cov[c.city]||{rank:0,km2:0,label:'none'};return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2,
+  const rows=s.cities.map(c=>{const v=(!candidate(c)&&cov[c.city])||{rank:0,km2:0,label:'none'};return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2,
     areaShare:v.rank&&c.cityAreaKm2?Math.min(1,v.km2/c.cityAreaKm2):null},going(c,v.rank));});
   const reasons=[...new Set(rows.map(r=>r.reason))].sort(); for(const r of reasons){const o=document.createElement('option');o.value=r;o.textContent=r;$('reason').appendChild(o);}
   const countries=[...new Set(rows.map(r=>r.country))].sort(); for(const c of countries){const o=document.createElement('option');o.value=c;o.textContent=c;$('country').appendChild(o);}
+  // The stats: how many cities give each reason (the feed's own tally when it has one), each a filter.
+  const tally=s.reasons||rows.reduce((t,r)=>(t[r.reason]=(t[r.reason]||0)+1,t),{});
+  $('tally').innerHTML=Object.entries(tally).sort((a,b)=>b[1]-a[1]).map(([k,n])=>'<a href="#" data-reason="'+k+'">'+n+' '+k.toLowerCase()+'</a>').join(' · ');
+  $('tally').onclick=e=>{const a=e.target.closest('a[data-reason]');if(!a)return;e.preventDefault();$('reason').value=a.dataset.reason;$('cov').value='';render();};
   let sortKey='goingOut', asc=false;
   const render=()=>{
     const q=$('q').value.trim().toLowerCase(), reason=$('reason').value, cv=$('cov').value, ctry=$('country').value, rec=$('recent').value;
@@ -89,7 +97,8 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({
     const trs=[...$('list').rows];
     document.querySelectorAll('thead th').forEach((th,i)=>{const empty=trs.length>0&&trs.every(tr=>{const t=tr.cells[i].textContent.trim();return !t||t==='NaN';});
       th.classList.toggle('empty',empty); for(const tr of trs) tr.cells[i].classList.toggle('empty',empty);});
-    $('status').textContent=shown.length+' of '+rows.length+' cities shown. Updated '+([s.updated,feed.updated].filter(Boolean).sort().pop()||'').slice(0,10)+'.';
+    const listed=s.listed!=null?s.listed:rows.length;
+    $('status').textContent=shown.length+' of '+rows.length+' cities shown ('+listed+' listed'+(rows.length>listed?', '+(rows.length-listed)+' not listed yet':'')+'). Updated '+([s.updated,feed.updated].filter(Boolean).sort().pop()||'').slice(0,10)+'.';
   };
   document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=(k==='city'||k==='country'||k==='reason');}render();});
   for(const id of ['q','reason','cov','country','recent']) $(id).oninput=render;

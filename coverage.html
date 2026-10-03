@@ -27,7 +27,9 @@ small{color:var(--muted)}
 .filter{display:flex;gap:8px;align-items:center;margin:10px 0 0}.filter label{color:var(--muted);white-space:nowrap}
 .filter input{flex:1;min-width:0;font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
 #none{margin:8px 0 0}#none:empty{display:none}
-.leaflet-control-layers .grp{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#5b6b6f;margin:6px 0 2px}.leaflet-control-layers .grp:first-child{margin-top:0}
+#layers{border:0;padding:0;margin:0;min-width:0}#layers legend{padding:0;font-size:15px;font-weight:700;margin:14px 0 4px}
+#layers .cats{display:flex;flex-wrap:wrap;gap:6px 28px}#layers .grp{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 2px}
+#layers label{display:block;cursor:pointer;padding:1px 0}#layers input{accent-color:var(--accent);margin:0 6px 0 0;vertical-align:-1px}
 .leaflet-popup-content{font:13px/1.4 -apple-system,system-ui,sans-serif;margin:10px 12px}
 .leaflet-popup-content h3{font-size:14px;margin:0 0 2px}.leaflet-popup-content h4{font-size:12px;margin:8px 0 2px;color:#5b6b6f;text-transform:uppercase;letter-spacing:.03em}
 .leaflet-popup-content dl{margin:0;display:grid;grid-template-columns:auto auto;gap:1px 10px}.leaflet-popup-content dt{color:#5b6b6f}.leaflet-popup-content dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
@@ -38,6 +40,7 @@ small{color:var(--muted)}
 <nav style="display:flex;gap:14px;margin-bottom:8px"><a href="coverage.html" style="color:var(--accent);font-weight:600;text-decoration:none;border-bottom:2px solid var(--accent)">Map</a><a href="cities.html" style="color:var(--muted);font-weight:600;text-decoration:none">Cities</a></nav>
 <h1>Compromise coverage</h1>
 <p id="status">Loading the feed…</p>
+<fieldset id="layers" hidden><legend>Layer</legend><div class="cats"></div></fieldset>
 <h2 id="layerName"></h2>
 <p id="layerAbout"></p>
 <div id="legend"></div>
@@ -118,13 +121,16 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   for(const name in layers) groups[name]=L.layerGroup();
   const show=name=>{build(name);$('layerName').textContent=name;$('layerAbout').textContent=layers[name].about+(layers[name].grid==='places'&&!perBlock?' (This feed has no per-block places yet: shown per 2 km tile.)':'');
     $('legend').innerHTML=((layers[name].grid==='places'&&!perBlock&&layers[name].legendTile)||layers[name].legend).map(([col,txt])=>'<p><span class="sw" style="background:'+col+'"></span>'+txt+'</p>').join('');};
-  const first='Sunny filter'; groups[first].addTo(map); show(first);
-  const control=L.control.layers(groups,{},{collapsed:false,position:'topright'}).addTo(map);
-  // Category headers in the layer menu (Leaflet has none of its own).
+  let current='Sunny filter'; groups[current].addTo(map); show(current);
+  const pick=name=>{if(name===current)return;groups[current].remove();current=name;groups[name].addTo(map);show(name);};
+  // One layer at a time, picked from the panel: radio buttons under a category header where a category starts.
   const cats={'Places':'Places','Sunny filter':'Sunny filter','Data freshness':'Data'};
-  for(const label of control.getContainer().querySelectorAll('.leaflet-control-layers-base label')){const t=label.textContent.trim();
-    if(cats[t]){const h=document.createElement('div');h.className='grp';h.textContent=cats[t];label.parentNode.insertBefore(h,label);}}
-  map.on('baselayerchange',e=>show(e.name));
+  let cat;
+  for(const name in layers){
+    if(cats[name]){cat=document.createElement('div');const h=document.createElement('div');h.className='grp';h.textContent=cats[name];cat.appendChild(h);$('layers').lastElementChild.appendChild(cat);}
+    const label=document.createElement('label'),r=document.createElement('input');r.type='radio';r.name='layer';r.value=name;r.checked=name===current;r.onchange=()=>pick(name);
+    label.appendChild(r);label.appendChild(document.createTextNode(name));cat.appendChild(label);}
+  $('layers').hidden=false;
 
   // ---- the area list: places are estimated from the 2 km tiles overlapping the area, in proportion to the overlap
   const areas=(d.areas||[]).slice();

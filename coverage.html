@@ -24,6 +24,9 @@ th .s{cursor:pointer;user-select:none}th.on .s{color:var(--accent)}th.on .s::aft
 th select{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 2px;max-width:200px}
 tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}
 small{color:var(--muted)}
+.filter{display:flex;gap:8px;align-items:center;margin:10px 0 0}.filter label{color:var(--muted);white-space:nowrap}
+.filter input{flex:1;min-width:0;font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+#none{margin:8px 0 0}#none:empty{display:none}
 .leaflet-control-layers .grp{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#5b6b6f;margin:6px 0 2px}.leaflet-control-layers .grp:first-child{margin-top:0}
 .leaflet-popup-content{font:13px/1.4 -apple-system,system-ui,sans-serif;margin:10px 12px}
 .leaflet-popup-content h3{font-size:14px;margin:0 0 2px}.leaflet-popup-content h4{font-size:12px;margin:8px 0 2px;color:#5b6b6f;text-transform:uppercase;letter-spacing:.03em}
@@ -39,6 +42,8 @@ small{color:var(--muted)}
 <p id="layerAbout"></p>
 <div id="legend"></div>
 <p><small>A block is one 200 m square of the grid the app reads. Tap a square for its numbers, an area in the list to fly to it. Pick the two metric columns below; click a header to sort.</small></p>
+<div class="filter"><label for="q">City</label><input id="q" type="search" placeholder="Search a city" autocomplete="off"></div>
+<p id="none" role="status" aria-live="polite"></p>
 <table><thead><tr><th><span class="s" data-k="city">Area</span></th><th><span class="s" data-k="km2">km²</span></th><th id="h1"></th><th id="h2"></th></tr></thead><tbody id="list"></tbody></table>
 </aside>
 <script>
@@ -128,7 +133,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
       if(ov>0){const f=ov/((la[1]-la[0])*(lo[1]-lo[0]));places+=t[2]*f;seats+=t[3]*f;}}
     a.exact=a.places!=null&&(a.places>0||places===0);if(!a.exact){a.places=Math.round(places);a.seats=Math.round(seats);}
     a.seatShare=a.places?a.seats/a.places:0;a.worksShare=a.tiled?a.passing/a.tiled:0;a.recordsShare=a.passing?a.terracesKnown/a.passing:0;
-    L.circleMarker([(s+n)/2,(w+e)/2],{radius:5,color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.7})
+    a.dot=L.circleMarker([(s+n)/2,(w+e)/2],{radius:5,color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.7})
       .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));}
   // #City in the address flies to that area (the cities page links here).
   const flyTo=()=>{const want=decodeURIComponent(location.hash.slice(1));if(!want)return;const a=areas.find(x=>x.city===want||x.name===want);if(a){const [s,w,n,e]=a.box;map.fitBounds([[s,w],[n,e]]);}};
@@ -167,6 +172,9 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   };
   const picks=['passing','places'];
   let sortKey='km2', asc=false;
+  // The city field: case- and accent-insensitive ("sao" finds São, "wroclaw" Wrocław) on the Area cell's text.
+  const fold=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/ł/g,'l').replace(/ø/g,'o').replace(/ß/g,'ss').replace(/æ/g,'ae').replace(/œ/g,'oe').replace(/đ/g,'d');
+  let lastQ='';
   const header=(i,th)=>{const sel=document.createElement('select');const og={};
     for(const k in metrics){const g=metrics[k].group;if(!og[g]){og[g]=document.createElement('optgroup');og[g].label=g;sel.appendChild(og[g]);}
       const o=document.createElement('option');o.value=k;o.textContent=metrics[k].label;if(k===picks[i])o.selected=true;og[g].appendChild(o);}
@@ -178,11 +186,17 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     const val=a=>sortKey==='city'?(a.city+' '+a.name).toLowerCase():sortKey==='lastBuilt'?(a.lastBuilt||''):(a[sortKey]||0);
     areas.sort((x,y)=>{const p=val(x),q=val(y);return (p<q?-1:p>q?1:0)*(asc?1:-1);});
     document.querySelectorAll('th').forEach(th=>{const k=th.dataset.k||th.querySelector('.s')?.dataset.k;th.classList.toggle('on',k===sortKey);th.classList.toggle('asc',k===sortKey&&asc);});
+    const q=fold($('q').value.trim()), shown=areas.filter(a=>!q||fold(a.city+' '+(a.name||'')).includes(q));
     const list=$('list');list.innerHTML='';
-    for(const a of areas){const [s,w,n,e]=a.box;const tr=document.createElement('tr');tr.className='c';
+    for(const a of shown){const [s,w,n,e]=a.box;const tr=document.createElement('tr');tr.className='c';
       tr.innerHTML='<td>'+a.city+(a.name&&a.name!==a.city?'<br><small>'+a.name+'</small>':'')+'</td><td>'+(a.km2!=null?Number(a.km2).toFixed(1):'')+'</td><td>'+metrics[picks[0]].cell(a)+'</td><td>'+metrics[picks[1]].cell(a)+'</td>';
-      tr.onclick=()=>map.fitBounds([[s,w],[n,e]]);list.appendChild(tr);}};
+      tr.onclick=()=>map.fitBounds([[s,w],[n,e]]);list.appendChild(tr);}
+    $('none').textContent=q&&!shown.length?'No city matches.':'';
+    // The map in step: only the matching areas' dots, and the view flies to the match when every match is one city.
+    for(const a of areas){if(shown.includes(a))a.dot.addTo(map);else a.dot.remove();}
+    if(q!==lastQ){lastQ=q;if(q&&shown.length&&shown.every(a=>a.city===shown[0].city))map.fitBounds(shown.map(a=>[[a.box[0],a.box[1]],[a.box[2],a.box[3]]]).flat());}};
   document.querySelectorAll('th .s[data-k]').forEach(s=>s.onclick=()=>{const k=s.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=k==='city';}render();});
+  $('q').oninput=render;
   render();
   $('status').textContent='Feed updated '+(d.updated||'')+': '+fmt(d.cells.length)+' blocks, '+fmt(d.venueCells.length)+' venue tiles, '+areas.length+' areas.';
 }).catch(err=>{$('status').textContent='The feed did not answer ('+err.message+'); try again later.';});

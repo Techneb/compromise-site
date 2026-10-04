@@ -35,6 +35,7 @@ details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;
 <dt>Going-out blocks</dt><dd>Counted in the municipality (the commune in France). Marked *: counted in a 24 km square around the city's centre instead, for a city covered only in its core or not yet covered.</dd>
 <dt>Terraces (%)</dt><dd>The going-out blocks where outdoor seating is on record. Left blank for a city covered only in its core.</dd>
 <dt>Coverage</dt><dd>Whole city, core (the part where people go out) or none.</dd>
+<dt>Checked</dt><dd>How far the sunny filter has been checked on screen in a covered city: in several districts, in one spot, or not yet.</dd>
 <dt>Covered (km²)</dt><dd>The surface where the sunny filter works.</dd>
 <dt>Covered (% of area)</dt><dd>That surface, as a share of the city's surface.</dd>
 <dt>Covered (% of going-out)</dt><dd>The going-out blocks where the sunny filter works, as a share of the Going-out blocks column.</dd>
@@ -43,12 +44,13 @@ details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;
 <div class="bar">
   <select id="reason"><option value="">Waiting for anything</option></select>
   <select id="cov"><option value="">Any coverage</option><option value="none" selected>Not covered</option><option value="core">Core only</option><option value="whole">Whole city</option></select>
+  <select id="chk"><option value="">Any check</option><option value="districts">Districts</option><option value="seed">One spot</option><option value="none">Not yet</option></select>
   <select id="country"><option value="">Any country</option></select>
   <input id="q" type="search" placeholder="Search a city">
   <select id="recent"><option value="">Updated any time</option><option value="7">Updated in the last 7 days</option><option value="30">Updated in the last 30 days</option></select>
 </div>
 <div class="scroll"><table><thead><tr>
-<th data-k="city">City</th><th data-k="country" class="hide">Country</th><th data-k="population" class="n">Inhabitants</th><th data-k="cityAreaKm2" class="n">Surface (km²)</th><th data-k="blocks" class="n hide">Blocks</th><th data-k="goingOut" class="n">Going-out blocks</th><th data-k="terraceShare" class="n hide">Terraces (%)</th><th data-k="covRank">Coverage</th><th data-k="km2" class="n">Covered (km²)</th><th data-k="areaShare" class="n">Covered (% of area)</th><th data-k="outShare" class="n">Covered (% of going-out)</th><th data-k="reason">Waiting for</th><th data-k="next" class="hide">Next step</th><th data-k="updated" class="n hide">Updated</th>
+<th data-k="city">City</th><th data-k="country" class="hide">Country</th><th data-k="population" class="n">Inhabitants</th><th data-k="cityAreaKm2" class="n">Surface (km²)</th><th data-k="blocks" class="n hide">Blocks</th><th data-k="goingOut" class="n">Going-out blocks</th><th data-k="terraceShare" class="n hide">Terraces (%)</th><th data-k="covRank">Coverage</th><th data-k="checked">Checked</th><th data-k="km2" class="n">Covered (km²)</th><th data-k="areaShare" class="n">Covered (% of area)</th><th data-k="outShare" class="n">Covered (% of going-out)</th><th data-k="reason">Waiting for</th><th data-k="next" class="hide">Next step</th><th data-k="updated" class="n hide">Updated</th>
 </tr></thead><tbody id="list"></tbody></table></div>
 </main>
 <script>
@@ -56,6 +58,8 @@ const STATUS=['https://raw.githubusercontent.com/Techneb/compromise-tiles/master
 const FEEDS=['https://tiles.alephb.uk/coverage.json','https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json'];
 const COUNTS='https://tiles.alephb.uk/counts.json';
 const get=u=>fetch(u+'?v='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
+// The feed's `checked` (how far the sunny filter was checked on screen), its wording and its sort order; blank when the feed has none.
+const CHECK={districts:'Districts',seed:'One spot',none:'Not yet'}, CHECK_RANK={districts:3,seed:2,none:1};
 const $=id=>document.getElementById(id), fmt=n=>n==null?'':Number(n).toLocaleString(), km=n=>n==null?'':Number(n).toLocaleString(undefined,{maximumFractionDigits:n<10?1:0}), pct=x=>x==null?'':(x<0.1?(100*x).toFixed(1):Math.round(100*x))+' %';
 Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({areas:[]})), get(COUNTS).catch(()=>({cities:[]}))]).then(([s,feed,counts])=>{
   // Two cities can share a name (London, Canada): a join by name also needs the place to agree. An area's box must
@@ -88,17 +92,17 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({
   // The stats: how many cities give each reason (the feed's own tally when it has one), each a filter.
   const tally=s.reasons||rows.reduce((t,r)=>(t[r.reason]=(t[r.reason]||0)+1,t),{});
   $('tally').innerHTML=Object.entries(tally).sort((a,b)=>b[1]-a[1]).map(([k,n])=>'<a href="#" data-reason="'+k+'">'+n+' '+k.toLowerCase()+'</a>').join(' · ');
-  $('tally').onclick=e=>{const a=e.target.closest('a[data-reason]');if(!a)return;e.preventDefault();$('reason').value=a.dataset.reason;$('cov').value='';render();};
+  $('tally').onclick=e=>{const a=e.target.closest('a[data-reason]');if(!a)return;e.preventDefault();$('reason').value=a.dataset.reason;$('cov').value='';$('chk').value='';render();};
   let sortKey='goingOut', asc=false;
   const render=()=>{
-    const q=$('q').value.trim().toLowerCase(), reason=$('reason').value, cv=$('cov').value, ctry=$('country').value, rec=$('recent').value;
+    const q=$('q').value.trim().toLowerCase(), reason=$('reason').value, cv=$('cov').value, chk=$('chk').value, ctry=$('country').value, rec=$('recent').value;
     const since=rec?Date.now()-rec*864e5:0;
-    const shown=rows.filter(r=>(!q||r.city.toLowerCase().includes(q))&&(!reason||r.reason===reason)&&(!cv||r.covLabel===cv)&&(!ctry||r.country===ctry)&&(!since||(r.updated&&Date.parse(r.updated)>=since)));
-    const val=r=>typeof r[sortKey]==='string'?r[sortKey].toLowerCase():(r[sortKey]==null?-1:r[sortKey]);
+    const shown=rows.filter(r=>(!q||r.city.toLowerCase().includes(q))&&(!reason||r.reason===reason)&&(!cv||r.covLabel===cv)&&(!chk||r.checked===chk)&&(!ctry||r.country===ctry)&&(!since||(r.updated&&Date.parse(r.updated)>=since)));
+    const val=r=>sortKey==='checked'?(CHECK_RANK[r.checked]||-1):typeof r[sortKey]==='string'?r[sortKey].toLowerCase():(r[sortKey]==null?-1:r[sortKey]);
     shown.sort((x,y)=>{const p=val(x),q2=val(y);return (p<q2?-1:p>q2?1:0)*(asc?1:-1);});
     document.querySelectorAll('th[data-k]').forEach(th=>{th.classList.toggle('on',th.dataset.k===sortKey);th.classList.toggle('asc',th.dataset.k===sortKey&&asc);});
     $('list').innerHTML=shown.map(r=>'<tr><td>'+(r.covRank?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+r.city+'</a>':r.city)+'</td><td class="hide">'+r.country+'</td><td class="n">'+fmt(r.population)+'</td><td class="n">'+km(r.cityAreaKm2)+'</td><td class="n hide">'+fmt(r.blocks)+'</td><td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut)+(r.sq?'<small>*</small>':''))+'</td><td class="n hide">'+(r.terraceShare==null?'':Math.round(100*r.terraceShare)+' %')+'</td>'
-      +'<td><span class="tag '+(r.covRank===2?'ok':r.covRank===1?'part':'')+'">'+(r.covRank===2?'whole city':r.covRank===1?'core':'none')+'</span></td><td class="n">'+(r.km2?r.km2.toFixed(1):'')+'</td><td class="n">'+pct(r.areaShare)+'</td><td class="n">'+pct(r.outShare)+'</td><td>'+(r.covRank===2||r.reason==='Covered'?'':r.reason)+'</td><td class="hide"><small>'+(r.next||'')+'</small></td><td class="n hide"><small>'+(r.updated||'')+'</small></td></tr>').join('');
+      +'<td><span class="tag '+(r.covRank===2?'ok':r.covRank===1?'part':'')+'">'+(r.covRank===2?'whole city':r.covRank===1?'core':'none')+'</span></td><td>'+(CHECK[r.checked]?'<span class="tag '+(r.checked==='districts'?'ok':r.checked==='seed'?'part':'')+'">'+CHECK[r.checked]+'</span>':'')+'</td><td class="n">'+(r.km2?r.km2.toFixed(1):'')+'</td><td class="n">'+pct(r.areaShare)+'</td><td class="n">'+pct(r.outShare)+'</td><td>'+(r.covRank===2||r.reason==='Covered'?'':r.reason)+'</td><td class="hide"><small>'+(r.next||'')+'</small></td><td class="n hide"><small>'+(r.updated||'')+'</small></td></tr>').join('');
     // A column empty for every row shown (the shares for uncovered cities, the reason for whole ones) is hidden.
     const trs=[...$('list').rows];
     document.querySelectorAll('thead th').forEach((th,i)=>{const empty=trs.length>0&&trs.every(tr=>{const t=tr.cells[i].textContent.trim();return !t||t==='NaN';});
@@ -107,7 +111,7 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({
     $('status').textContent=shown.length+' of '+rows.length+' cities shown ('+listed+' listed'+(rows.length>listed?', '+(rows.length-listed)+' not listed yet':'')+'). Updated '+([s.updated,feed.updated].filter(Boolean).sort().pop()||'').slice(0,10)+'.';
   };
   document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=(k==='city'||k==='country'||k==='reason');}render();});
-  for(const id of ['q','reason','cov','country','recent']) $(id).oninput=render;
+  for(const id of ['q','reason','cov','chk','country','recent']) $(id).oninput=render;
   render();
 }).catch(err=>{$('status').textContent='The data did not load ('+err.message+'). Try again later.';});
 </script></body></html>

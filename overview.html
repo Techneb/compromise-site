@@ -1,0 +1,171 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
+<title>Compromise overview</title>
+<style>
+:root{--bg:#fbfcfc;--fg:#1d2a2d;--muted:#5b6b6f;--line:#dde3e4;--accent:#368B9C;--panel:#fff;--ok:#1f9d55;--part:#e0a030;--bad:#c94a3c}
+@media (prefers-color-scheme:dark){:root{--bg:#15191a;--fg:#e6ecec;--muted:#9aa8ab;--line:#2b3336;--accent:#16B9DB;--panel:#1c2224;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,system-ui,sans-serif}
+main{max-width:1400px;margin:0 auto;padding:16px}
+nav{display:flex;gap:14px;align-items:center;margin-bottom:10px}nav a{color:var(--muted);text-decoration:none;font-weight:600}nav a.on{color:var(--accent);border-bottom:2px solid var(--accent)}
+h1{font-size:18px;margin:0 0 4px}h2{font-size:15px;margin:22px 0 4px}p{margin:0 0 8px;color:var(--muted)}
+.big{display:flex;gap:28px;flex-wrap:wrap;margin:10px 0}.big div{display:flex;flex-direction:column}.big b{font-size:22px;font-variant-numeric:tabular-nums}.big span{color:var(--muted);font-size:13px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+th,td{text-align:left;padding:6px 6px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;vertical-align:bottom;user-select:none;background:var(--bg)}
+th[data-k]{cursor:pointer}th.on{color:var(--accent)}th.on::after{content:' ▾'}th.on.asc::after{content:' ▴'}
+td.n,th.n{text-align:right}td.n{white-space:nowrap}
+tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}tr.c td:first-child::before{content:'▸ ';color:var(--muted)}tr.c.open td:first-child::before{content:'▾ '}
+tr.sub>td{padding:0 0 10px 18px;border-top:0}tr.sub table{font-size:12px}
+.tag{display:inline-block;white-space:nowrap;padding:1px 6px;border-radius:10px;font-size:12px;background:var(--line)}.tag.ok{background:var(--ok);color:#fff}.tag.part{background:var(--part);color:#fff}.tag.bad{background:var(--bad);color:#fff}
+.meter{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:80px}.meter i{display:block;height:100%;background:var(--accent)}
+.meter.total{height:12px;margin:6px 0 10px;max-width:640px}
+a{color:var(--accent)}small{color:var(--muted)}
+@media (max-width:700px){.hide{display:none}.scroll{overflow-x:auto}.big{gap:18px}}
+</style></head><body><main>
+<nav><a href="coverage.html">Map</a><a href="cities.html">Cities</a><a class="on" href="overview.html">Overview</a></nav>
+<h1>Overview</h1>
+<p id="status">Loading…</p>
+
+<h2>Totals</h2>
+<div class="big" id="totals"></div>
+<p id="tally"></p>
+
+<h2>Countries</h2>
+<div class="scroll"><table><thead><tr>
+<th data-k="country">Country</th><th data-k="covered" class="n">Cities covered</th><th data-k="all" class="n">Cities in the database</th><th>Top 3 by going-out blocks</th><th data-k="population" class="n">Population covered</th><th data-k="streets" class="n">Cities with streets</th>
+</tr></thead><tbody id="countries"></tbody></table></div>
+
+<h2>Going-out</h2>
+<p><small>* counted in a 24 km square around the city's centre. ⚑ tiled area under half the city's surface.</small></p>
+<div class="scroll"><table><thead><tr>
+<th data-k="city">City</th><th data-k="country" class="hide">Country</th><th data-k="goingOut" class="n">Going-out blocks</th><th data-k="tiledOut" class="n">In the tiled area</th><th data-k="tiledKm2" class="n">Tiled (km²)</th><th data-k="perKm2" class="n">Going-out per km² tiled</th><th data-k="tiledShare" class="n">Tiled (% of surface)</th>
+</tr></thead><tbody id="going"></tbody></table></div>
+
+<h2>Streets</h2>
+<div id="streets"><p>Loading…</p></div>
+
+<h2>Storage</h2>
+<div id="storage"><p>Loading…</p></div>
+
+<h2>Last 10 tile builds</h2>
+<div class="scroll" id="runs"><p>Loading…</p></div>
+</main>
+<script>
+const TILES='https://tiles.alephb.uk/', STATUS='https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json';
+const REPO='Techneb/compromise-tiles', API='https://api.github.com/repos/'+REPO+'/actions/';
+const get=u=>fetch(u+'?v='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
+const $=id=>document.getElementById(id), fmt=n=>n==null?'':Number(n).toLocaleString(), pct=x=>x==null?'':(x<0.1?(100*x).toFixed(1):Math.round(100*x))+' %';
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const size=b=>b==null?'':b>=1e9?(b/1e9).toFixed(2)+' GB':b>=1e6?(b/1e6).toFixed(1)+' MB':(b/1e3).toFixed(0)+' kB';
+const dur=s=>{if(s==null||isNaN(s))return '';s=Math.round(s);if(s<60)return s+' s';const m=Math.round(s/60);return m<60?m+' min':Math.floor(m/60)+' h '+String(m%60).padStart(2,'0')+' min';};
+const day=t=>t?new Date(t).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}):'';
+// A sortable table: headers with data-k sort, a second click flips; text columns start ascending.
+const sortable=(tbody,state,draw)=>tbody.closest('table').querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;
+  if(state.key===k)state.asc=!state.asc;else{state.key=k;state.asc=(k==='city'||k==='country');}draw();});
+const sortRows=(rows,{key,asc})=>rows.sort((x,y)=>{const v=r=>typeof r[key]==='string'?r[key].toLowerCase():(r[key]==null?-1:r[key]);const p=v(x),q=v(y);return (p<q?-1:p>q?1:0)*(asc?1:-1);});
+const marks=(tbody,{key,asc})=>tbody.closest('table').querySelectorAll('th[data-k]').forEach(th=>{th.classList.toggle('on',th.dataset.k===key);th.classList.toggle('asc',th.dataset.k===key&&asc);});
+
+const status=get(STATUS), coverage=get(TILES+'coverage.json').catch(()=>({areas:[]})), counts=get(TILES+'counts.json').catch(()=>({cities:[]}));
+const cities=get(TILES+'cities.json').catch(()=>[]), stats=get(TILES+'stats.json').catch(()=>null);
+
+// ---- the cities: cities.html's joins (a name and a place: an area's box holds the city's point give or take 12 km)
+Promise.all([status,coverage,counts,cities,stats]).then(([s,feed,cnts,tiled,st])=>{
+  const KM=12, near=(la,lo,lb,lob)=>Math.hypot((la-lb)*111.32,(lo-lob)*111.32*Math.cos(la*Math.PI/180))<=KM;
+  const holds=(box,c)=>{if(c.lat==null)return true;const [s0,w,n,e]=box,dy=KM/111.32,dx=dy/Math.cos(c.lat*Math.PI/180);
+    return c.lat>=s0-dy&&c.lat<=n+dy&&c.lon>=w-dx&&c.lon<=e+dx;};
+  const cellKm2=lat=>Math.pow(0.002*111.32,2)*Math.cos(lat*Math.PI/180);
+  const cnt={}; for(const c of cnts.cities||[]) (cnt[c.city]=cnt[c.city]||[]).push(c);
+  const countsRow=c=>(cnt[c.city]||[]).find(k=>(!k.country||k.country===c.country)&&(k.lat==null||c.lat==null||near(k.lat,k.lon,c.lat,c.lon)));
+  const streetNames=new Set((Array.isArray(tiled)?tiled:[]).filter(e=>e.streets===true).map(e=>e.city));
+  const rows=s.cities.map(c=>{const cand=c.status==='candidate';
+    const areas=cand?[]:(feed.areas||[]).filter(a=>a.city===c.city&&a.box&&holds(a.box,c));
+    let rank=0; for(const a of areas){const whole=/whole|intra-muros|municipality/i.test(a.name)||a.name===a.city;rank=Math.max(rank,whole?2:1);}
+    const k=cand?null:countsRow(c);
+    const g=!k?{goingOut:c.goingOut,sq:!!c.extent&&!/^(municipality|commune)$/.test(c.extent)}
+      :k.extent==='tiled box'?{goingOut:k.goingOutCellsWide,sq:true}:{goingOut:k.goingOutCells,sq:!/^(municipality|commune)$/.test(k.extent)};
+    const tiledKm2=areas.reduce((t,a)=>t+(a.tiled||0)*cellKm2((a.box[0]+a.box[2])/2),0), tiledOut=areas.reduce((t,a)=>t+(a.goingOut||0),0);
+    return Object.assign({},c,g,{rank,areas,tiledKm2:rank?tiledKm2:null,tiledOut:rank?tiledOut:null,perKm2:rank&&tiledKm2?tiledOut/tiledKm2:null,
+      tiledShare:rank&&c.cityAreaKm2?Math.min(1,tiledKm2/c.cityAreaKm2):null,streets:streetNames.has(c.city)});});
+  const covered=rows.filter(r=>r.rank);
+
+  // ---- 1. totals, and the status breakdown in cities.html's words
+  const countries=new Set(covered.map(r=>r.country));
+  $('totals').innerHTML=[[covered.length,'cities covered'],[countries.size,'countries covered'],[covered.filter(r=>r.rank===2).length,'whole city'],[covered.filter(r=>r.rank===1).length,'core only'],
+    [rows.length,'cities in the database'],[streetNames.size,'cities with streets']].map(([n,t])=>'<div><b>'+fmt(n)+'</b><span>'+t+'</span></div>').join('');
+  const tally=s.reasons||rows.reduce((t,r)=>(t[r.reason]=(t[r.reason]||0)+1,t),{});
+  $('tally').innerHTML=Object.entries(tally).sort((a,b)=>b[1]-a[1]).map(([k,n])=>n+' '+esc(k.toLowerCase())).join(' · ');
+
+  // ---- 2. countries, a row opens on its cities
+  const byCountry={}; for(const r of rows)(byCountry[r.country]=byCountry[r.country]||[]).push(r);
+  const ctry=Object.entries(byCountry).map(([country,list])=>{const cov=list.filter(r=>r.rank);
+    return {country,list,covered:cov.length,all:list.length,population:cov.reduce((t,r)=>t+(r.population||0),0),streets:list.filter(r=>r.streets).length,
+      top:cov.slice().sort((a,b)=>(b.goingOut||0)-(a.goingOut||0)).slice(0,3)};});
+  const cState={key:'covered',asc:false}, open=new Set();
+  const outCell=r=>r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut)+(r.sq?'<small>*</small>':'');
+  const covTag=r=>'<span class="tag '+(r.rank===2?'ok':r.rank===1?'part':'')+'">'+(r.rank===2?'whole city':r.rank===1?'core':'none')+'</span>';
+  const drawCountries=()=>{sortRows(ctry,cState);marks($('countries'),cState);
+    $('countries').innerHTML=ctry.map(c=>'<tr class="c'+(open.has(c.country)?' open':'')+'" data-c="'+esc(c.country)+'"><td>'+esc(c.country)+'</td><td class="n">'+fmt(c.covered)+'</td><td class="n">'+fmt(c.all)+'</td><td>'
+      +c.top.map(r=>esc(r.city)+' <small>'+fmt(r.goingOut)+'</small>').join(', ')+'</td><td class="n">'+(c.population?fmt(c.population):'')+'</td><td class="n">'+(c.streets||'')+'</td></tr>'
+      +(open.has(c.country)?'<tr class="sub"><td colspan="6"><table><thead><tr><th>City</th><th>Coverage</th><th class="n">Going-out blocks</th><th class="n">Inhabitants</th><th class="hide">Waiting for</th><th>Streets</th></tr></thead><tbody>'
+        +c.list.slice().sort((a,b)=>b.rank-a.rank||(b.goingOut||0)-(a.goingOut||0)).map(r=>'<tr><td>'+(r.rank?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+esc(r.city)+'</a>':esc(r.city))+'</td><td>'+covTag(r)+'</td><td class="n">'+outCell(r)+'</td><td class="n">'+fmt(r.population)+'</td><td class="hide">'
+          +(r.rank===2||r.reason==='Covered'?'':esc(r.reason))+'</td><td>'+(r.streets?'yes':'')+'</td></tr>').join('')+'</tbody></table></td></tr>':'')).join('');};
+  $('countries').onclick=e=>{const tr=e.target.closest('tr.c');if(!tr||e.target.closest('a'))return;const k=tr.dataset.c;open.has(k)?open.delete(k):open.add(k);drawCountries();};
+  sortable($('countries'),cState,drawCountries); drawCountries();
+
+  // ---- 3. going-out: the count, and per km² of tiled area; ⚑ where the tiled area is under half the city's surface
+  const gState={key:'goingOut',asc:false};
+  const drawGoing=()=>{sortRows(covered,gState);marks($('going'),gState);
+    $('going').innerHTML=covered.map(r=>'<tr><td><a href="coverage.html#'+encodeURIComponent(r.city)+'">'+esc(r.city)+'</a>'+(r.tiledShare!=null&&r.tiledShare<0.5?' <span title="tiled area under half the city\'s surface">⚑</span>':'')+'</td><td class="hide">'+esc(r.country)+'</td><td class="n">'+outCell(r)
+      +'</td><td class="n">'+fmt(r.tiledOut)+'</td><td class="n">'+(r.tiledKm2?Math.round(r.tiledKm2).toLocaleString():'')+'</td><td class="n">'+(r.perKm2==null?'':r.perKm2.toFixed(1))+'</td><td class="n">'+pct(r.tiledShare)+'</td></tr>').join('');};
+  sortable($('going'),gState,drawGoing); drawGoing();
+
+  // ---- 4. streets: cities.json's "streets": true, with stats.json's size and build time
+  const sc=rows.filter(r=>r.streets);
+  if(!sc.length){$('streets').innerHTML='<p>No city has streets yet.</p>';}
+  else{const sz=c=>{const v=st&&st.streets&&st.streets[c];return v?Object.values(v).reduce((t,x)=>t+x.bytes,0):null;}, b=c=>(st&&st.builds&&st.builds[c])||{};
+    const lastBuilt=r=>b(r.city).date||r.areas.map(a=>a.lastBuilt).filter(Boolean).sort().pop()||'';
+    $('streets').innerHTML='<div class="scroll"><table><thead><tr><th>City</th><th class="hide">Country</th><th class="n">Size</th><th class="n">Build time</th><th class="n">Built</th></tr></thead><tbody>'
+      +sc.sort((a,b2)=>a.city.localeCompare(b2.city)).map(r=>{const layers=st&&st.streets&&st.streets[r.city];
+        return '<tr><td>'+esc(r.city)+'</td><td class="hide">'+esc(r.country)+'</td><td class="n"'+(layers?' title="'+esc(Object.entries(layers).map(([l,v])=>l+' '+size(v.bytes)).join(', '))+'"':'')+'>'+size(sz(r.city))
+          +'</td><td class="n">'+dur(b(r.city).seconds)+'</td><td class="n">'+day(lastBuilt(r))+'</td></tr>';}).join('')+'</tbody></table></div>';}
+  $('status').textContent='Updated '+([s.updated,feed.updated].filter(Boolean).sort().pop()||'').slice(0,10)+'.';
+}).catch(err=>{$('status').textContent='The data did not load ('+err.message+'). Try again later.';$('streets').innerHTML='';});
+
+// ---- 5. storage per layer against R2's free 10 GB
+stats.then(st=>{
+  if(!st||!st.layers){$('storage').innerHTML='<p>No storage numbers yet: they arrive with the next tile build.</p>';return;}
+  const free=st.freeBytes||1e10, list=Object.entries(st.layers).sort((a,b)=>b[1].bytes-a[1].bytes);
+  if(st.other&&st.other.objects) list.push(['other files',st.other]);
+  const bar=x=>'<div class="meter"><i style="width:'+Math.min(100,100*x).toFixed(1)+'%"></i></div>';
+  $('storage').innerHTML='<p><b style="color:var(--fg)">'+size(st.bytes)+'</b> of '+size(free)+' free ('+pct(st.bytes/free)+'), '+fmt(st.objects)+' files. Listed '+day(st.updated)+'.</p>'
+    +'<div class="meter total"><i style="width:'+Math.min(100,100*st.bytes/free).toFixed(1)+'%"></i></div>'
+    +'<div class="scroll"><table><thead><tr><th>Layer</th><th class="n">Size</th><th class="n">Files</th><th class="n">Of 10 GB</th><th style="width:40%"></th></tr></thead><tbody>'
+    +list.map(([l,v])=>'<tr><td>'+esc(l)+'</td><td class="n">'+size(v.bytes)+'</td><td class="n">'+fmt(v.objects)+'</td><td class="n">'+pct(v.bytes/free)+'</td><td>'+bar(v.bytes/free)+'</td></tr>').join('')+'</tbody></table></div>';
+});
+
+// ---- 6. the last 10 runs of tiles.yml, from GitHub's public API (60 requests an hour per visitor): kept in sessionStorage,
+// the list for 10 minutes, a finished run's jobs for the session.
+const cache={get:(k,ttl)=>{try{const v=JSON.parse(sessionStorage.getItem(k));return v&&(!ttl||Date.now()-v.t<ttl)?v.d:null;}catch(e){return null;}},
+  stale:k=>{try{const v=JSON.parse(sessionStorage.getItem(k));return v?v.d:null;}catch(e){return null;}},
+  set:(k,d)=>{try{sessionStorage.setItem(k,JSON.stringify({t:Date.now(),d}));}catch(e){}}};
+const gh=u=>fetch(u,{headers:{Accept:'application/vnd.github+json'}}).then(r=>{if(!r.ok)throw new Error(r.status===403||r.status===429?'GitHub limit reached, try again within the hour':r.status);return r.json();});
+const jobsOf=async run=>{const k='ov:jobs:'+run.id, hit=cache.get(k);if(hit)return hit;
+  let jobs=[];for(let p=1;;p++){const j=await gh(API+'runs/'+run.id+'/jobs?per_page=100&page='+p);jobs=jobs.concat(j.jobs);if(j.jobs.length<100)break;}
+  const d=jobs.map(j=>({name:j.name,conclusion:j.conclusion,url:j.html_url}));if(run.status==='completed')cache.set(k,d);return d;};
+(async()=>{
+  let runs=cache.get('ov:runs',6e5);
+  try{if(!runs){runs=(await gh(API+'workflows/tiles.yml/runs?per_page=10')).workflow_runs.map(r=>({id:r.id,url:r.html_url,status:r.status,conclusion:r.conclusion,
+    started:r.run_started_at||r.created_at,updated:r.updated_at}));cache.set('ov:runs',runs);}}
+  catch(e){runs=cache.stale('ov:runs');if(!runs){$('runs').innerHTML='<p>The runs did not load ('+esc(e.message)+').</p>';return;}}
+  const jobs=await Promise.all(runs.map(r=>jobsOf(r).catch(()=>null)));
+  const result=r=>r.status!=='completed'?'<span class="tag part">'+esc(r.status.replace('_',' '))+'</span>':'<span class="tag '+(r.conclusion==='success'?'ok':r.conclusion==='failure'?'bad':'')+'">'+esc(r.conclusion)+'</span>';
+  $('runs').innerHTML='<table><thead><tr><th>Date</th><th class="n">Cities</th><th class="n">Duration</th><th>Result</th><th>Failed jobs</th></tr></thead><tbody>'
+    +runs.map((r,i)=>{const j=jobs[i], cities=j&&j.filter(x=>/^build \(/.test(x.name)).length, failed=j?j.filter(x=>['failure','timed_out','cancelled'].includes(x.conclusion)):null;
+      return '<tr><td><a href="'+esc(r.url)+'">'+new Date(r.started).toLocaleString(undefined,{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</a></td><td class="n">'+(j?fmt(cities):'')+'</td><td class="n">'
+        +(r.status==='completed'?dur((Date.parse(r.updated)-Date.parse(r.started))/1e3):'')+'</td><td>'+result(r)+'</td><td>'
+        +(failed==null?'<small>not loaded</small>':failed.map(x=>'<a href="'+esc(x.url)+'">'+esc(x.name.replace(/^build \((.*)\)$/,'$1'))+'</a>'+(x.conclusion==='failure'?'':' <small>('+esc(x.conclusion.replace('_',' '))+')</small>')).join(', '))+'</td></tr>';}).join('')+'</tbody></table>';
+})();
+</script></body></html>

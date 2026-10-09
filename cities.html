@@ -32,14 +32,15 @@ details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;
 <dt>Block</dt><dd>A square of about 200 m.</dd>
 <dt>Going-out block</dt><dd>A block with at least 10 bars, cafés and restaurants within 400 m.</dd>
 <dt>Inhabitants, Surface, Blocks</dt><dd>The municipality's own.</dd>
-<dt>Going-out blocks</dt><dd>Counted in the municipality (the commune in France). Marked *: counted in a 24 km square around the city's centre instead, for a city covered only in its core or not yet covered.</dd>
+<dt>Going-out blocks</dt><dd>Counted in the municipality (the commune in France). Marked *: counted in a 24 km square around the city's centre instead, for a city covered only in its core or not yet covered. <em>not counted</em>: no count yet.</dd>
 <dt>Terraces (%)</dt><dd>The going-out blocks where outdoor seating is on record. Left blank for a city covered only in its core.</dd>
-<dt>Coverage</dt><dd>Whole city, core (the part where people go out) or none.</dd>
-<dt>Checked</dt><dd>How far the sunny filter has been checked on screen in a covered city: in several districts, in one spot, or not yet.</dd>
+<dt>Coverage</dt><dd><span class="tag ok">whole city</span> all of it; <span class="tag part">core</span> the part where people go out; <span class="tag">none</span> not covered.</dd>
+<dt>Checked</dt><dd>How far the sunny filter has been checked on screen in a covered city: <span class="tag ok">Districts</span> in several districts; <span class="tag part">One spot</span> in one place; <span class="tag">Not yet</span> not checked. Blank: no check on record.</dd>
 <dt>Covered (km²)</dt><dd>The surface where the sunny filter works.</dd>
-<dt>Covered (% of area)</dt><dd>That surface, as a share of the city's surface.</dd>
+<dt>Covered (% of area)</dt><dd>That surface, as a share of the city's surface (at most 100 %).</dd>
 <dt>Covered (% of going-out)</dt><dd>The going-out blocks where the sunny filter works, as a share of the Going-out blocks column.</dd>
-<dt>Waiting for</dt><dd>What a city not yet covered whole needs first. The counts above the table say how many cities wait for each; tap one to show only those.</dd>
+<dt>Waiting for</dt><dd>What a city not yet covered whole needs first, for example <em>In the survey queue</em>, <em>Not planned</em>, <em>Data found, not wired yet</em> or <em>City portal unreachable</em>. The counts above the table say how many cities wait for each; tap one to show only those.</dd>
+<dt>Blank cell</dt><dd>Nothing to show for that city; a column blank for every row shown is hidden.</dd>
 </dl></details>
 <div class="bar">
   <select id="reason"><option value="">Waiting for anything</option></select>

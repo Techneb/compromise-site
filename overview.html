@@ -80,10 +80,15 @@ Promise.all([status,coverage,counts,cities,stats]).then(([s,feed,cnts,tiled,st])
   const cnt={}; for(const c of cnts.cities||[]) (cnt[c.city]=cnt[c.city]||[]).push(c);
   const countsRow=c=>(cnt[c.city]||[]).find(k=>(!k.country||k.country===c.country)&&(k.lat==null||c.lat==null||near(k.lat,k.lon,c.lat,c.lon)));
   const streetNames=new Set((Array.isArray(tiled)?tiled:[]).filter(e=>e.streets===true).map(e=>e.city));
+  // Past the name, the numbers: a core whose areas cover 85 % of the city's surface, or a tiled box holding 95 % of its
+  // square's going-out blocks, is the whole city.
+  const wholeByNumbers=(c,km2,k)=>(!!c.cityAreaKm2&&km2/c.cityAreaKm2>=0.85)
+    ||(!!k&&k.extent==='tiled box'&&k.goingOutCellsWide>0&&k.goingOutCoveredWide!=null&&k.goingOutCoveredWide/k.goingOutCellsWide>=0.95);
   const rows=s.cities.map(c=>{const cand=c.status==='candidate';
     const areas=cand?[]:(feed.areas||[]).filter(a=>a.city===c.city&&a.box&&holds(a.box,c));
     let rank=0; for(const a of areas){const whole=/whole|intra-muros|municipality|^greater /i.test(a.name)||a.name===a.city;rank=Math.max(rank,whole?2:1);}
     const k=cand?null:countsRow(c);
+    if(rank===1&&wholeByNumbers(c,areas.reduce((t,a)=>t+(a.km2||0),0),k))rank=2;
     const g=!k?{goingOut:c.goingOut,sq:!!c.extent&&!/^(municipality|commune)$/.test(c.extent)}
       :k.extent==='tiled box'?{goingOut:k.goingOutCellsWide,sq:true}:{goingOut:k.goingOutCells,sq:!/^(municipality|commune)$/.test(k.extent)};
     const tiledKm2=areas.reduce((t,a)=>t+(a.tiled||0)*cellKm2((a.box[0]+a.box[2])/2),0), tiledOut=areas.reduce((t,a)=>t+(a.goingOut||0),0);

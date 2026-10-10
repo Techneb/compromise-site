@@ -86,7 +86,13 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({
     return {goingOut:k.goingOutCells,terraceShare:k.terraceShare,sq:!/^(municipality|commune)$/.test(k.extent),
       outShare:rank&&k.goingOutCells&&k.goingOutCovered!=null?k.goingOutCovered/k.goingOutCells:null};};
   // Whole blocks overhang a small commune's border, and some tiled boxes pass the municipality: at most 100 %.
-  const rows=s.cities.map(c=>{const v=candidate(c)?{rank:0,km2:0,label:'none'}:coverage(c);return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2,
+  // Past the name, the numbers: a core whose areas cover 85 % of the city's surface, or a tiled box holding 95 % of its
+  // square's going-out blocks, is the whole city.
+  const wholeByNumbers=(c,km2,k)=>(!!c.cityAreaKm2&&km2/c.cityAreaKm2>=0.85)
+    ||(!!k&&k.extent==='tiled box'&&k.goingOutCellsWide>0&&k.goingOutCoveredWide!=null&&k.goingOutCoveredWide/k.goingOutCellsWide>=0.95);
+  const rows=s.cities.map(c=>{const v=candidate(c)?{rank:0,km2:0,label:'none'}:coverage(c);
+    if(v.rank===1&&wholeByNumbers(c,v.km2,countsRow(c))){v.rank=2;v.label='whole';}
+    return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2,
     areaShare:v.rank&&c.cityAreaKm2?Math.min(1,v.km2/c.cityAreaKm2):null},going(c,v.rank));});
   const reasons=[...new Set(rows.map(r=>r.reason))].sort(); for(const r of reasons){const o=document.createElement('option');o.value=r;o.textContent=r;$('reason').appendChild(o);}
   const countries=[...new Set(rows.map(r=>r.country))].sort(); for(const c of countries){const o=document.createElement('option');o.value=c;o.textContent=c;$('country').appendChild(o);}

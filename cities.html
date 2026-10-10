@@ -70,7 +70,7 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({
     return c.lat>=s0-dy&&c.lat<=n+dy&&c.lon>=w-dx&&c.lon<=e+dx;};
   // Coverage per city from the feed's areas: a municipality or commune entry is the whole city, a district the core.
   const coverage=c=>{const v={rank:0,km2:0,label:'none'};
-    for(const a of feed.areas||[]){if(a.city!==c.city||!a.box||!holds(a.box,c))continue;const whole=/whole|intra-muros|municipality/i.test(a.name)||a.name===a.city;
+    for(const a of feed.areas||[]){if(a.city!==c.city||!a.box||!holds(a.box,c))continue;const whole=/whole|intra-muros|municipality|^greater /i.test(a.name)||a.name===a.city;
       v.km2+=a.km2||0; if(whole&&v.rank<2){v.rank=2;v.label='whole';} else if(!whole&&v.rank<1){v.rank=1;v.label='core';}}
     return v;};
   // Going-out numbers from the counts job, read by each row's extent: a municipality or commune is counted over the

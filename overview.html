@@ -82,7 +82,7 @@ Promise.all([status,coverage,counts,cities,stats]).then(([s,feed,cnts,tiled,st])
   const streetNames=new Set((Array.isArray(tiled)?tiled:[]).filter(e=>e.streets===true).map(e=>e.city));
   const rows=s.cities.map(c=>{const cand=c.status==='candidate';
     const areas=cand?[]:(feed.areas||[]).filter(a=>a.city===c.city&&a.box&&holds(a.box,c));
-    let rank=0; for(const a of areas){const whole=/whole|intra-muros|municipality/i.test(a.name)||a.name===a.city;rank=Math.max(rank,whole?2:1);}
+    let rank=0; for(const a of areas){const whole=/whole|intra-muros|municipality|^greater /i.test(a.name)||a.name===a.city;rank=Math.max(rank,whole?2:1);}
     const k=cand?null:countsRow(c);
     const g=!k?{goingOut:c.goingOut,sq:!!c.extent&&!/^(municipality|commune)$/.test(c.extent)}
       :k.extent==='tiled box'?{goingOut:k.goingOutCellsWide,sq:true}:{goingOut:k.goingOutCells,sq:!/^(municipality|commune)$/.test(k.extent)};

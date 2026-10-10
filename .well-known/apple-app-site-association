@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["YW54794935.uk.alephb.compromise"],
+        "components": [
+          { "/": "/join" },
+          { "/": "/join/" },
+          { "/": "/spots" },
+          { "/": "/spots/" }
+        ]
+      }
+    ]
+  }
+}

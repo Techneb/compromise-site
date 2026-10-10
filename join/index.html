@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Compromise — Join</title>
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<style>
+/* Same tokens, nav and footer as privacy.html. */
+:root {
+  --bg: #F6F9FA; --surface: #FFFFFF; --fg: #0F2328; --muted: #50686E; --hair: #DCE6E8;
+  --tint: #2F7F90; --p1: #368B9C; --p2: #DB7116;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #0B1416; --surface: #132126; --fg: #E4EFF1; --muted: #98B0B6; --hair: #22363B;
+  --tint: #16B9DB; --p1: #16B9DB; --p2: #E8842E; } }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.55 var(--font); }
+a { color: var(--tint); }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--tint); outline-offset: 3px; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; }
+h1 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.02em; font-size: clamp(30px, 6vw, 44px); line-height: 1.1; font-weight: 700; }
+p { margin: 0; }
+.kicker { font: 600 13px/1 var(--font); text-transform: uppercase; letter-spacing: 0.09em; color: var(--tint); }
+.muted { color: var(--muted); }
+
+nav { display: flex; align-items: center; justify-content: space-between; padding-block: 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 19px/1 var(--display); color: var(--fg); text-decoration: none; letter-spacing: -0.01em; }
+.brand-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--p1); display: grid; place-items: center; }
+nav .links { display: flex; gap: 22px; font-size: 15px; }
+nav .links a { color: var(--muted); text-decoration: none; }
+nav .links a:hover { color: var(--fg); }
+
+main { max-width: 34rem; margin: 0 auto; padding-block: 24px 64px; }
+main > * { display: grid; gap: 24px; }
+header { display: grid; gap: 12px; }
+.lede { font-size: 18px; color: var(--muted); }
+
+fieldset { margin: 0; padding: 0; border: 0; min-width: 0; display: grid; gap: 10px; }
+legend, .label { padding: 0; margin-bottom: 10px; font-weight: 650; }
+.label { display: block; margin-bottom: 8px; }
+.optional { font-weight: 400; color: var(--muted); }
+.choices { display: grid; gap: 8px; }
+.choices.modes { grid-template-columns: repeat(4, 1fr); }
+.choice { position: relative; display: block; }
+.choice input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.choice span { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 10px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--hair); font-weight: 550; text-align: center; cursor: pointer; }
+.choices:not(.modes) .choice span { justify-content: flex-start; }
+.choice input:checked + span { border-color: var(--tint); background: color-mix(in srgb, var(--p1) 12%, var(--surface)); box-shadow: inset 0 0 0 1px var(--tint); }
+.choice input:focus-visible + span { outline: 2px solid var(--tint); outline-offset: 3px; }
+input[type="text"] { width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--hair); background: var(--surface); color: var(--fg); font: inherit; }
+.hint { font-size: 15px; color: var(--muted); }
+.hint:empty { display: none; }
+.error { color: var(--p2); font-weight: 550; }
+.error:empty { display: none; }
+
+button { width: 100%; min-height: 52px; border: 0; border-radius: 16px; background: var(--p1); color: #fff; font: 650 18px/1 var(--font); cursor: pointer; }
+@media (prefers-color-scheme: dark) { button { color: #0B1416; } }
+.sent { font-weight: 650; color: var(--tint); text-align: center; }
+.sent:empty { display: none; }
+.fine { font-size: 14px; color: var(--muted); }
+
+.note { padding: 24px; border-radius: 20px; background: var(--surface); }
+.note h1 { font-size: clamp(22px, 4.6vw, 28px); line-height: 1.25; }
+
+footer { padding-block: 40px 56px; border-top: 1px solid var(--hair); display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; font-size: 15px; color: var(--muted); }
+footer .links { display: flex; flex-wrap: wrap; gap: 20px; }
+footer a { color: var(--muted); }
+
+@media (max-width: 420px) {
+  nav .links { gap: 16px; }
+  .choices.modes { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+<link rel="icon" type="image/png" href="/logo.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"></head>
+<body>
+<div class="wrap">
+  <nav aria-label="Main">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5c-3.3 0-6 2.5-6 5.8 0 4.2 6 9.2 6 9.2s6-5 6-9.2c0-3.3-2.7-5.8-6-5.8z" fill="#fff"/><path d="M5.8 7.6c1-.9 2-.9 3.2 0s2.2.9 3.2 0" fill="none" stroke="#368B9C" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </span>
+      Compromise
+    </a>
+    <div class="links"><a href="/#how">How it works</a><a href="/privacy">Privacy</a></div>
+  </nav>
+
+  <main>
+    <form id="invite" hidden novalidate>
+      <header>
+        <p class="kicker">Invitation</p>
+        <h1 id="title"></h1>
+        <p class="lede">Say where you're starting from and how you'll get there, then send the link back.</p>
+      </header>
+
+      <fieldset>
+        <legend>Starting point</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="start" value="here"><span>Use my location</span></label>
+          <label class="choice"><input type="radio" name="start" value="address"><span>Type an address</span></label>
+        </div>
+        <p id="location-status" class="hint" aria-live="polite"></p>
+        <div id="address-field" hidden>
+          <label class="label" for="address">Address</label>
+          <input type="text" id="address" autocomplete="street-address" enterkeyhint="next">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Getting there</legend>
+        <div class="choices modes">
+          <label class="choice"><input type="radio" name="mode" value="walk"><span>Walk</span></label>
+          <label class="choice"><input type="radio" name="mode" value="transit"><span>Transit</span></label>
+          <label class="choice"><input type="radio" name="mode" value="car"><span>Car</span></label>
+          <label class="choice"><input type="radio" name="mode" value="bike"><span>Bike</span></label>
+        </div>
+      </fieldset>
+
+      <div>
+        <label class="label" for="name">Your first name <span class="optional">(optional)</span></label>
+        <input type="text" id="name" autocomplete="given-name" autocapitalize="words" enterkeyhint="send">
+      </div>
+
+      <p id="error" class="error" role="alert"></p>
+      <button type="submit">Send back</button>
+      <p id="sent" class="sent" role="status"></p>
+      <div id="manual" hidden>
+        <label class="label" for="link">Copy this link and send it back</label>
+        <input type="text" id="link" readonly>
+      </div>
+      <p class="fine">Nothing leaves this page until you send the link. A location is rounded to about 100 m.</p>
+    </form>
+
+    <div id="reply" class="note" hidden>
+      <h1>This link is meant for the organiser's Compromise app.</h1>
+    </div>
+
+    <div id="refused" class="note" hidden>
+      <h1>This link can't be read.</h1>
+    </div>
+
+    <noscript><div class="note"><h1>This page needs JavaScript to read the link.</h1></div></noscript>
+  </main>
+
+  <footer>
+    <span>Compromise, by AlephB.</span>
+    <div class="links"><a href="/privacy">Privacy policy</a></div>
+  </footer>
+</div>
+<script src="/grouplink.js"></script>
+<script>
+(function () {
+  "use strict";
+  var form = document.getElementById("invite");
+  var address = document.getElementById("address");
+  var addressField = document.getElementById("address-field");
+  var status = document.getElementById("location-status");
+  var error = document.getElementById("error");
+  var sent = document.getElementById("sent");
+  var manual = document.getElementById("manual");
+  var linkField = document.getElementById("link");
+  var organiser = "";
+  var point = null;
+  var locating = 0;
+
+  function show(id) {
+    ["invite", "reply", "refused"].forEach(function (other) {
+      document.getElementById(other).hidden = other !== id;
+    });
+  }
+
+  function pagePath() {
+    return location.pathname.replace(/index\.html$/, "").replace(/\.html$/, "").replace(/\/$/, "");
+  }
+
+  function render() {
+    var link = GroupLink.read(location.hash);
+    if (!link || GroupLink.pathFor(link) !== pagePath()) { show("refused"); return; }
+    if (link.kind === "reply") { show("reply"); return; }
+    organiser = link.organiser;
+    form.reset();
+    point = null;
+    locating += 1;
+    addressField.hidden = true;
+    [status, error, sent].forEach(function (p) { p.textContent = ""; });
+    manual.hidden = true;
+    document.getElementById("title").textContent = organiser + " wants to meet";
+    document.title = organiser + " wants to meet — Compromise";
+    show("invite");
+  }
+
+  function useAddress(message) {
+    form.elements.start.value = "address";
+    addressField.hidden = false;
+    status.textContent = message || "";
+  }
+
+  function locate() {
+    addressField.hidden = true;
+    point = null;
+    if (!navigator.geolocation) { useAddress("Your location isn't available here. Type an address instead."); return; }
+    var attempt = ++locating;
+    status.textContent = "Finding your location…";
+    navigator.geolocation.getCurrentPosition(function (position) {
+      if (attempt !== locating || form.elements.start.value !== "here") return;
+      point = { latitude: position.coords.latitude, longitude: position.coords.longitude };
+      status.textContent = "Location found, rounded to about 100 m.";
+    }, function () {
+      if (attempt !== locating || form.elements.start.value !== "here") return;
+      useAddress("Your location isn't available. Type an address instead.");
+      address.focus();
+    }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 });
+  }
+
+  form.addEventListener("change", function (event) {
+    if (event.target.name !== "start") return;
+    error.textContent = "";
+    if (event.target.value === "here") { locate(); return; }
+    locating += 1;
+    point = null;
+    useAddress();
+    address.focus();
+  });
+
+  function copy(url) {
+    function fallback() {
+      manual.hidden = false;
+      linkField.value = url;
+      linkField.focus();
+      linkField.select();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function () {
+        sent.textContent = "Copied. Paste it in your chat with " + organiser + ".";
+      }, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    error.textContent = "";
+    sent.textContent = "";
+    manual.hidden = true;
+    var startChoice = form.elements.start.value;
+    var mode = form.elements.mode.value;
+    var start;
+    if (startChoice === "here") {
+      if (!point) { error.textContent = "Wait for your location, or type an address."; return; }
+      start = { point: point };
+    } else if (startChoice === "address") {
+      if (GroupLink.cleaned(address.value, GroupLink.Limit.address) === "") {
+        error.textContent = "Type an address.";
+        address.focus();
+        return;
+      }
+      start = { address: address.value };
+    } else {
+      error.textContent = "Choose a starting point.";
+      return;
+    }
+    if (!mode) { error.textContent = "Choose how you'll get there."; return; }
+    var url;
+    try {
+      url = GroupLink.writeReply({ name: document.getElementById("name").value, mode: mode, start: start });
+    } catch (e) {
+      error.textContent = "This can't be sent. Try writing the address differently.";
+      return;
+    }
+    if (navigator.share) {
+      navigator.share({ url: url }).catch(function (e) {
+        if (!e || e.name !== "AbortError") copy(url);
+      });
+    } else {
+      copy(url);
+    }
+  });
+
+  window.addEventListener("hashchange", render);
+  render();
+})();
+</script>
+</body>
+</html>

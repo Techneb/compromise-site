@@ -7,7 +7,7 @@
   var MODES = ["walk", "transit", "car", "bike"];
   var Limit = {
     fragment: 4000, pairs: 32, name: 30, address: 200, spotName: 80, spotAddress: 150,
-    people: 12, spots: 3, startDecimals: 3, spotDecimals: 5, scalarsPerCharacter: 4
+    people: 12, spots: 3, startDecimals: 5, startStep: 0.00005, spotDecimals: 5, scalarsPerCharacter: 4
   };
 
   function Refused(reason) { this.reason = reason; }
@@ -232,8 +232,11 @@
     }
     pairs.push(["m", reply.mode]);
     if (reply.start.point) {
-      var p = reply.start.point;
-      pairs.push(["p", formatted(p.latitude, Limit.startDecimals) + "," + formatted(p.longitude, Limit.startDecimals)]);
+      var p = reply.start.point, step = Limit.startStep;
+      // Half away from zero, as Swift rounds.
+      var snap = function (v) { return Math.sign(v) * Math.round(Math.abs(v) / step) * step; };
+      var lat = snap(p.latitude), lon = snap(p.longitude);
+      pairs.push(["p", formatted(lat, Limit.startDecimals) + "," + formatted(lon, Limit.startDecimals)]);
     } else {
       pairs.push(["a", encoded(reply.start.address, Limit.address)]);
     }

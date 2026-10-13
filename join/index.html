@@ -135,7 +135,7 @@ footer a { color: var(--muted); }
         <label class="label" for="link">Copy this link and send it back</label>
         <input type="text" id="link" readonly>
       </div>
-      <p class="fine">Nothing leaves this page until you send the link. A location is rounded to about 100 m.</p>
+      <p class="fine">Nothing leaves this page until you send the link. A location is rounded to about 5 m.</p>
     </form>
 
     <div id="reply" class="note" hidden>
@@ -211,7 +211,7 @@ footer a { color: var(--muted); }
     navigator.geolocation.getCurrentPosition(function (position) {
       if (attempt !== locating || form.elements.start.value !== "here") return;
       point = { latitude: position.coords.latitude, longitude: position.coords.longitude };
-      status.textContent = "Location found, rounded to about 100 m.";
+      status.textContent = "Location found, rounded to about 5 m.";
     }, function () {
       if (attempt !== locating || form.elements.start.value !== "here") return;
       useAddress("Your location isn't available. Type an address instead.");

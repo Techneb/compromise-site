@@ -24,17 +24,25 @@
 
   function utf8Length(text) { return new TextEncoder().encode(text).length; }
 
+  // Control characters, line and paragraph separators, and every scalar Unicode
+  // lets a renderer draw as nothing (bidi marks, zero width space, soft hyphen,
+  // invisible operators, tags…), but the joiners and variation selectors emoji
+  // and some scripts are made of: the app's GroupLink.isRefused.
   var refusedCategory = /[\p{Cc}\p{Zl}\p{Zp}\p{Cs}]/u;
-  var invisible = [
-    [0x061C, 0x061C], [0x200B, 0x200B], [0x200E, 0x200F], [0x202A, 0x202E],
-    [0x2060, 0x2060], [0x2066, 0x2069], [0xFEFF, 0xFEFF]
+  var ignorable = /\p{Default_Ignorable_Code_Point}/u;
+  var drawnWith = [
+    [0x200C, 0x200D], [0x180B, 0x180D], [0x180F, 0x180F], [0xFE00, 0xFE0F], [0xE0100, 0xE01EF]
   ];
 
   function isRefused(scalar) {
     if (refusedCategory.test(scalar)) return true;
     var value = scalar.codePointAt(0);
-    return invisible.some(function (r) { return value >= r[0] && value <= r[1]; });
+    return ignorable.test(scalar) && !drawnWith.some(function (r) { return value >= r[0] && value <= r[1]; });
   }
+
+  // Text with nothing to draw: only spaces and the joiners or selectors left.
+  var drawn = /[^\p{White_Space}\p{Default_Ignorable_Code_Point}]/u;
+  function isBlank(text) { return !drawn.test(text); }
 
   function isDigits(text) { return /^[0-9]+$/.test(text); }
 
@@ -58,7 +66,7 @@
     try { text = decodeURIComponent(raw); } catch (e) { throw new Refused("badField"); }
     if (Array.from(text).some(isRefused)) throw new Refused("badField");
     text = text.trim();
-    if (text === "" || characters(text).length > max ||
+    if (isBlank(text) || characters(text).length > max ||
         scalarCount(text) > max * Limit.scalarsPerCharacter) throw new Refused("badField");
     return text;
   }
@@ -164,18 +172,6 @@
 
   function pathFor(link) { return link.kind === "pick" || link.kind === "top" ? "/spots" : "/join"; }
 
-  function readURL(string) {
-    if (utf8Length(string) > Limit.fragment + 64) throw new Refused("tooLong");
-    var parts = /^([A-Za-z][A-Za-z0-9+.\-]*):\/\/([^\/?#]*)([^?#]*)(?:\?[^#]*)?#([^#]*)$/.exec(string);
-    if (!parts || !/^[\x21-\x7e]*$/.test(string) || parts[1].toLowerCase() !== "https" ||
-        parts[2].toLowerCase() !== HOST) throw new Refused("wrongAddress");
-    var path;
-    try { path = decodeURIComponent(parts[3]); } catch (e) { throw new Refused("wrongAddress"); }
-    var link = readFragment(parts[4]);
-    if (path.replace(/\/$/, "") !== pathFor(link)) throw new Refused("wrongAddress");
-    return link;
-  }
-
   // Reads a link, or null: a refused link is dropped whole.
   function read(fragment) {
     try { return readFragment(fragment); } catch (e) { if (e instanceof Refused) return null; throw e; }
@@ -198,7 +194,7 @@
       result += parts[i];
       count += 1;
     }
-    return result.trim();
+    return isBlank(result) ? "" : result.trim();
   }
 
   function encoded(text, max) {
@@ -246,7 +242,7 @@
   }
 
   var api = {
-    Limit: Limit, Refused: Refused, read: read, readFragment: readFragment, readURL: readURL,
+    Limit: Limit, Refused: Refused, read: read, readFragment: readFragment,
     pathFor: pathFor, cleaned: cleaned, encoded: encoded, formatted: formatted, writeReply: writeReply
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;

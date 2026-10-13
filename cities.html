@@ -56,18 +56,18 @@ details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;
 </main>
 <script>
 const STATUS=['https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json'];
-const FEEDS=['https://tiles.alephb.uk/coverage.json','https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json'];
+// The areas alone (areas.json, tens of kB), else the whole feed they come from (tens of MB).
+const FEEDS=['https://tiles.alephb.uk/areas.json','https://tiles.alephb.uk/coverage.json','https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json'];
 const COUNTS='https://tiles.alephb.uk/counts.json';
-// TODO: this reads coverage.json for its areas only (tens of MB today); read a slim areas.json once the tiles build
-// publishes one beside it (review 2026-10-13, finding 4).
-const get=u=>fetch(u+'?v='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
+// The servers say max-age=300 with an ETag: the browser keeps each file 5 minutes, then asks whether it changed.
+const get=u=>fetch(u).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
 // The feed's `checked` (how far the sunny filter was checked on screen), its wording and its sort order; blank when the feed has none.
 const CHECK={districts:'Districts',seed:'One spot',none:'Not yet'}, CHECK_RANK={districts:3,seed:2,none:1};
 // Feed text goes into HTML escaped; the search folds case, accents and ligatures ("sao" finds São, "wroclaw" Wrocław).
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fold=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/ł/g,'l').replace(/ø/g,'o').replace(/ß/g,'ss').replace(/æ/g,'ae').replace(/œ/g,'oe').replace(/đ/g,'d');
 const $=id=>document.getElementById(id), fmt=n=>n==null?'':Number(n).toLocaleString(), km=n=>n==null?'':Number(n).toLocaleString(undefined,{maximumFractionDigits:n<10?1:0}), pct=x=>x==null?'':(x<0.1?(100*x).toFixed(1):Math.round(100*x))+' %';
-Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>({areas:[]})), get(COUNTS).catch(()=>({cities:[]}))]).then(([s,feed,counts])=>{
+Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).catch(()=>({areas:[]})), get(COUNTS).catch(()=>({cities:[]}))]).then(([s,feed,counts])=>{
   // Two cities can share a name (London, Canada): a join by name also needs the place to agree. An area's box must
   // hold the city's point, give or take 12 km (the counts job's square), and a counts row's point lie within 12 km.
   const KM=12, near=(la,lo,lb,lob)=>Math.hypot((la-lb)*111.32,(lo-lob)*111.32*Math.cos(la*Math.PI/180))<=KM;

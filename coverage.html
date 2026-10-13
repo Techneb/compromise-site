@@ -32,6 +32,7 @@ small{color:var(--muted)}
 #layers{border:0;padding:0;margin:0;min-width:0}#layers legend{padding:0;font-size:15px;font-weight:700;margin:14px 0 4px}
 #layers .cats{display:flex;flex-wrap:wrap;gap:6px 28px}#layers .grp{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 2px}
 #layers label{display:block;cursor:pointer;padding:1px 0}#layers input{accent-color:var(--accent);margin:0 6px 0 0;vertical-align:-1px}
+.hint{background:var(--panel);color:var(--fg);padding:4px 8px;border-radius:6px;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .leaflet-popup-content{font:13px/1.4 -apple-system,system-ui,sans-serif;margin:10px 12px}
 .leaflet-popup-content h3{font-size:14px;margin:0 0 2px}.leaflet-popup-content h4{font-size:12px;margin:8px 0 2px;color:#5b6b6f;text-transform:uppercase;letter-spacing:.03em}
 .leaflet-popup-content dl{margin:0;display:grid;grid-template-columns:auto auto;gap:1px 10px}.leaflet-popup-content dt{color:#5b6b6f}.leaflet-popup-content dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
@@ -54,8 +55,11 @@ small{color:var(--muted)}
 <table><thead><tr><th><span class="s" data-k="city">Area</span></th><th><span class="s" data-k="km2">km²</span></th><th id="h1"></th><th id="h2"></th></tr></thead><tbody id="list"></tbody></table>
 </aside>
 <script>
-// The store first (its bucket answers browsers since 2026-09-27), then the tile repository's copy, then the snapshot published beside this page.
-const FEEDS=['https://tiles.alephb.uk/coverage.json','https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json','coverage.json'];
+// areas.json first: the areas and an index of 1° squares of blocks (coverage/<square>.json), each loaded when the map
+// shows it close enough to see a block. Without it, the whole feed (tens of MB): the store, the tile repository's copy,
+// then the snapshot published beside this page.
+const TILES='https://tiles.alephb.uk/', ZOOM=9;
+const FEEDS=[TILES+'coverage.json','https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json','coverage.json'];
 const FLOOR=20, RATIO=0.30, MINIMUM=5;   // the reader's rules: buildings for availability; terraces vs nearby venues for "known"
 const css=getComputedStyle(document.documentElement), v=n=>css.getPropertyValue(n).trim();
 const map=L.map('map',{preferCanvas:true,worldCopyJump:true}).setView([48.86,2.35],5);
@@ -64,15 +68,18 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,
 const edge=(k,scale)=>{const a=k/scale,b=(k+(k<0?-1:1))/scale;return [Math.min(a,b),Math.max(a,b)];};
 const rect=(ky,kx,scale,style)=>{const la=edge(ky,scale),lo=edge(kx,scale);return L.rectangle([[la[0],lo[0]],[la[1],lo[1]]],Object.assign({stroke:false},style));};
 const $=id=>document.getElementById(id);
-const get=u=>fetch(u+(u.startsWith('http')?'?v='+Date.now():''),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
+// The store says max-age=300 with an ETag: the browser keeps each file 5 minutes, then asks whether it changed.
+const get=u=>fetch(u).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
 // One colour family per layer category: places blue, sunny filter green (amber for the street-side test), freshness purple.
 const BLUE=['#e3edf0','#8fc1d9','#4f9ec4','#1f6f9a','#0b3f5e'], GREEN=['#e0e7e8','#a8d5b5','#5fbf85','#1f9d55','#0f6b38'], PURPLE=['#e6e3ee','#c3b7e0','#9a86cc','#6f57b3','#4a3591'];
 const bucket=(x,steps,ramp)=>{let i=0;while(i<steps.length&&x>=steps[i])i++;return ramp[Math.min(i,ramp.length-1)];};
 const fmt=n=>n==null?'':Number(n).toLocaleString();
 // Feed text goes into HTML (rows, popups, tooltips) escaped.
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
-  const dates=d.dates||[], day=i=>(i>=0&&dates[i])||'';
+get(TILES+'areas.json').then(d=>Object.assign(d,{slim:true,cells:[],venueCells:[],communes:{}}))
+  .catch(()=>get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2]))).then(d=>{
+  // A date is an index into the feed's dates, or the date itself in a square's blocks (each square has its own dates).
+  const dates=d.dates||[], day=i=>typeof i==='string'?i:(i>=0&&dates[i])||'';
   const venues=new Map(); for(const w of d.venueCells) venues.set(w[0]+','+w[1],w);
   const near=(ky,kx)=>{let sum=0,any=false;for(const i of[-1,0,1])for(const j of[-1,0,1]){const w=venues.get(Math.trunc((ky+i)/10)+','+Math.trunc((kx+j)/10));if(w){any=true;sum+=w[2]/100;}}return any?sum:null;};
   const known=c=>{const n=near(c[0],c[1]);return n===null?c[2]>=FLOOR:(c[2]>=MINIMUM&&c[2]>=RATIO*n);};
@@ -114,16 +121,17 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   const tilePopup=w=>'<h3 class="nm">Venue tile '+w[0]+','+w[1]+'</h3><small class="sub">2 km square</small><h4>Places on record (OpenStreetMap)</h4>'+dl([['bars, cafés, restaurants',w[2]],['with outdoor seating',w[3]]])+'<h4>Data</h4>'+dl([['built',day(w[4])||'–']]);
   const withName=(layer,lat,lon)=>layer.on('popupopen',async e=>{const el=e.popup.getElement();const n=await nameOf(lat,lon);if(n&&el){const h=el.querySelector('.nm'),s=el.querySelector('.sub');if(h){s.textContent=h.textContent+' · '+s.textContent;h.textContent=n;}}});
 
-  const groups={}, built={};
-  const perBlock=d.cells.some(c=>c.length>9);
+  const groups={}, drawn={}, chunks=d.slim?[]:[d.cells];
+  const perBlock=!!d.slim||d.cells.some(c=>c.length>9);
   // A venue tile counts as recounted when any of its blocks carries a place; elsewhere a 0 means "not counted yet".
   const recounted=new Set(); if(perBlock) for(const c of d.cells) if(c[8]>0) recounted.add(Math.trunc(c[0]/10)+','+Math.trunc(c[1]/10));
   const tileOf=c=>venues.get(Math.trunc(c[0]/10)+','+Math.trunc(c[1]/10));
   const counted=c=>{const t=tileOf(c);return !t||t[2]===0||recounted.has(Math.trunc(c[0]/10)+','+Math.trunc(c[1]/10));};
-  const build=name=>{if(built[name])return;built[name]=true;const g=groups[name], L_=layers[name];
-    if(L_.grid==='places'&&perBlock){for(const c of d.cells){const la=edge(c[0],500),lo=edge(c[1],500);withName(rect(c[0],c[1],500,L_.style(c)).bindPopup(()=>blockPopup(c)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}}
-    else if(L_.grid==='places'||L_.grid==='tile'){const st=L_.styleTile||L_.style;for(const w of d.venueCells){const la=edge(w[0],50),lo=edge(w[1],50);withName(rect(w[0],w[1],50,Object.assign({color:BLUE[3],weight:.5,stroke:true},st(w))).bindPopup(tilePopup(w)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}}
-    else {for(const c of d.cells){const la=edge(c[0],500),lo=edge(c[1],500);withName(rect(c[0],c[1],500,L_.style(c)).bindPopup(()=>blockPopup(c)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}}};
+  // A layer draws the blocks loaded since it last drew (whole feed: one chunk; slim: one chunk a square).
+  const build=name=>{const g=groups[name], L_=layers[name];
+    if(L_.grid==='places'&&!perBlock){if(drawn[name])return;drawn[name]=1;const st=L_.styleTile||L_.style;for(const w of d.venueCells){const la=edge(w[0],50),lo=edge(w[1],50);withName(rect(w[0],w[1],50,Object.assign({color:BLUE[3],weight:.5,stroke:true},st(w))).bindPopup(tilePopup(w)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}return;}
+    for(let i=drawn[name]||0;i<chunks.length;i++)for(const c of chunks[i]){const la=edge(c[0],500),lo=edge(c[1],500);withName(rect(c[0],c[1],500,L_.style(c)).bindPopup(()=>blockPopup(c)),(la[0]+la[1])/2,(lo[0]+lo[1])/2).addTo(g);}
+    drawn[name]=chunks.length;};
   for(const name in layers) groups[name]=L.layerGroup();
   const show=name=>{build(name);$('layerName').textContent=name;$('layerAbout').textContent=layers[name].about+(layers[name].grid==='places'&&!perBlock?' (This feed has no per-block places yet: shown per 2 km tile.)':'');
     $('legend').innerHTML=((layers[name].grid==='places'&&!perBlock&&layers[name].legendTile)||layers[name].legend).map(([col,txt])=>'<p><span class="sw" style="background:'+col+'"></span>'+txt+'</p>').join('');};
@@ -137,6 +145,17 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     const label=document.createElement('label'),r=document.createElement('input');r.type='radio';r.name='layer';r.value=name;r.checked=name===current;r.onchange=()=>pick(name);
     label.appendChild(r);label.appendChild(document.createTextNode(name));cat.appendChild(label);}
   $('layers').hidden=false;
+  // Slim feed: the squares in view, once the map is close enough for a block to show (a hint on the map otherwise).
+  const hint=L.control({position:'topright'});hint.onAdd=()=>{const e=L.DomUtil.create('div','hint');e.textContent='Zoom in to see the blocks';return e;};
+  const loading=new Set(), sq=x=>Math.trunc(Math.trunc(x*500)/500);
+  const want=()=>{if(map.getZoom()<ZOOM){hint.addTo(map);return;}hint.remove();const b=map.getBounds(), ks=new Set();
+    for(let y=Math.floor(b.getSouth());y<=Math.floor(b.getNorth());y++)for(let x=Math.floor(b.getWest());x<=Math.floor(b.getEast());x++)ks.add(sq(y+.5)+','+sq(x+.5));
+    for(const k of ks){if(!d.blocks[k]||loading.has(k))continue;loading.add(k);
+      get(TILES+'coverage/'+k+'.json?v='+d.updated).then(t=>{const at=i=>t.dates[i]||'';
+        for(const c of t.cells){c[5]=at(c[5]);c[6]=at(c[6]);if(c[8]>0)recounted.add(Math.trunc(c[0]/10)+','+Math.trunc(c[1]/10));}
+        for(const w of t.venueCells){w[4]=at(w[4]);venues.set(w[0]+','+w[1],w);}
+        Object.assign(d.communes,t.communes);chunks.push(t.cells);build(current);}).catch(()=>loading.delete(k));}};
+  if(d.slim){map.on('moveend',want);want();}
 
   // ---- the area list: places are estimated from the 2 km tiles overlapping the area, in proportion to the overlap
   const areas=(d.areas||[]).slice();
@@ -220,6 +239,6 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     document.querySelector('#transitTable tbody').innerHTML=cities.map(c=>'<tr>'+row(esc(c),tr[c])+'</tr>').join('');
     document.querySelector('#transitTable tfoot').innerHTML='<tr>'+row('Total, '+cities.length+' cities',Object.assign(total,{built:''}))+'</tr>';
     $('transit').hidden=false;}
-  $('status').textContent='Feed updated '+(d.updated||'')+': '+fmt(d.cells.length)+' blocks, '+fmt(d.venueCells.length)+' venue tiles, '+areas.length+' areas.';
+  $('status').textContent='Feed updated '+(d.updated||'')+': '+fmt(d.slim?Object.values(d.blocks).reduce((t,n)=>t+n,0):d.cells.length)+' blocks, '+(d.slim?'':fmt(d.venueCells.length)+' venue tiles, ')+areas.length+' areas.';
 }).catch(err=>{$('status').textContent='The feed did not answer ('+err.message+'); try again later.';});
 </script></body></html>

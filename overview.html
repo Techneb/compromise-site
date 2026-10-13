@@ -68,7 +68,7 @@ const sortRows=(rows,{key,asc})=>rows.sort((x,y)=>{const v=r=>typeof r[key]==='s
 const marks=(tbody,{key,asc})=>tbody.closest('table').querySelectorAll('th[data-k]').forEach(th=>{const on=th.dataset.k===key;th.classList.toggle('on',on);th.classList.toggle('asc',on&&asc);
   on?th.setAttribute('aria-sort',asc?'ascending':'descending'):th.removeAttribute('aria-sort');});
 
-const status=get(STATUS), coverage=get(TILES+'coverage.json').catch(()=>({areas:[]})), counts=get(TILES+'counts.json').catch(()=>({cities:[]}));
+const status=get(STATUS), coverage=get(TILES+'areas.json').catch(()=>get(TILES+'coverage.json')).catch(()=>({areas:[]})), counts=get(TILES+'counts.json').catch(()=>({cities:[]}));
 const cities=get(TILES+'cities.json').catch(()=>[]), stats=get(TILES+'stats.json').catch(()=>null);
 
 // Each section opens or closes as this viewer last left it.

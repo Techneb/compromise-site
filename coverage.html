@@ -65,6 +65,8 @@ const get=u=>fetch(u+(u.startsWith('http')?'?v='+Date.now():''),{cache:'no-store
 const BLUE=['#e3edf0','#8fc1d9','#4f9ec4','#1f6f9a','#0b3f5e'], GREEN=['#e0e7e8','#a8d5b5','#5fbf85','#1f9d55','#0f6b38'], PURPLE=['#e6e3ee','#c3b7e0','#9a86cc','#6f57b3','#4a3591'];
 const bucket=(x,steps,ramp)=>{let i=0;while(i<steps.length&&x>=steps[i])i++;return ramp[Math.min(i,ramp.length-1)];};
 const fmt=n=>n==null?'':Number(n).toLocaleString();
+// Feed text goes into HTML (rows, popups, tooltips) escaped.
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   const dates=d.dates||[], day=i=>(i>=0&&dates[i])||'';
   const venues=new Map(); for(const w of d.venueCells) venues.set(w[0]+','+w[1],w);
@@ -104,7 +106,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     return '<h3 class="nm">Block '+c[0]+','+c[1]+'</h3><small class="sub">200 m square</small>'
       +'<h4>Places</h4>'+dl((c.length>9&&counted(c)?[['in this block',c[8]],['with outdoor seating',c[8]?c[9]+' ('+Math.round(100*c[9]/c[8])+' %)':'0']]:[]).concat([['within ~600 m (estimate)',n===null?'no venue tile':Math.round(n)]]))
       +'<h4>Sunny filter</h4>'+dl([['works here',works(c)?'yes':'no, too few buildings'],['judges',works(c)?(known(c)?'the terrace itself':'the sunny side of the street'):'–'],['terrace records',c[2]],['buildings',c[3]],['heights measured',pct]])
-      +'<h4>Data</h4>'+dl([['terraces built',day(c[5])||'–'],['buildings built',day(c[6])||'–']].concat(c[7]?[['commune',c[7].split(' ').map(k=>(d.communes||{})[k]||k).join(', ')]]:[]));};
+      +'<h4>Data</h4>'+dl([['terraces built',day(c[5])||'–'],['buildings built',day(c[6])||'–']].concat(c[7]?[['commune',esc(c[7].split(' ').map(k=>(d.communes||{})[k]||k).join(', '))]]:[]));};
   const tilePopup=w=>'<h3 class="nm">Venue tile '+w[0]+','+w[1]+'</h3><small class="sub">2 km square</small><h4>Places on record (OpenStreetMap)</h4>'+dl([['bars, cafés, restaurants',w[2]],['with outdoor seating',w[3]]])+'<h4>Data</h4>'+dl([['built',day(w[4])||'–']]);
   const withName=(layer,lat,lon)=>layer.on('popupopen',async e=>{const el=e.popup.getElement();const n=await nameOf(lat,lon);if(n&&el){const h=el.querySelector('.nm'),s=el.querySelector('.sub');if(h){s.textContent=h.textContent+' · '+s.textContent;h.textContent=n;}}});
 
@@ -140,7 +142,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     a.exact=a.places!=null&&(a.places>0||places===0);if(!a.exact){a.places=Math.round(places);a.seats=Math.round(seats);}
     a.seatShare=a.places?a.seats/a.places:0;a.worksShare=a.tiled?a.passing/a.tiled:0;a.recordsShare=a.passing?a.terracesKnown/a.passing:0;
     a.dot=L.circleMarker([(s+n)/2,(w+e)/2],{radius:5,color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.7})
-      .addTo(map).bindTooltip(a.city+(a.name&&a.name!==a.city?' · '+a.name:''),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));}
+      .addTo(map).bindTooltip(esc(a.city+(a.name&&a.name!==a.city?' · '+a.name:'')),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));}
   // #City in the address flies to that area (the cities page links here).
   const flyTo=()=>{const want=decodeURIComponent(location.hash.slice(1));if(!want)return;const a=areas.find(x=>x.city===want||x.name===want);if(a){const [s,w,n,e]=a.box;map.fitBounds([[s,w],[n,e]]);}};
   flyTo(); window.addEventListener('hashchange',flyTo);
@@ -161,7 +163,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     // area hides a dot only when it holds the dot's point, never by name alone.
     for(const c of st.cities){const cand=c.status==='candidate';if(!c.lat||covered(c)||!c.goingOut)continue;
       L.circleMarker([c.lat,c.lon],{radius:4,color:cand?'#DB7116':'#7f8c90',weight:1.5,fill:false,dashArray:'3 3'})
-        .addTo(map).bindTooltip(c.city+(cand?', '+c.country+' · not listed yet: meets the survey rule':' · not covered: '+c.reason.toLowerCase()),{direction:'top'}).on('click',()=>{location.href='cities.html#'+encodeURIComponent(c.city);});}
+        .addTo(map).bindTooltip(esc(c.city+(cand?', '+c.country+' · not listed yet: meets the survey rule':' · not covered: '+c.reason.toLowerCase())),{direction:'top'}).on('click',()=>{location.href='cities.html#'+encodeURIComponent(c.city);});}
   }).catch(()=>{});
   const metrics={
     places:{group:'Places',label:'Places',cell:a=>(a.exact?'':'≈ ')+fmt(a.places)},
@@ -174,7 +176,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     areaShare:{group:'Sunny filter',label:'Filter works, % of city area',cell:a=>pct(a.areaShare)},
     outShare:{group:'Sunny filter',label:'Going-out blocks covered, %',cell:a=>pct(a.outShare)},
     tiled:{group:'Data',label:'Blocks with data',cell:a=>fmt(a.tiled)},
-    lastBuilt:{group:'Data',label:'Last built',cell:a=>a.lastBuilt||''},
+    lastBuilt:{group:'Data',label:'Last built',cell:a=>esc(a.lastBuilt)},
   };
   const picks=['passing','places'];
   let sortKey='km2', asc=false;
@@ -195,7 +197,7 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
     const q=fold($('q').value.trim()), shown=areas.filter(a=>!q||fold(a.city+' '+(a.name||'')).includes(q));
     const list=$('list');list.innerHTML='';
     for(const a of shown){const [s,w,n,e]=a.box;const tr=document.createElement('tr');tr.className='c';
-      tr.innerHTML='<td>'+a.city+(a.name&&a.name!==a.city?'<br><small>'+a.name+'</small>':'')+'</td><td>'+(a.km2!=null?Number(a.km2).toFixed(1):'')+'</td><td>'+metrics[picks[0]].cell(a)+'</td><td>'+metrics[picks[1]].cell(a)+'</td>';
+      tr.innerHTML='<td>'+esc(a.city)+(a.name&&a.name!==a.city?'<br><small>'+esc(a.name)+'</small>':'')+'</td><td>'+(a.km2!=null?Number(a.km2).toFixed(1):'')+'</td><td>'+metrics[picks[0]].cell(a)+'</td><td>'+metrics[picks[1]].cell(a)+'</td>';
       tr.onclick=()=>map.fitBounds([[s,w],[n,e]]);list.appendChild(tr);}
     $('none').textContent=q&&!shown.length?'No city matches.':'';
     // The map in step: only the matching areas' dots, and the view flies to the match when every match is one city.

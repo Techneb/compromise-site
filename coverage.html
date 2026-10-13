@@ -26,6 +26,8 @@ tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}
 small{color:var(--muted)}
 .filter{display:flex;gap:8px;align-items:center;margin:10px 0 0}.filter label{color:var(--muted);white-space:nowrap}
 .filter input{flex:1;min-width:0;font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+.b{display:inline-block;padding:0 6px;margin:1px 0 1px 4px;border:1px solid var(--line);border-radius:9px;font-size:11px;color:var(--muted)}
+#transitTable tfoot td{font-weight:600}#transitTable td:nth-child(2){white-space:normal}.b{white-space:nowrap}@media (max-width:500px){#transitTable th:last-child,#transitTable td:last-child{display:none}}
 #none{margin:8px 0 0}#none:empty{display:none}
 #layers{border:0;padding:0;margin:0;min-width:0}#layers legend{padding:0;font-size:15px;font-weight:700;margin:14px 0 4px}
 #layers .cats{display:flex;flex-wrap:wrap;gap:6px 28px}#layers .grp{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 2px}
@@ -44,6 +46,8 @@ small{color:var(--muted)}
 <h2 id="layerName"></h2>
 <p id="layerAbout"></p>
 <div id="legend"></div>
+<section id="transit" hidden><h2>Transit lines</h2><p><small>Lines on record per city and mode, a line counted once however many tiles hold it; size is the raw JSON.</small></p>
+<table id="transitTable"><thead><tr><th>City</th><th>Lines by mode</th><th>Lines</th><th>Tiles</th><th>Size</th><th>Built</th></tr></thead><tbody></tbody><tfoot></tfoot></table></section>
 <p><small>A block is one 200 m square of the grid the app reads. Tap a square for its numbers, an area in the list to fly to it. Pick the two metric columns below; click a header to sort.</small></p>
 <div class="filter"><label for="q">City</label><input id="q" type="search" placeholder="Search a city" autocomplete="off"></div>
 <p id="none" role="status" aria-live="polite"></p>
@@ -206,6 +210,16 @@ get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).then(d=>{
   document.querySelectorAll('th .s[data-k]').forEach(s=>s.onclick=()=>{const k=s.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=k==='city';}render();});
   $('q').oninput=render;
   render();
+  // ---- transit lines, per city (the feed's "transit" key; absent from older feeds: the section stays hidden)
+  const tr=d.transit||{}, cities=Object.keys(tr).sort((a,b)=>tr[b].lines-tr[a].lines);
+  if(cities.length){const kb=n=>(n/1e3).toLocaleString(undefined,{maximumFractionDigits:0})+' kB';
+    const badges=m=>Object.entries(m||{}).sort((a,b)=>b[1]-a[1]).map(([k,n])=>'<span class="b">'+esc(k.replace('_',' '))+' '+fmt(n)+'</span>').join('')||'–';
+    const row=(c,t)=>'<td>'+c+'</td><td>'+badges(t.modes)+'</td><td>'+fmt(t.lines)+'</td><td>'+fmt(t.tiles)+'</td><td>'+kb(t.bytes)+'</td><td>'+esc(t.built||'–')+'</td>';
+    const total={modes:{},lines:0,tiles:0,bytes:0};
+    for(const c of cities){const t=tr[c];total.lines+=t.lines;total.tiles+=t.tiles;total.bytes+=t.bytes;for(const k in t.modes)total.modes[k]=(total.modes[k]||0)+t.modes[k];}
+    document.querySelector('#transitTable tbody').innerHTML=cities.map(c=>'<tr>'+row(esc(c),tr[c])+'</tr>').join('');
+    document.querySelector('#transitTable tfoot').innerHTML='<tr>'+row('Total, '+cities.length+' cities',Object.assign(total,{built:''}))+'</tr>';
+    $('transit').hidden=false;}
   $('status').textContent='Feed updated '+(d.updated||'')+': '+fmt(d.cells.length)+' blocks, '+fmt(d.venueCells.length)+' venue tiles, '+areas.length+' areas.';
 }).catch(err=>{$('status').textContent='The feed did not answer ('+err.message+'); try again later.';});
 </script></body></html>

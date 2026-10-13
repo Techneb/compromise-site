@@ -24,9 +24,12 @@ tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}tr.c .btn::before{content:
 tr.sub>td{padding:0 0 10px 18px;border-top:0}tr.sub table{font-size:12px}
 .tag{display:inline-block;white-space:nowrap;padding:1px 6px;border-radius:10px;font-size:12px;background:var(--line)}.tag.ok{background:var(--ok);color:#fff}.tag.part{background:var(--part);color:#1d2a2d}
 .meter{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:80px}.meter i{display:block;height:100%;background:var(--accent)}
+.tip{position:relative;cursor:help;outline:none}.tip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.tip em{display:none;position:absolute;top:100%;left:0;z-index:2;margin-top:4px;padding:4px 8px;border-radius:6px;background:var(--fg);color:var(--bg);font-style:normal;font-size:12px;white-space:nowrap}
+.tip:hover em,.tip:focus em{display:block}
 .meter.total{height:12px;margin:6px 0 10px;max-width:640px}
 a{color:var(--accent)}small{color:var(--muted)}
-@media (max-width:700px){.hide,.long{display:none}.short{display:inline}.scroll{overflow-x:auto}.big{gap:18px}th,td{padding:6px 4px}th[data-k]{white-space:nowrap}tr.sub>td{padding-left:8px}tr.sub td td,tr.sub th{padding:5px 3px}}
+@media (max-width:700px){.tip em{position:static;white-space:normal;max-width:60vw}.hide,.long{display:none}.short{display:inline}.scroll{overflow-x:auto}.big{gap:18px}th,td{padding:6px 4px}th[data-k]{white-space:nowrap}tr.sub>td{padding-left:8px}tr.sub td td,tr.sub th{padding:5px 3px}}
 </style><link rel="icon" type="image/png" href="logo.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"></head><body><main>
 <nav><a href="coverage.html">Map</a><a href="cities.html">Cities</a><a class="on" aria-current="page" href="overview.html">Overview</a></nav>
 <h1>Overview</h1>
@@ -99,6 +102,11 @@ Promise.all([status,coverage,counts,cities]).then(([s,feed,cnts,tiled])=>{
   const countries=new Set(covered.map(r=>r.country));
   $('totals').innerHTML=[[covered.length,'cities covered'],[countries.size,'countries covered'],[covered.filter(r=>r.rank===2).length,'whole city'],[covered.filter(r=>r.rank===1).length,'core only'],
     [rows.length,'cities in the database'],[streetNames.size,'cities with streets']].map(([n,t])=>'<div><b>'+fmt(n)+'</b><span>'+t+'</span></div>').join('');
+  // Cities with transit lines (the feed's "transit" key; a dash until a feed carries it), the share of covered cities on hover or focus.
+  const transit=feed.transit?Object.keys(feed.transit).filter(c=>feed.transit[c].lines>0).length:null;
+  const tip=transit==null?'':fmt(transit)+' of '+fmt(covered.length)+' covered cities, '+(covered.length?Math.round(100*transit/covered.length):0)+' %';
+  $('totals').insertAdjacentHTML('beforeend',transit==null?'<div><b>–</b><span>cities with transit lines</span></div>'
+    :'<div class="tip" tabindex="0" title="'+tip+'" aria-describedby="tt-transit"><b>'+fmt(transit)+'</b><span>cities with transit lines</span><em role="tooltip" id="tt-transit">'+tip+'</em></div>');
   const tally=s.reasons||rows.reduce((t,r)=>(t[r.reason]=(t[r.reason]||0)+1,t),{});
   // Each reason names its biggest cities (by inhabitants, then going-out blocks); a button shows the rest in place.
   const byReason={}; for(const r of rows)(byReason[r.reason]=byReason[r.reason]||[]).push(r);

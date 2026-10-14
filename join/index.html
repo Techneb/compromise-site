@@ -210,13 +210,26 @@ footer a { color: var(--muted); }
     status.textContent = "Finding your location…";
     navigator.geolocation.getCurrentPosition(function (position) {
       if (attempt !== locating || form.elements.start.value !== "here") return;
+      var accuracy = position.coords.accuracy;
+      if (!(accuracy <= 150)) {
+        useAddress("Your location is only approximate (" + within(accuracy) + "). Type an address instead.");
+        address.focus();
+        return;
+      }
       point = { latitude: position.coords.latitude, longitude: position.coords.longitude };
-      status.textContent = "Location found, rounded to about 5 m.";
+      status.textContent = accuracy <= 10 ? "Location found, rounded to about 5 m."
+        : "Location found, approximate (" + within(accuracy) + ").";
     }, function () {
       if (attempt !== locating || form.elements.start.value !== "here") return;
       useAddress("Your location isn't available. Type an address instead.");
       address.focus();
-    }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 });
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+  }
+
+  // A fix's accuracy, in words: "±40 m", "±12 km", or "accuracy unknown".
+  function within(metres) {
+    if (!isFinite(metres)) return "accuracy unknown";
+    return metres < 1000 ? "±" + Math.round(metres / 10) * 10 + " m" : "±" + Math.round(metres / 1000) + " km";
   }
 
   form.addEventListener("change", function (event) {

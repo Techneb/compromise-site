@@ -55,6 +55,7 @@ small{color:var(--muted)}
 <p id="none" role="status" aria-live="polite"></p>
 <table><thead><tr><th><span class="s" data-k="city">Area</span></th><th><span class="s" data-k="km2">km²</span></th><th id="h1"></th><th id="h2"></th></tr></thead><tbody id="list"></tbody></table>
 </aside>
+<script src="/common.js"></script>
 <script>
 // areas.json first: the areas and an index of 1° squares of blocks (coverage/<square>.json), each loaded when the map
 // shows it close enough to see a block. Without it, the whole feed (tens of MB): the store, the tile repository's copy,
@@ -66,17 +67,12 @@ const css=getComputedStyle(document.documentElement), v=n=>css.getPropertyValue(
 const map=L.map('map',{preferCanvas:true,worldCopyJump:true}).setView([48.86,2.35],5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,
   attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
-const edge=(k,scale)=>{const a=k/scale,b=(k+(k<0?-1:1))/scale;return [Math.min(a,b),Math.max(a,b)];};
+// A key truncates toward zero, so key 0 spans both sides of the axis: (−1/scale, 1/scale).
+const edge=(k,scale)=>{if(k===0)return [-1/scale,1/scale];const a=k/scale,b=(k+(k<0?-1:1))/scale;return [Math.min(a,b),Math.max(a,b)];};
 const rect=(ky,kx,scale,style)=>{const la=edge(ky,scale),lo=edge(kx,scale);return L.rectangle([[la[0],lo[0]],[la[1],lo[1]]],Object.assign({stroke:false},style));};
-const $=id=>document.getElementById(id);
-// The store says max-age=300 with an ETag: the browser keeps each file 5 minutes, then asks whether it changed.
-const get=u=>fetch(u).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
 // One colour family per layer category: places blue, sunny filter green (amber for the street-side test), freshness purple.
 const BLUE=['#e3edf0','#8fc1d9','#4f9ec4','#1f6f9a','#0b3f5e'], GREEN=['#e0e7e8','#a8d5b5','#5fbf85','#1f9d55','#0f6b38'], PURPLE=['#e6e3ee','#c3b7e0','#9a86cc','#6f57b3','#4a3591'];
 const bucket=(x,steps,ramp)=>{let i=0;while(i<steps.length&&x>=steps[i])i++;return ramp[Math.min(i,ramp.length-1)];};
-const fmt=n=>n==null?'':Number(n).toLocaleString();
-// Feed text goes into HTML (rows, popups, tooltips) escaped.
-const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 get(TILES+'areas.json').then(d=>Object.assign(d,{slim:true,cells:[],venueCells:[],communes:{}}))
   .catch(()=>get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2]))).then(d=>{
   // A date is an index into the feed's dates, or the date itself in a square's blocks (each square has its own dates).
@@ -168,15 +164,14 @@ get(TILES+'areas.json').then(d=>Object.assign(d,{slim:true,cells:[],venueCells:[
     a.dot=L.circleMarker([(s+n)/2,(w+e)/2],{radius:5,color:v('--accent'),weight:1.5,fillColor:v('--accent'),fillOpacity:.7})
       .addTo(map).bindTooltip(esc(a.city+(a.name&&a.name!==a.city?' · '+a.name:'')),{direction:'top'}).on('click',()=>map.fitBounds([[s,w],[n,e]]));}
   // #City in the address flies to that area (the cities page links here).
-  const flyTo=()=>{const want=decodeURIComponent(location.hash.slice(1));if(!want)return;const a=areas.find(x=>x.city===want||x.name===want);if(a){const [s,w,n,e]=a.box;map.fitBounds([[s,w],[n,e]]);}};
+  const flyTo=()=>{let want;try{want=decodeURIComponent(location.hash.slice(1));}catch(e){return;}if(!want)return;const a=areas.find(x=>x.city===want||x.name===want);if(a){const [s,w,n,e]=a.box;map.fitBounds([[s,w],[n,e]]);}};
   flyTo(); window.addEventListener('hashchange',flyTo);
   // The cities looked at but not tiled, as hollow grey dots sized by their going-out blocks (the status feed).
   // The status feed also gives each city's area, counts.json its going-out blocks in the wide square: the two shares below.
-  const share=(n,d)=>n!=null&&d?n/d:null, pct=x=>x==null?'':(x<0.1?(100*x).toFixed(1):Math.round(100*x))+' %';
+  const share=(n,d)=>n!=null&&d?n/d:null;
   // Joined by name and place: a counts row or a status row belongs to an area when its point lies in the area's box,
   // give or take 12 km (two cities can share a name, London, Canada). A row without a point joins by name alone.
-  const inBox=(a,c)=>{if(c.lat==null)return true;const [s0,w,n,e]=a.box,dy=12/111.32,dx=dy/Math.cos(c.lat*Math.PI/180);
-    return c.lat>=s0-dy&&c.lat<=n+dy&&c.lon>=w-dx&&c.lon<=e+dx;};
+  const inBox=(a,c)=>holds(a.box,c);
   const match=(list,a)=>list.find(c=>c.city===a.city&&inBox(a,c));
   get('https://tiles.alephb.uk/counts.json').then(ct=>{
     for(const a of areas)a.outShare=share(a.goingOut,(match(ct.cities||[],a)||{}).goingOutCellsWide);render();}).catch(()=>{});
@@ -205,7 +200,6 @@ get(TILES+'areas.json').then(d=>Object.assign(d,{slim:true,cells:[],venueCells:[
   const picks=['passing','places'];
   let sortKey='km2', asc=false;
   // The city field: case- and accent-insensitive ("sao" finds São, "wroclaw" Wrocław) on the Area cell's text.
-  const fold=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/ł/g,'l').replace(/ø/g,'o').replace(/ß/g,'ss').replace(/æ/g,'ae').replace(/œ/g,'oe').replace(/đ/g,'d');
   let lastQ='';
   const header=(i,th)=>{const sel=document.createElement('select');const og={};
     for(const k in metrics){const g=metrics[k].group;if(!og[g]){og[g]=document.createElement('optgroup');og[g].label=g;sel.appendChild(og[g]);}

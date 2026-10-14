@@ -51,12 +51,9 @@ a{color:var(--accent)}small{color:var(--muted)}
 </tr></thead><tbody id="countries"></tbody></table></div>
 </details>
 </main>
+<script src="/common.js"></script>
 <script>
 const TILES='https://tiles.alephb.uk/', STATUS='https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json';
-// The servers say max-age=300 with an ETag: the browser keeps each file 5 minutes, then asks whether it changed.
-const get=u=>fetch(u).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
-const $=id=>document.getElementById(id), fmt=n=>n==null?'':Number(n).toLocaleString(), pct=x=>x==null?'':x>0&&x<0.0005?'< 0.1 %':(100*x).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
-const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // Sizes to 3 significant figures: 4.35 GB, 78.0 MB, 169 kB.
 const size=b=>{if(b==null)return '';if(b<1000)return fmt(b)+' B';let i=Math.min(4,Math.floor(Math.log10(b)/3)),v=b/Math.pow(1000,i);
   if(v>=999.5&&i<4){i++;v/=1000;}return v.toLocaleString(undefined,{minimumSignificantDigits:3,maximumSignificantDigits:3})+' '+['B','kB','MB','GB','TB'][i];};
@@ -78,19 +75,11 @@ document.querySelectorAll('details[id]').forEach(d=>{const k='ov:open:'+d.id;
 
 // ---- the cities: cities.html's joins (a name and a place: an area's box holds the city's point give or take 12 km)
 Promise.all([status,coverage,counts,cities]).then(([s,feed,cnts,tiled])=>{
-  const KM=12, near=(la,lo,lb,lob)=>Math.hypot((la-lb)*111.32,(lo-lob)*111.32*Math.cos(la*Math.PI/180))<=KM;
-  const holds=(box,c)=>{if(c.lat==null)return true;const [s0,w,n,e]=box,dy=KM/111.32,dx=dy/Math.cos(c.lat*Math.PI/180);
-    return c.lat>=s0-dy&&c.lat<=n+dy&&c.lon>=w-dx&&c.lon<=e+dx;};
-  const cnt={}; for(const c of cnts.cities||[]) (cnt[c.city]=cnt[c.city]||[]).push(c);
-  const countsRow=c=>(cnt[c.city]||[]).find(k=>(!k.country||k.country===c.country)&&(k.lat==null||c.lat==null||near(k.lat,k.lon,c.lat,c.lon)));
+  const countsRow=countsRows(cnts.cities);
   const streetNames=new Set((Array.isArray(tiled)?tiled:[]).filter(e=>e.streets===true).map(e=>e.city));
-  // Past the name, the numbers: a core whose areas cover 85 % of the city's surface, or a tiled box holding 95 % of its
-  // square's going-out blocks, is the whole city.
-  const wholeByNumbers=(c,km2,k)=>(!!c.cityAreaKm2&&km2/c.cityAreaKm2>=0.85)
-    ||(!!k&&k.extent==='tiled box'&&k.goingOutCellsWide>0&&k.goingOutCoveredWide!=null&&k.goingOutCoveredWide/k.goingOutCellsWide>=0.95);
   const rows=s.cities.map(c=>{const cand=c.status==='candidate';
     const areas=cand?[]:(feed.areas||[]).filter(a=>a.city===c.city&&a.box&&holds(a.box,c));
-    let rank=0; for(const a of areas){const whole=/whole|intra-muros|municipality|^greater /i.test(a.name)||a.name===a.city;rank=Math.max(rank,whole?2:1);}
+    let rank=0; for(const a of areas){const whole=wholeName(a);rank=Math.max(rank,whole?2:1);}
     const k=cand?null:countsRow(c);
     if(rank===1&&wholeByNumbers(c,areas.reduce((t,a)=>t+(a.km2||0),0),k))rank=2;
     const g=!k?{goingOut:c.goingOut,sq:!!c.extent&&!/^(municipality|commune)$/.test(c.extent)}

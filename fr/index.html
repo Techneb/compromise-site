@@ -14,9 +14,7 @@ const BETA_URL = "{{ site.beta_url }}";
 <meta name="description" content="Compromise trouve le bar, le café ou le restaurant où tout le monde arrive à peu près en même temps, à pied, en transports, en voiture ou à vélo. Invite tes amis avec un lien. En bêta sur iPhone.">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://compromise.alephb.uk/fr/">
-<link rel="alternate" hreflang="en" href="https://compromise.alephb.uk/en/">
-<link rel="alternate" hreflang="fr" href="https://compromise.alephb.uk/fr/">
-<link rel="alternate" hreflang="x-default" href="https://compromise.alephb.uk/">
+{% include hreflang.html %}
 <link rel="stylesheet" href="/landing.css">
 <link rel="icon" type="image/png" href="/logo.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
@@ -31,7 +29,7 @@ const BETA_URL = "{{ site.beta_url }}";
     </a>
     <div class="links">
       <a class="hide-sm" href="#how">Comment ça marche</a><a class="hide-xs" href="/privacy" hreflang="en">Confidentialité</a>
-      <span class="switch" aria-label="Langue"><a href="/en/" lang="en" hreflang="en" onclick="try{localStorage.setItem('lang','en')}catch(e){}">EN</a><span aria-current="true" lang="fr">FR</span></span>
+      {% include lang-menu.html current="fr" label="Langue" %}
     </div>
   </nav>
 
@@ -296,7 +294,7 @@ const BETA_URL = "{{ site.beta_url }}";
 
   <footer>
     <span>Compromise, par AlephB.</span>
-    <div class="links"><a href="/privacy" hreflang="en">Confidentialité</a><a href="/en/" lang="en" hreflang="en" onclick="try{localStorage.setItem('lang','en')}catch(e){}">English</a><span>Contact : <span class="email">contact@alephb.uk</span></span></div>
+    <div class="links"><a href="/privacy" hreflang="en">Confidentialité</a>{% include lang-links.html current="fr" %}<span>Contact : <span class="email">contact@alephb.uk</span></span></div>
   </footer>
 </div>
 <script>

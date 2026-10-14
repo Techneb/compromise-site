@@ -7,15 +7,16 @@
 // The public TestFlight link lives in _config.yml (beta_url), shared with /fr/. Empty, the "Join the beta" buttons stay hidden and "Beta opening soon" shows.
 const BETA_URL = "{{ site.beta_url }}";
 {%- if include.redirect %}
-// / only (never /en/): a French browser lands on /fr/ unless the visitor picked English (the EN switch, or ?lang=en); a choice is remembered.
+// / only (never /en/): a browser in another of the site's languages lands on its page unless the visitor picked one (the globe menu, or ?lang=en); a choice is remembered.
 (function () {
-  var chosen = null;
+  var langs = {{ site.data.languages | jsonify }}, chosen = null;
   try {
-    if (new URLSearchParams(location.search).get("lang") === "en") { localStorage.setItem("lang", "en"); return; }
-    chosen = localStorage.getItem("lang");
-  } catch (e) { if (/[?&]lang=en/.test(location.search)) return; }
-  var first = (navigator.languages && navigator.languages[0]) || navigator.language || "";
-  if (chosen === "fr" || (!chosen && /^fr/i.test(first))) location.replace("/fr/" + location.hash);
+    chosen = new URLSearchParams(location.search).get("lang");
+    if (chosen) localStorage.setItem("lang", chosen); else chosen = localStorage.getItem("lang");
+  } catch (e) { chosen = (/[?&]lang=([a-z-]+)/i.exec(location.search) || [])[1] || null; }
+  var first = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase().split("-")[0];
+  var go = langs.filter(function (l) { return l.code === (chosen || first); })[0];
+  if (go && go.code !== "en") location.replace(go.path + location.hash);
 })();
 {%- endif %}
 </script>
@@ -23,9 +24,7 @@ const BETA_URL = "{{ site.beta_url }}";
 <meta name="description" content="Compromise finds the bar, café or restaurant everyone reaches in about the same time, on foot, by transit, by car or by bike. Invite friends with a link. In beta on iPhone.">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://compromise.alephb.uk/en/">
-<link rel="alternate" hreflang="en" href="https://compromise.alephb.uk/en/">
-<link rel="alternate" hreflang="fr" href="https://compromise.alephb.uk/fr/">
-<link rel="alternate" hreflang="x-default" href="https://compromise.alephb.uk/">
+{% include hreflang.html %}
 <link rel="stylesheet" href="/landing.css">
 <link rel="icon" type="image/png" href="/logo.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
@@ -40,7 +39,7 @@ const BETA_URL = "{{ site.beta_url }}";
     </a>
     <div class="links">
       <a class="hide-sm" href="#how">How it works</a><a class="hide-xs" href="/privacy">Privacy</a>
-      <span class="switch" aria-label="Language"><span aria-current="true" lang="en">EN</span><a href="/fr/" lang="fr" hreflang="fr" onclick="try{localStorage.setItem('lang','fr')}catch(e){}">FR</a></span>
+      {% include lang-menu.html current="en" label="Language" %}
     </div>
   </nav>
 
@@ -313,7 +312,7 @@ const BETA_URL = "{{ site.beta_url }}";
 
   <footer>
     <span>Compromise, by AlephB.</span>
-    <div class="links"><a href="/privacy">Privacy policy</a><a href="/fr/" lang="fr" hreflang="fr" onclick="try{localStorage.setItem('lang','fr')}catch(e){}">Français</a><span>Contact: <span class="email">contact@alephb.uk</span></span></div>
+    <div class="links"><a href="/privacy">Privacy policy</a>{% include lang-links.html current="en" %}<span>Contact: <span class="email">contact@alephb.uk</span></span></div>
   </footer>
 </div>
 <script>

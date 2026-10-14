@@ -1,5 +1,5 @@
 title: Compromise
 description: A fair place to meet
 include: [".well-known"]
-# The public TestFlight link, used by /, /en/ and /fr/: paste it between the quotes.
+# The public TestFlight link, used by /, /en/, /fr/, /es/ and /de/: paste it between the quotes.
 beta_url: ""

@@ -6,3 +6,9 @@
 - code: fr
   name: Français
   path: /fr/
+- code: es
+  name: Español
+  path: /es/
+- code: de
+  name: Deutsch
+  path: /de/

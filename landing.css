@@ -1,4 +1,4 @@
-/* The landing page, English (/) and French (/fr/). Hero with the phone, three steps, one section per feature with its
+/* The landing page, English (/), French (/fr/), Spanish (/es/) and German (/de/). Hero with the phone, three steps, one section per feature with its
    own picture, privacy, the beta. The app's own palette: one colour per person, amber for the sun. */
 :root {
   --bg: #F6F9FA; --surface: #FFFFFF; --fg: #0F2328; --muted: #50686E; --hair: #DCE6E8;

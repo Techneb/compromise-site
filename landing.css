@@ -25,7 +25,7 @@ h2 { font-size: clamp(28px, 4.2vw, 42px); line-height: 1.08; font-weight: 700; }
 h3 { font-size: 20px; line-height: 1.25; font-weight: 650; letter-spacing: -0.01em; }
 p { margin: 0; }
 .muted { color: var(--muted); }
-.kicker { font: 600 13px/1 var(--font); text-transform: uppercase; letter-spacing: 0.09em; color: var(--tint); }
+.kicker { font: 600 13px/1.35 var(--font); text-transform: uppercase; letter-spacing: 0.09em; color: var(--tint); }
 
 /* Nav */
 nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 18px; }

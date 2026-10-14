@@ -47,7 +47,7 @@ a{color:var(--accent)}small{color:var(--muted)}
 <details id="sec-countries" open><summary><h2>Countries</h2></summary>
 <p><small>* counted in a 24 km square around the city's centre.</small></p>
 <div class="scroll"><table><thead><tr>
-<th data-k="country"><button type="button" class="btn">Country</button></th><th data-k="covered" class="n"><button type="button" class="btn"><span class="long">Cities covered</span><span class="short">Covered</span></button></th><th data-k="all" class="n"><button type="button" class="btn"><span class="long">Cities in the database</span><span class="short">Listed</span></button></th><th class="hide">Top 3 by going-out blocks</th><th data-k="population" class="n"><button type="button" class="btn"><span class="long">Population covered</span><span class="short">Population</span></button></th><th data-k="streets" class="n"><button type="button" class="btn"><span class="long">Cities with streets</span><span class="short">Streets</span></button></th>
+<th data-k="country"><button type="button" class="btn">Country</button></th><th data-k="covered" class="n"><button type="button" class="btn"><span class="long">Cities covered</span><span class="short">Covered</span></button></th><th data-k="all" class="n"><button type="button" class="btn"><span class="long">Cities in the database</span><span class="short">Listed</span></button></th><th class="hide">Top 3 by going-out blocks</th><th data-k="population" class="n"><button type="button" class="btn"><span class="long">Population covered</span><span class="short">Population</span></button></th><th data-k="streets" class="n"><button type="button" class="btn"><span class="long">Cities with streets</span><span class="short">Streets</span></button></th><th data-k="transit" class="n"><button type="button" class="btn"><span class="long">Cities with transit lines</span><span class="short">Transit</span></button></th>
 </tr></thead><tbody id="countries"></tbody></table></div>
 </details>
 </main>
@@ -84,7 +84,8 @@ Promise.all([status,coverage,counts,cities]).then(([s,feed,cnts,tiled])=>{
     if(rank===1&&wholeByNumbers(c,areas.reduce((t,a)=>t+(a.km2||0),0),k))rank=2;
     const g=!k?{goingOut:c.goingOut,sq:!!c.extent&&!/^(municipality|commune)$/.test(c.extent)}
       :k.extent==='tiled box'?{goingOut:k.goingOutCellsWide,sq:true}:{goingOut:k.goingOutCells,sq:!/^(municipality|commune)$/.test(k.extent)};
-    return Object.assign({},c,g,{rank,streets:streetNames.has(c.city)});});
+    const tl=rank&&feed.transit&&feed.transit[c.city];
+    return Object.assign({},c,g,{rank,streets:streetNames.has(c.city),lines:tl?tl.lines:0});});
   const covered=rows.filter(r=>r.rank);
 
   // ---- 1. totals, and the status breakdown in cities.html's words
@@ -111,21 +112,21 @@ Promise.all([status,coverage,counts,cities]).then(([s,feed,cnts,tiled])=>{
   // ---- 2. countries, a row opens on its cities
   const byCountry={}; for(const r of rows)(byCountry[r.country]=byCountry[r.country]||[]).push(r);
   const ctry=Object.entries(byCountry).map(([country,list])=>{const cov=list.filter(r=>r.rank);
-    return {country,list,covered:cov.length,all:list.length,population:cov.reduce((t,r)=>t+(r.population||0),0),streets:list.filter(r=>r.streets).length,
+    return {country,list,covered:cov.length,all:list.length,population:cov.reduce((t,r)=>t+(r.population||0),0),streets:list.filter(r=>r.streets).length,transit:feed.transit?list.filter(r=>r.lines>0).length:null,
       top:cov.slice().sort((a,b)=>(b.goingOut||0)-(a.goingOut||0)).slice(0,3)};});
   const cState={key:'covered',asc:false}, open=new Set(); let more=false;
   const outCell=r=>r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut)+(r.sq?'<small>*</small>':'');
   const covTag=r=>'<span class="tag '+(r.rank===2?'ok':r.rank===1?'part':'')+'">'+(r.rank===2?'whole city':r.rank===1?'core':'none')+'</span>';
   const row=c=>{const o=open.has(c.country);
     return '<tr class="c'+(o?' open':'')+'" data-c="'+esc(c.country)+'"><td><button type="button" class="btn" aria-expanded="'+o+'" data-f="c:'+esc(c.country)+'">'+esc(c.country)+'</button></td><td class="n">'+fmt(c.covered)+'</td><td class="n">'+fmt(c.all)+'</td><td class="hide">'
-      +c.top.map(r=>esc(r.city)+' <small>'+fmt(r.goingOut)+'</small>').join(', ')+'</td><td class="n">'+(c.population?fmt(c.population):'')+'</td><td class="n">'+(c.streets?fmt(c.streets):'')+'</td></tr>'
-      +(o?'<tr class="sub"><td colspan="6"><table><thead><tr><th>City</th><th>Coverage</th><th class="n"><span class="long">Going-out blocks</span><span class="short">Going-out</span></th><th class="n"><span class="long">Inhabitants</span><span class="short">People</span></th><th class="hide">Waiting for</th><th>Streets</th></tr></thead><tbody>'
+      +c.top.map(r=>esc(r.city)+' <small>'+fmt(r.goingOut)+'</small>').join(', ')+'</td><td class="n">'+(c.population?fmt(c.population):'')+'</td><td class="n">'+(c.streets?fmt(c.streets):'')+'</td><td class="n">'+(c.transit==null?'–':c.transit?fmt(c.transit):'')+'</td></tr>'
+      +(o?'<tr class="sub"><td colspan="7"><table><thead><tr><th>City</th><th>Coverage</th><th class="n"><span class="long">Going-out blocks</span><span class="short">Going-out</span></th><th class="n"><span class="long">Inhabitants</span><span class="short">People</span></th><th class="hide">Waiting for</th><th>Streets</th><th class="n"><span class="long">Transit lines</span><span class="short">Transit</span></th></tr></thead><tbody>'
         +c.list.slice().sort((a,b)=>b.rank-a.rank||(b.goingOut||0)-(a.goingOut||0)).map(r=>'<tr><td>'+(r.rank?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+esc(r.city)+'</a>':esc(r.city))+'</td><td>'+covTag(r)+'</td><td class="n">'+outCell(r)+'</td><td class="n">'+fmt(r.population)+'</td><td class="hide">'
-          +(r.rank===2||r.reason==='Covered'?'':esc(r.reason))+'</td><td>'+(r.streets?'yes':'')+'</td></tr>').join('')+'</tbody></table></td></tr>':'');};
+          +(r.rank===2||r.reason==='Covered'?'':esc(r.reason))+'</td><td>'+(r.streets?'yes':'')+'</td><td class="n">'+(r.lines?fmt(r.lines):'')+'</td></tr>').join('')+'</tbody></table></td></tr>':'');};
   // Countries with a covered city first; the others wait behind a button.
   const drawCountries=()=>{sortRows(ctry,cState);marks($('countries'),cState);const zero=ctry.filter(c=>!c.covered);
     $('countries').innerHTML=ctry.filter(c=>c.covered).map(row).join('')
-      +(zero.length?'<tr class="more"><td colspan="6"><button type="button" class="btn" aria-expanded="'+more+'" data-f="more">'+(more?'▾ ':'▸ ')+fmt(zero.length)+' more '+(zero.length===1?'country':'countries')+' with no city covered</button></td></tr>'
+      +(zero.length?'<tr class="more"><td colspan="7"><button type="button" class="btn" aria-expanded="'+more+'" data-f="more">'+(more?'▾ ':'▸ ')+fmt(zero.length)+' more '+(zero.length===1?'country':'countries')+' with no city covered</button></td></tr>'
         +(more?zero.map(row).join(''):''):'');};
   // A click, Enter or Space opens a row; the redraw keeps the focus on the same button.
   $('countries').onclick=e=>{if(e.target.closest('a'))return;

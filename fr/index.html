@@ -190,28 +190,18 @@ const BETA_URL = "";
       <div class="visual" id="shot-sun">
         <!-- Screenshot slot: img/fr/sun.png, 1206 × 2622 -->
         <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/fr/sun.png" alt="Des adresses avec terrasse au soleil, chacune avec la durée du soleil" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
-        <div class="panel" role="img" aria-label="Illustration : le soleil du soir éclaire une terrasse, tandis que celle à l'ombre d'un immeuble reste à l'ombre.">
-          <svg viewBox="0 0 420 260" aria-hidden="true">
-            <circle cx="360" cy="54" r="26" fill="var(--sun)"/>
-            <path d="M334 72 L150 214 L240 214 Z" fill="var(--sun)" opacity="0.16"/>
-            <rect x="170" y="104" width="70" height="110" rx="4" fill="var(--shade)" opacity="0.9"/>
-            <g fill="var(--surface)" opacity="0.5"><rect x="184" y="120" width="14" height="14"/><rect x="212" y="120" width="14" height="14"/><rect x="184" y="148" width="14" height="14"/><rect x="212" y="148" width="14" height="14"/><rect x="184" y="176" width="14" height="14"/><rect x="212" y="176" width="14" height="14"/></g>
-            <path d="M170 214 L40 214 L100 150 Z" fill="var(--fg)" opacity="0.10"/>
-            <line x1="10" y1="214" x2="410" y2="214" stroke="var(--muted)" stroke-width="2"/>
-            <g>
-              <rect x="258" y="196" width="60" height="4" rx="2" fill="var(--fg)"/>
-              <rect x="262" y="200" width="3" height="14" fill="var(--fg)"/><rect x="311" y="200" width="3" height="14" fill="var(--fg)"/>
-              <path d="M252 186 Q288 168 324 186 Z" fill="var(--p2)"/>
-              <text x="288" y="238" text-anchor="middle" font-size="13" font-weight="600" fill="var(--fg)" font-family="-apple-system, Segoe UI, sans-serif">Au soleil</text>
-            </g>
-            <g opacity="0.7">
-              <rect x="70" y="196" width="60" height="4" rx="2" fill="var(--fg)"/>
-              <rect x="74" y="200" width="3" height="14" fill="var(--fg)"/><rect x="123" y="200" width="3" height="14" fill="var(--fg)"/>
-              <path d="M64 186 Q100 168 136 186 Z" fill="var(--p1)"/>
-              <text x="100" y="238" text-anchor="middle" font-size="13" font-weight="600" fill="var(--muted)" font-family="-apple-system, Segoe UI, sans-serif">À l'ombre</text>
-            </g>
-          </svg>
-        </div>
+        <div class="panel mini" role="img" aria-label="Illustration : une carte avec des terrasses au soleil, la meilleure adresse au soleil jusqu'à 18:40, et l'interrupteur Terrasse au soleil activé.">
+<svg class="snip" viewBox="0 0 300 150" aria-hidden="true"><rect width="300" height="150" fill="var(--map)"/>
+<path d="M-10 104 C 60 84, 120 128, 190 100 S 290 70, 320 86" stroke="var(--water)" stroke-width="16" fill="none"/>
+<rect x="196" y="16" width="64" height="40" rx="8" fill="var(--park)"/>
+<g stroke="var(--street)" stroke-linecap="round" fill="none"><path d="M-10 40 L310 54" stroke-width="7"/><path d="M-10 136 L310 124" stroke-width="8"/><path d="M70 -10 L86 160" stroke-width="7"/><path d="M182 -10 L170 160" stroke-width="6"/><path d="M-10 10 L130 80 L310 150" stroke-width="5"/></g>
+<g stroke="#fff" stroke-width="2.5"><circle cx="30" cy="22" r="6" fill="var(--p1)"/><circle cx="276" cy="30" r="6" fill="var(--p2)"/><circle cx="150" cy="142" r="6" fill="var(--p3)"/></g>
+<path d="M226 72c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--shade)" stroke="#fff" stroke-width="2"/><circle cx="226" cy="83" r="4" fill="#fff"/><path d="M104 68c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--sun)" stroke="#fff" stroke-width="2"/><circle cx="104" cy="79" r="4" fill="#fff"/><path d="M140 40c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--sun)" stroke="#fff" stroke-width="2"/><circle cx="140" cy="51" r="4" fill="#fff"/>
+<rect x="156" y="40" width="118" height="22" rx="11" fill="var(--surface)"/><circle cx="168" cy="51" r="4.5" fill="var(--sun)"/><text x="177" y="55" font-size="10.5" font-weight="650" fill="var(--fg)" font-family="-apple-system, Segoe UI, sans-serif">Soleil jusqu'à 18:40</text>
+</svg>
+<div class="spot"><div class="spot-head"><span class="rank r1">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 min d'écart</span></div><div class="sun-cap">Au soleil jusqu'à 18:40</div><div class="bars"><div class="bar"><span>Toi</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 min</b></div><div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div><div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 min</b></div></div></div>
+<div class="switch-row"><span>Terrasse au soleil</span><span class="ios-switch" aria-hidden="true"></span></div>
+</div>
       </div>
     </div>
   </section>
@@ -231,23 +221,20 @@ const BETA_URL = "";
       <div class="visual" id="shot-home">
         <!-- Screenshot slot: img/fr/home.png, 1206 × 2622 -->
         <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/fr/home.png" alt="« Où on vit ? » dans Compromise : les rues colorées de Meilleur à Plus loin" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
-        <div class="panel" role="img" aria-label="Illustration : une carte où les rues entre les lieux habituels de deux personnes sont colorées en meilleur, et celles plus loin moins bien.">
-          <svg viewBox="0 0 420 260" aria-hidden="true">
-            <rect width="420" height="260" rx="14" fill="var(--map)"/>
-            <path d="M-10 170 C 90 140, 180 210, 280 170 S 400 120, 430 140" stroke="var(--water)" stroke-width="20" fill="none"/>
-            <g fill="none" stroke-linecap="round" stroke-width="7">
-              <path d="M150 40 L170 230" stroke="var(--p1)"/><path d="M200 30 L210 230" stroke="var(--p1)"/>
-              <path d="M110 90 L270 100" stroke="var(--p1)"/><path d="M120 130 L280 120" stroke="var(--sun)"/>
-              <path d="M240 30 L260 230" stroke="var(--sun)"/><path d="M90 40 L110 230" stroke="var(--sun)"/>
-              <path d="M30 60 L60 230" stroke="var(--p2)"/><path d="M300 20 L330 230" stroke="var(--p2)"/><path d="M360 30 L390 230" stroke="var(--p2)"/>
-              <path d="M10 210 L410 200" stroke="var(--p2)"/><path d="M10 30 L410 50" stroke="var(--p2)"/>
-            </g>
-            <g stroke="#fff" stroke-width="3"><circle cx="62" cy="76" r="10" fill="var(--p3)"/><circle cx="346" cy="88" r="10" fill="var(--fg)"/></g>
-            <rect x="121" y="104" width="124" height="26" rx="13" fill="var(--surface)"/>
-            <text x="183" y="122" text-anchor="middle" font-size="13" font-weight="650" fill="var(--fg)" font-family="-apple-system, Segoe UI, sans-serif">Meilleur quartier</text>
-          </svg>
-          <div class="legend"><span>Meilleur</span><span class="ramp"></span><span>Plus loin</span></div>
-        </div>
+        <div class="panel mini" role="img" aria-label="Illustration : trois quartiers classés sur une carte, Canal Saint-Martin en premier, avec le temps de trajet de chacun.">
+<svg class="snip" viewBox="0 0 300 150" aria-hidden="true"><rect width="300" height="150" fill="var(--map)"/>
+<path d="M-10 104 C 60 84, 120 128, 190 100 S 290 70, 320 86" stroke="var(--water)" stroke-width="16" fill="none"/>
+<rect x="196" y="16" width="64" height="40" rx="8" fill="var(--park)"/>
+<g stroke="var(--street)" stroke-linecap="round" fill="none"><path d="M-10 40 L310 54" stroke-width="7"/><path d="M-10 136 L310 124" stroke-width="8"/><path d="M70 -10 L86 160" stroke-width="7"/><path d="M182 -10 L170 160" stroke-width="6"/><path d="M-10 10 L130 80 L310 150" stroke-width="5"/></g>
+<ellipse cx="128" cy="60" rx="40" ry="26" fill="var(--p1)" opacity="0.38"/><ellipse cx="196" cy="104" rx="34" ry="22" fill="var(--p1)" opacity="0.24"/><ellipse cx="96" cy="118" rx="30" ry="20" fill="var(--p1)" opacity="0.14"/>
+<g font-family="ui-rounded, -apple-system, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#fff"><circle cx="128" cy="60" r="10" fill="var(--p1)"/><text x="128" y="64">1</text><circle cx="196" cy="104" r="10" fill="color-mix(in srgb, var(--p1) 70%, var(--muted))"/><text x="196" y="108">2</text><circle cx="96" cy="118" r="10" fill="var(--muted)"/><text x="96" y="122">3</text></g>
+<g stroke="#fff" stroke-width="2.5"><rect x="22" y="20" width="14" height="14" rx="4" fill="var(--p1)"/><rect x="262" y="58" width="14" height="14" rx="4" fill="var(--p2)"/></g>
+</svg>
+<div class="area"><span class="rank r1">1</span><span class="spot-name">Canal Saint-Martin</span><span class="times"><span style="background: var(--p1)">22 min</span><span style="background: var(--p2)">24 min</span></span></div>
+<div class="area"><span class="rank r2">2</span><span class="spot-name">Bastille</span><span class="times"><span style="background: var(--p1)">21 min</span><span style="background: var(--p2)">27 min</span></span></div>
+<div class="area"><span class="rank">3</span><span class="spot-name">Montmartre</span><span class="times"><span style="background: var(--p1)">33 min</span><span style="background: var(--p2)">24 min</span></span></div>
+<div class="scale"><i></i><i style="opacity:.6"></i><i style="opacity:.3"></i><span>Meilleur → Plus loin</span><span style="margin-left:auto">par trajet</span></div>
+</div>
       </div>
     </div>
   </section>

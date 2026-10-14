@@ -1,0 +1,8 @@
+# The site's languages, in menu order. Adding one: a page at its path (like fr/index.html) and an entry here.
+# The globe menu, the footer links, the hreflang tags and the redirect from / all read this list.
+- code: en
+  name: English
+  path: /en/
+- code: fr
+  name: Français
+  path: /fr/

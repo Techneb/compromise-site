@@ -1,0 +1,1 @@
+{%- for l in site.data.languages %}{% unless l.code == include.current %}<a href="{{ l.path }}" lang="{{ l.code }}" hreflang="{{ l.code }}" data-lang="{{ l.code }}">{{ l.name }}</a>{% endunless %}{% endfor -%}

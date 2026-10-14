@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>
-// The public TestFlight link lives in _config.yml (beta_url), shared with /fr/. Empty, the "Join the beta" buttons stay hidden and "Beta opening soon" shows.
+// The public TestFlight link lives in _config.yml (beta_url), shared with the other languages. Empty, the "Join the beta" buttons stay hidden and "Beta opening soon" shows.
 const BETA_URL = "{{ site.beta_url }}";
 {%- if include.redirect %}
 // / only (never /en/): a browser in another of the site's languages lands on its page unless the visitor picked one (the globe menu, or ?lang=en); a choice is remembered.

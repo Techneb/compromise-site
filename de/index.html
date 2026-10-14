@@ -1,0 +1,305 @@
+---
+layout: null
+---
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+// Der öffentliche TestFlight-Link steht in _config.yml (beta_url), gemeinsam mit den anderen Seiten. Ist er leer, bleiben die Buttons „Bei der Beta mitmachen“ versteckt und „Die Beta startet bald“ wird angezeigt.
+const BETA_URL = "{{ site.beta_url }}";
+</script>
+<title>Compromise — wo treffen wir uns?</title>
+<meta name="description" content="Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, zu Fuß, mit den Öffis, mit dem Auto oder mit dem Rad. Lade Freunde per Link ein. Als Beta auf dem iPhone.">
+<meta name="color-scheme" content="light dark">
+<link rel="canonical" href="https://compromise.alephb.uk/de/">
+{% include hreflang.html %}
+<link rel="stylesheet" href="/landing.css">
+<link rel="icon" type="image/png" href="/logo.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Main">
+    <a class="brand" href="/de/">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5c-3.3 0-6 2.5-6 5.8 0 4.2 6 9.2 6 9.2s6-5 6-9.2c0-3.3-2.7-5.8-6-5.8z" fill="#fff"/><path d="M5.8 7.6c1-.9 2-.9 3.2 0s2.2.9 3.2 0" fill="none" stroke="#368B9C" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </span>
+      Compromise
+    </a>
+    <div class="links">
+      <a class="hide-sm" href="#how">So geht’s</a><a class="hide-xs" href="/privacy" hreflang="en">Datenschutz</a>
+      {% include lang-menu.html current="de" label="Sprache" %}
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <p class="kicker">Wo treffen wir uns?</p>
+      <h1>Die Mitte in Minuten, nicht in Kilometern.</h1>
+      <p class="lede">Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, egal wie ihr unterwegs seid.</p>
+      <div class="modes" aria-label="Wie ihr unterwegs seid"><span class="mode">Zu Fuß</span><span class="mode">Öffis</span><span class="mode">Auto</span><span class="mode">Rad</span></div>
+      <div class="cta">
+        <a class="button beta" href="#" hidden>Bei der Beta mitmachen</a>
+        <p class="status"><span class="dot" aria-hidden="true"></span>Als Beta auf dem iPhone (ab iOS 18)</p>
+        <p class="soon">Die Beta startet bald</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="phone">
+        <div class="screen" role="img" aria-label="Illustration der App: eine Karte mit drei Freunden und einem Treffpunkt, dazu eine Liste mit Orten, zu denen Nino, Léa und du jeweils etwa 18 Minuten braucht.">
+          <!-- Screenshot slot: img/de/meet.png, 1206 × 2622 -->
+          <img class="shot" src="/img/de/meet.png" alt="Compromise: die Karte, die Startpunkte aller und die Orte, sortiert danach, wie nah die Fahrtzeiten beieinanderliegen" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
+          <div class="island"></div>
+          <svg class="map" viewBox="0 0 300 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="300" height="640" fill="var(--map)"/>
+            <path d="M-20 250 C 60 220, 120 300, 190 260 S 300 200, 330 230" stroke="var(--water)" stroke-width="26" fill="none"/>
+            <rect x="170" y="90" width="90" height="70" rx="10" fill="var(--park)"/>
+            <g stroke="var(--street)" stroke-linecap="round" fill="none">
+              <path d="M-10 120 L310 150" stroke-width="10"/><path d="M-10 330 L310 300" stroke-width="12"/>
+              <path d="M80 -10 L110 660" stroke-width="10"/><path d="M220 -10 L200 660" stroke-width="9"/>
+              <path d="M-10 60 L150 200 L310 420" stroke-width="7"/><path d="M30 420 L310 380" stroke-width="7"/>
+            </g>
+            <g fill="none" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="1 7">
+              <path d="M52 92 L96 150 L140 196" stroke="var(--p1)"/>
+              <path d="M248 70 L214 140 L150 200" stroke="var(--p2)"/>
+              <path d="M170 330 L150 260 L148 214" stroke="var(--p3)"/>
+            </g>
+            <g stroke="#fff" stroke-width="3">
+              <circle cx="52" cy="92" r="9" fill="var(--p1)"/>
+              <circle cx="248" cy="70" r="9" fill="var(--p2)"/>
+              <circle cx="170" cy="330" r="9" fill="var(--p3)"/>
+            </g>
+            <path d="M146 176c-9 0-16 7-16 15 0 11 16 25 16 25s16-14 16-25c0-8-7-15-16-15z" fill="var(--fg)" stroke="#fff" stroke-width="2.5"/>
+            <circle cx="146" cy="191" r="5" fill="var(--sun)"/>
+          </svg>
+          <div class="sheet" aria-hidden="true">
+            <div class="grabber"></div>
+            <div class="chips">
+              <span class="chip"><i style="background: var(--p1)"></i>Du · zu Fuß</span>
+              <span class="chip"><i style="background: var(--p2)"></i>Nino · Öffis</span>
+              <span class="chip"><i style="background: var(--p3)"></i>Léa · Rad</span>
+            </div>
+            <div class="spot">
+              <div class="spot-head"><span class="rank">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 Min. Unterschied</span></div>
+              <div class="sun-cap">In der Sonne bis 18:40</div>
+              <div class="bars">
+                <div class="bar"><span>Du</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 min</b></div>
+                <div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div>
+                <div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 min</b></div>
+              </div>
+            </div>
+            <div class="spot">
+              <div class="spot-head"><span class="rank">2</span><span class="spot-name">Bar Mercure</span><span class="gap">≃ 4 Min. Unterschied</span></div>
+              <div class="bars">
+                <div class="bar"><span>Du</span><span class="track"><span class="fill" style="width: 50%; background: var(--p1)"></span></span><b>15 min</b></div>
+                <div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div>
+                <div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 57%; background: var(--p3)"></span></span><b>17 min</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="illustration">Namen und Orte sind Beispiele.</p>
+    </div>
+  </header>
+</div>
+
+<div class="wrap">
+  <section id="how" aria-labelledby="how-title">
+    <div class="section-head">
+      <p class="kicker">So geht’s</p>
+      <h2 id="how-title">In drei Schritten zu einem Ort, der für alle passt.</h2>
+    </div>
+    <ol class="steps">
+      <li><h3>Alle hinzufügen</h3><p>Starte da, wo du bist, und füge Freunde hinzu oder lade sie per Link ein. Zu zweit oder als ganze Gruppe, alle mit ihrem eigenen Startpunkt.</p></li>
+      <li><h3>Sag, wie alle hinkommen</h3><p>Eine läuft, einer nimmt die U-Bahn, eine fährt Rad. Jeder Weg wird so berechnet, wie die Person wirklich unterwegs ist.</p></li>
+      <li><h3>Wähl aus den fairsten Orten</h3><p>Bars, Cafés und Restaurants, bei denen die Fahrtzeiten aller am nächsten beieinanderliegen, stehen oben. Öffne die Route oder teile den Ort mit einem Tipp.</p></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="fair-title">
+    <div class="feature">
+      <div class="copy">
+        <p class="kicker">Fair heißt: gleiche Zeit</p>
+        <h2 id="fair-title">Die Mitte der Karte ist selten der faire Ort.</h2>
+        <p>Ein Punkt auf halbem Weg zwischen zwei Adressen kann für den einen ein kurzer Spaziergang sein und für die andere eine lange Fahrt. Compromise vergleicht echte Fahrtzeiten, damit niemand den Abend unterwegs verbringt.</p>
+        <ul>
+          <li>Zu Fuß, mit den Öffis, mit dem Auto oder mit dem Rad: alle auf ihre Art.</li>
+          <li>Mit den Öffis siehst du, welche Linien du nehmen musst.</li>
+          <li>Halte die Zeiten aller nah beieinander oder lass etwas Unterschied zu, damit die Wege insgesamt kürzer werden.</li>
+          <li>Leg eine maximale Fahrtzeit fest, damit niemand zu weit fahren muss.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="panel compare" role="img" aria-label="Beispiel: Der Punkt auf halbem Weg auf der Karte bedeutet 35 Minuten für den einen und 12 für die andere; der Ort, den Compromise wählt, 18 und 22 Minuten.">
+          <div class="compare-row">
+            <div class="compare-title">Die Mitte auf der Karte <span>Beispiel</span></div>
+            <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 88%; background: var(--p2)"></span></span><b>35 min</b></div>
+            <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 30%; background: var(--p3)"></span></span><b>12 min</b></div>
+            <p class="verdict bad">23 Minuten Unterschied</p>
+          </div>
+          <div class="compare-row">
+            <div class="compare-title">Der Ort, den Compromise wählt</div>
+            <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 45%; background: var(--p2)"></span></span><b>18 min</b></div>
+            <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 55%; background: var(--p3)"></span></span><b>22 min</b></div>
+            <p class="verdict good">4 Minuten Unterschied</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="groups" aria-labelledby="group-title">
+    <div class="feature flip">
+      <div class="copy">
+        <p class="kicker">Gruppen</p>
+        <h2 id="group-title">Ein Link, und alle sind dabei.</h2>
+        <p>Schick der Gruppe einen einzigen Link. Wer die App und iCloud hat, tritt der Gruppe bei: Startpunkt und Fortbewegung aller erscheinen auf jedem Handy, und Änderungen sind live zu sehen. Wer die App nicht hat, antwortet in ein paar Sekunden über den Link.</p>
+        <ul>
+          <li>Kein Konto nötig, weder für dich noch für deine Freunde.</li>
+          <li>Pläne ändern sich? Die Orte ändern sich für alle mit.</li>
+          <li>Eine Gruppe endet von selbst nach zwei Tagen ohne Änderung.</li>
+        </ul>
+      </div>
+      <div class="visual" id="shot-group">
+        <!-- Screenshot slot: img/de/group.png, 1206 × 2622 -->
+        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/group.png" alt="Eine Gruppe in Compromise: alle, die beigetreten sind, und wie sie unterwegs sind" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
+        <div class="panel group" role="img" aria-label="Illustration: ein Einladungslink an eine Gruppe; Nino ist mit der App beigetreten, Léa hat über den Link geantwortet.">
+          <div class="invite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Freitagsbier · Einladungslink</span></div>
+          <div class="member"><i style="background: var(--p1)"></i><span><b>Du</b> · zu Fuß</span><small>Organisiert</small></div>
+          <div class="member"><i style="background: var(--p2)"></i><span><b>Nino</b> · Öffis</span><small class="live">Dabei · live</small></div>
+          <div class="member"><i style="background: var(--p3)"></i><span><b>Léa</b> · Rad</span><small>Per Link geantwortet</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sun-title">
+    <div class="feature">
+      <div class="copy">
+        <p class="kicker">Sonnige Terrassen</p>
+        <h2 id="sun-title">Noch Sonne auf der Terrasse, wenn alle da sind.</h2>
+        <p>Schalte „Sonnige Terrasse“ ein, und Compromise behält die Orte, deren Terrasse noch in der Sonne liegt, wenn alle angekommen sind, und sagt dir, wie lange noch. An heißen Tagen frag stattdessen nach Schatten.</p>
+        <ul>
+          <li>„In der Sonne bis 18:40“ bei jedem Ort.</li>
+          <li>Dachterrassen zählen auch.</li>
+          <li>In immer mehr Städten verfügbar.</li>
+        </ul>
+      </div>
+      <div class="visual" id="shot-sun">
+        <!-- Screenshot slot: img/de/sun.png, 1206 × 2622 -->
+        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/sun.png" alt="Orte mit sonniger Terrasse, jeweils mit der Angabe, wie lange die Sonne bleibt" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
+        <div class="panel mini" role="img" aria-label="Illustration: eine Karte mit sonnigen Terrassen, der beste Ort in der Sonne bis 18:40 und der Schalter Sonnige Terrasse an.">
+<svg class="snip" viewBox="0 0 300 150" aria-hidden="true"><rect width="300" height="150" fill="var(--map)"/>
+<path d="M-10 104 C 60 84, 120 128, 190 100 S 290 70, 320 86" stroke="var(--water)" stroke-width="16" fill="none"/>
+<rect x="196" y="16" width="64" height="40" rx="8" fill="var(--park)"/>
+<g stroke="var(--street)" stroke-linecap="round" fill="none"><path d="M-10 40 L310 54" stroke-width="7"/><path d="M-10 136 L310 124" stroke-width="8"/><path d="M70 -10 L86 160" stroke-width="7"/><path d="M182 -10 L170 160" stroke-width="6"/><path d="M-10 10 L130 80 L310 150" stroke-width="5"/></g>
+<g stroke="#fff" stroke-width="2.5"><circle cx="30" cy="22" r="6" fill="var(--p1)"/><circle cx="276" cy="30" r="6" fill="var(--p2)"/><circle cx="150" cy="142" r="6" fill="var(--p3)"/></g>
+<path d="M226 72c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--shade)" stroke="#fff" stroke-width="2"/><circle cx="226" cy="83" r="4" fill="#fff"/><path d="M104 68c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--sun)" stroke="#fff" stroke-width="2"/><circle cx="104" cy="79" r="4" fill="#fff"/><path d="M140 40c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--sun)" stroke="#fff" stroke-width="2"/><circle cx="140" cy="51" r="4" fill="#fff"/>
+<rect x="156" y="40" width="110" height="22" rx="11" fill="var(--surface)"/><circle cx="168" cy="51" r="4.5" fill="var(--sun)"/><text x="177" y="55" font-size="10.5" font-weight="650" fill="var(--fg)" font-family="-apple-system, Segoe UI, sans-serif">Sonne bis 18:40</text>
+</svg>
+<div class="spot"><div class="spot-head"><span class="rank r1">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 Min. Unterschied</span></div><div class="sun-cap">In der Sonne bis 18:40</div><div class="bars"><div class="bar"><span>Du</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 min</b></div><div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div><div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 min</b></div></div></div>
+<div class="switch-row"><span>Sonnige Terrasse</span><span class="ios-switch" aria-hidden="true"></span></div>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="home" aria-labelledby="home-title">
+    <div class="feature flip">
+      <div class="copy">
+        <p class="kicker">Wo wohnen wir? <span class="beta-tag">BETA</span></p>
+        <h2 id="home-title">Ihr zieht zusammen? Findet das richtige Viertel.</h2>
+        <p>Alle tragen die Orte ein, zu denen sie oft fahren (Arbeit, Schule oder Uni, Familie), wie oft pro Woche und wie sie hinkommen. Compromise zeigt dir die Viertel, in denen die Wege der Woche für alle fair sind.</p>
+        <ul>
+          <li>In Dutzenden Großstädten färbt die Karte die Straßen von Beste bis Weiter weg.</li>
+          <li>Eine Wohnung gefunden? Gib die Adresse ein und sieh, wo sie landet.</li>
+          <li>Öffne Inserate für ein Viertel: zur Miete, zum Kauf oder als WG.</li>
+        </ul>
+      </div>
+      <div class="visual" id="shot-home">
+        <!-- Screenshot slot: img/de/home.png, 1206 × 2622 -->
+        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/home.png" alt="„Wo wohnen wir?“ in Compromise: die Straßen eingefärbt von Beste bis Weiter weg" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
+        <div class="panel mini" role="img" aria-label="Illustration: drei Viertel auf einer Karte gereiht, Canal Saint-Martin vorne, mit der Fahrtzeit jeder Person.">
+<svg class="snip" viewBox="0 0 300 150" aria-hidden="true"><rect width="300" height="150" fill="var(--map)"/>
+<path d="M-10 104 C 60 84, 120 128, 190 100 S 290 70, 320 86" stroke="var(--water)" stroke-width="16" fill="none"/>
+<rect x="196" y="16" width="64" height="40" rx="8" fill="var(--park)"/>
+<g stroke="var(--street)" stroke-linecap="round" fill="none"><path d="M-10 40 L310 54" stroke-width="7"/><path d="M-10 136 L310 124" stroke-width="8"/><path d="M70 -10 L86 160" stroke-width="7"/><path d="M182 -10 L170 160" stroke-width="6"/><path d="M-10 10 L130 80 L310 150" stroke-width="5"/></g>
+<ellipse cx="128" cy="60" rx="40" ry="26" fill="var(--p1)" opacity="0.38"/><ellipse cx="196" cy="104" rx="34" ry="22" fill="var(--p1)" opacity="0.24"/><ellipse cx="96" cy="118" rx="30" ry="20" fill="var(--p1)" opacity="0.14"/>
+<g font-family="ui-rounded, -apple-system, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#fff"><circle cx="128" cy="60" r="10" fill="var(--p1)"/><text x="128" y="64">1</text><circle cx="196" cy="104" r="10" fill="color-mix(in srgb, var(--p1) 70%, var(--muted))"/><text x="196" y="108">2</text><circle cx="96" cy="118" r="10" fill="var(--muted)"/><text x="96" y="122">3</text></g>
+<g stroke="#fff" stroke-width="2.5"><rect x="22" y="20" width="14" height="14" rx="4" fill="var(--p1)"/><rect x="262" y="58" width="14" height="14" rx="4" fill="var(--p2)"/></g>
+</svg>
+<div class="area"><span class="rank r1">1</span><span class="spot-name">Canal Saint-Martin</span><span class="times"><span style="background: var(--p1)">22 min</span><span style="background: var(--p2)">24 min</span></span></div>
+<div class="area"><span class="rank r2">2</span><span class="spot-name">Bastille</span><span class="times"><span style="background: var(--p1)">21 min</span><span style="background: var(--p2)">27 min</span></span></div>
+<div class="area"><span class="rank">3</span><span class="spot-name">Montmartre</span><span class="times"><span style="background: var(--p1)">33 min</span><span style="background: var(--p2)">24 min</span></span></div>
+<div class="scale"><i></i><i style="opacity:.6"></i><i style="opacity:.3"></i><span>Beste → Weiter weg</span><span style="margin-left:auto">pro Weg</span></div>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="more-title">
+    <div class="section-head">
+      <p class="kicker">Für echte Pläne gemacht</p>
+      <h2 id="more-title">Alles, um euch auf einen Ort zu einigen.</h2>
+    </div>
+    <div class="grid4">
+      <div class="tile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
+        <h3>35 Arten von Orten</h3><p>Bars, Cafés und Restaurants, aber auch Kinos, Museen, Klettern, Parks oder Strände, dazu ein Stichwort für alles andere.</p>
+      </div>
+      <div class="tile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
+        <h3>Eine Farbe pro Person</h3><p>Die Fahrtzeit aller auf einer Skala, jede in ihrer eigenen Farbe, in der Liste und auf der Karte.</p>
+      </div>
+      <div class="tile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
+        <h3>Teilen oder los</h3><p>Schick die Orte an die Gruppe oder öffne die Route in deiner Karten-App.</p>
+      </div>
+      <div class="tile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+        <h3>Für später planen</h3><p>Wähl, wann ihr losgeht: Fahrtzeiten und Sonne richten sich nach dieser Uhrzeit, nicht nur nach jetzt.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="privacy-title">
+    <div class="privacy">
+      <div>
+        <p class="kicker">Datenschutz</p>
+        <h2 id="privacy-title" style="margin-top: 14px">Deine Pläne bleiben deine.</h2>
+        <p class="muted" style="margin-top: 16px">Kein Konto, keine Werbung, kein Tracking. Nichts, was du eintippst, wird an uns gesendet. In einer Gruppe läuft, was du teilst, über dein iCloud, verschlüsselt, sodass nur die Gruppe es lesen kann.</p>
+      </div>
+      <ul>
+        <li>Keine Anmeldung, weder für dich noch für deine Freunde.</li>
+        <li>Adressen werden nur auf deinem Handy gespeichert, und ein Tipp löscht sie.</li>
+        <li><span>Lies die <a href="/privacy" hreflang="en">Datenschutzerklärung</a> (auf Englisch).</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="beta" aria-labelledby="beta-title">
+    <div class="join">
+      <p class="kicker">Beta</p>
+      <h2 id="beta-title">Probier die App vor allen anderen.</h2>
+      <p class="muted">Compromise gibt es als Beta auf dem iPhone, ab iOS 18. Auf Deutsch, Englisch, Französisch und Spanisch.</p>
+      <div class="cta">
+        <a class="button beta" href="#" hidden>Bei der Beta mitmachen</a>
+        <p class="soon">Die Beta startet bald</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Compromise, von AlephB.</span>
+    <div class="links"><a href="/privacy" hreflang="en">Datenschutz (auf Englisch)</a>{% include lang-links.html current="de" %}<span>Kontakt: <span class="email">contact@alephb.uk</span></span></div>
+  </footer>
+</div>
+<script>
+if (BETA_URL) document.querySelectorAll(".beta").forEach(function (a) { a.href = BETA_URL; a.hidden = false; });
+if (BETA_URL) document.querySelectorAll(".soon").forEach(function (p) { p.hidden = true; });
+</script>
+</body>
+</html>

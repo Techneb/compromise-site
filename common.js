@@ -17,35 +17,36 @@ const holds=(box,c)=>{if(c.lat==null)return true;const [s0,w,n,e]=box,dy=KM/111.
 // counts.json's row for a status row: same name, same country, within 12 km.
 const countsRows=list=>{const cnt={};for(const c of list||[])(cnt[c.city]=cnt[c.city]||[]).push(c);
   return c=>(cnt[c.city]||[]).find(k=>(!k.country||k.country===c.country)&&(k.lat==null||c.lat==null||near(k.lat,k.lon,c.lat,c.lon)));};
-// An area named as the whole city; past the name, the numbers: a core whose areas cover 85 % of the city's surface,
-// or a tiled box holding 95 % of its square's going-out blocks, is the whole city.
-const wholeName=a=>/whole|intra-muros|municipality|^greater /i.test(a.name)||a.name===a.city;
-const wholeByNumbers=(c,km2,k)=>(!!c.cityAreaKm2&&km2/c.cityAreaKm2>=0.85)
-  ||(!!k&&k.extent==='tiled box'&&k.goingOutCellsWide>0&&k.goingOutCoveredWide!=null&&k.goingOutCoveredWide/k.goingOutCellsWide>=0.95);
-// The ingestion ladder (owner, 2026-10-15; cities.html): every step a city goes through, in order. A city's code is the
-// first step it has not done ("done" past the last); a step that does not apply to it is skipped, never waited for.
-// Stages 4 to 7 follow the owner's consolidation order: whole cities, then streets, then transit lines, then checks.
+// The ingestion ladder (owner, 2026-10-15; cities.html, overview.html): every step a city goes through, in order, read
+// from the status feed's per-data fields (cities_status.py). A city's code is the first step it has not done ("done"
+// past the last); a step that does not apply to it is skipped, never waited for. Stages 4 to 7 follow the owner's
+// consolidation order: whole cities, then Home, then transit lines, then the checks.
+const STAGES={1:'Found',2:'Surveyed',3:'Sun data',4:'Whole city',5:'Home',6:'Transit',7:'Checked'};
 const LADDER=[
   ['1.1','Listed','Counted and over the survey rule, but no row in the city list yet.'],
-  ['1.2','Counted','Its going-out blocks counted by the counts job.'],
+  ['1.2','Counted','Its going-out blocks counted.'],
   ['1.3','Busy enough','At least the survey floor of going-out blocks; a quieter city is not surveyed.'],
   ['1.4','Planned','Kept for the survey, not set aside.'],
   ['2.1','Surveyed','Its own open-data portals surveyed for terraces and building heights.'],
   ['2.2','Portal reached','The city\'s portal answered (an unreachable one is retried).'],
   ['2.3','Decided','Data found and the owner\'s decision on it taken.'],
-  ['2.4','Measured','Its data counted at a landmark (terraces, buildings with a height).'],
+  ['2.4','Measured at a landmark','Its data counted at a landmark (terraces, buildings with a height).'],
   ['3.1','City data wired','The city\'s own terrace or height feed in the tile build. Skipped when it has none.'],
-  ['3.2','Tiled','Venues, terraces and buildings tiles built: the sunny filter covers part of it.'],
-  ['3.3','Offered','The sunny filter offered in a measured district: enough buildings and terraces on record.'],
+  ['3.2','Venues','Venue tiles built, with venues on record.'],
+  ['3.3','Terraces','Terrace tiles built, with outdoor seating on record (a permit feed or OpenStreetMap).'],
+  ['3.4','Buildings','Building tiles built, with blocks holding enough buildings for the sunny filter.'],
+  ['3.5','Heights measured','Its districts measured from the tiles (wired cities wait here).'],
+  ['3.6','Offered','The sunny filter offered: enough buildings and terraces where it was measured.'],
   ['4.1','Whole city','Tiled over the whole municipality, not only its core.'],
   ['5.1','Streets','Home\'s layers (streets, numbers, places, boundaries) built where it lies.'],
-  ['6.1','Transit lines','Transit lines built where it lies. Skipped when a build found no line.'],
-  ['7.1','Checked in districts','The sunny filter checked on screen in its districts, not only at its seed.'],
+  ['5.2','Listing links','Home\'s listing sites wired for its country.'],
+  ['6.1','Transit lines','Transit lines built where it lies. Skipped when it has no network.'],
+  ['7.1','Seed check','EveryCityCheck passed at its seed; the cell names the last result (weather, no sun, no route, failed).'],
+  ['7.2','Districts checked','The sunny filter offered in its districts on record, not only at its seed.'],
   ['done','Done','Every step that applies is done.']];
 const LADDER_RANK=Object.fromEntries(LADDER.map((s,i)=>[s[0],i]));
-// A status row's code. x: covRank (0 none, 1 core, 2 whole), streets (true when a cities.json entry with streets
-// holds it), lines (the most transit lines of an entry holding it; null when none was built, 0 built with no line).
-const ladderCode=(r,x)=>{const s=r.status;
+// A status feed row's code.
+const ladderCode=r=>{const s=r.status;
   if(s==='candidate')return '1.1';
   if(r.reason==='Not counted yet')return '1.2';
   if(r.reason==='Too quiet to survey')return '1.3';
@@ -55,15 +56,19 @@ const ladderCode=(r,x)=>{const s=r.status;
   if(s==='held for the owner')return '2.3';
   if(s==='surveyed'||s==='to measure'||s==='landmark only')return '2.4';
   if(s==='found, to wire')return '3.1';
-  if(s==='measured, not offered'||s==='wired, to measure')return '3.3';
-  if(s==='surveyed, nothing usable'||!x.covRank)return '3.2';
-  if(x.covRank<2)return '4.1';
-  if(!x.streets)return '5.1';
-  if(x.lines==null)return '6.1';
-  if(r.checked!=='districts')return '7.1';
+  if(s==='measured, not offered')return '3.6';   // measured, too few buildings or terraces: whatever its tiles
+  if(r.venues!==true)return '3.2';
+  if(!r.terraces||r.terraces==='none')return '3.3';
+  if(r.buildings!==true)return '3.4';
+  if(s==='wired, to measure')return '3.5';
+  if(!r.offered)return '3.6';
+  if(r.coverage!=='whole')return '4.1';
+  if(!r.streets)return '5.1';
+  if(!r.listings)return '5.2';
+  if(r.transit==null)return '6.1';
+  if(r.check!=='pass')return '7.1';
+  if(!r.districtsOffered)return '7.2';
   return 'done';};
-// The cities.json entries whose box holds a city's point (its own, or a neighbour's whose tiles reach it: Paris's
-// petite couronne entry holds Saint-Mandé). ponytail: a box, not the boundary; a commune just outside a departements
-// entry's departements but inside its box counts as held.
-const entriesAt=(entries,c)=>c.lat==null?[]:(entries||[]).filter(e=>e.box&&c.lat>=e.box[0]&&c.lat<=e.box[2]&&c.lon>=e.box[1]&&c.lon<=e.box[3]);
-if(typeof module!=='undefined'&&module.exports)module.exports={esc,fmt,pct,fold,near,holds,countsRows,wholeName,wholeByNumbers,LADDER,LADDER_RANK,ladderCode,entriesAt};
+// The code's label: "3.2 · Venues", "7.1 · Seed check (weather)", "done".
+const ladderStep=(code,r)=>code==='done'?'done':code+' · '+LADDER[LADDER_RANK[code]][1]+(code==='7.1'?' ('+(r&&r.check||'not run')+')':'');
+if(typeof module!=='undefined'&&module.exports)module.exports={esc,fmt,pct,fold,near,holds,countsRows,STAGES,LADDER,LADDER_RANK,ladderCode,ladderStep};

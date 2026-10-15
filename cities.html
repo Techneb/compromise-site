@@ -22,7 +22,7 @@ a{color:var(--accent)}small{color:var(--muted)}
 details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;font-weight:600}dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;margin:6px 0 0}dt{color:var(--fg)}dd{margin:0}
 @media (max-width:700px){dl{grid-template-columns:1fr}dd{margin-bottom:4px}.hide{display:none}.scroll{overflow-x:auto}select{max-width:100%}}
 .empty{display:none}
-.ladder th{cursor:default;position:static}.ladder td:first-child,td.code{white-space:nowrap}
+.ladder th{cursor:default;position:static}.ladder th[colspan]{color:var(--fg);font-weight:600;padding-top:10px}.ladder td:first-child,td.code{white-space:nowrap}
 </style><link rel="icon" type="image/png" href="logo.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"></head><body><main>
 <nav><a href="coverage.html">Map</a><a class="on" href="cities.html">Cities</a><a href="overview.html">Overview</a></nav>
 <h1>City coverage</h1>
@@ -61,21 +61,16 @@ details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;
 const STATUS=['https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json'];
 // The areas alone (areas.json, tens of kB), else the whole feed they come from (tens of MB).
 const FEEDS=['https://tiles.alephb.uk/areas.json','https://tiles.alephb.uk/coverage.json','https://raw.githubusercontent.com/Techneb/compromise-tiles/master/coverage.json'];
-const COUNTS='https://tiles.alephb.uk/counts.json', TILED='https://tiles.alephb.uk/cities.json';
+const COUNTS='https://tiles.alephb.uk/counts.json';
 // The feed's `checked` (how far the sunny filter was checked on screen), its wording and its sort order; blank when the feed has none.
 const CHECK={districts:'Districts',seed:'One spot',none:'Not yet'}, CHECK_RANK={districts:3,seed:2,none:1};
 const km=n=>n==null?'':Number(n).toLocaleString(undefined,{maximumFractionDigits:n<10?1:0});
-Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).catch(()=>({areas:[]})), get(COUNTS).catch(()=>({cities:[]})), get(TILED).catch(()=>[])]).then(([s,feed,counts,tiled])=>{
-  $('ladder').innerHTML=LADDER.map(([c,n,m])=>'<tr><td>'+c+'</td><td>'+esc(n)+'</td><td>'+esc(m)+'</td></tr>').join('');
-  // The ladder's inputs past the status: Home's streets and the transit lines of the cities.json entries holding the city.
-  const transit=feed.transit||{};
-  const ladderInputs=c=>{const at=new Set([...entriesAt(tiled,c),...(Array.isArray(tiled)?tiled:[]).filter(e=>e.city===c.city&&e.box&&holds(e.box,c))]);
-    const lines=[...at].map(e=>transit[e.city]).filter(Boolean).map(t=>t.lines);
-    return {streets:[...at].some(e=>e.streets===true),lines:lines.length?Math.max(...lines):null};};
-  // Coverage per city from the feed's areas: a municipality or commune entry is the whole city, a district the core.
-  const coverage=c=>{const v={rank:0,km2:0,label:'none'};
-    for(const a of feed.areas||[]){if(a.city!==c.city||!a.box||!holds(a.box,c))continue;const whole=wholeName(a);
-      v.km2+=a.km2||0; if(whole&&v.rank<2){v.rank=2;v.label='whole';} else if(!whole&&v.rank<1){v.rank=1;v.label='core';}}
+Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).catch(()=>({areas:[]})), get(COUNTS).catch(()=>({cities:[]}))]).then(([s,feed,counts])=>{
+  $('ladder').innerHTML=LADDER.map(([c,n,m])=>(c.endsWith('.1')?'<tr><th colspan="3">'+c[0]+' · '+STAGES[c[0]]+'</th></tr>':'')
+    +'<tr><td>'+c+'</td><td>'+esc(n)+'</td><td>'+esc(m)+'</td></tr>').join('');
+  // Whole city or core: the status feed's own verdict (cities_status.py), the one every page reads. The km² from the areas.
+  const coverage=c=>{const rank=c.coverage==='whole'?2:c.coverage==='core'?1:0, v={rank,km2:0,label:['none','core','whole'][rank]};
+    if(rank) for(const a of feed.areas||[]) if(a.city===c.city&&a.box&&holds(a.box,c)) v.km2+=a.km2||0;
     return v;};
   // Going-out numbers from the counts job, read by each row's extent: a municipality or commune is counted over the
   // city itself; a tiled box (a city covered only in its core) and a 24 km square are shown over the square (marked *).
@@ -89,14 +84,12 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>ge
     return {goingOut:k.goingOutCells,terraceShare:k.terraceShare,sq:!/^(municipality|commune)$/.test(k.extent),
       outShare:rank&&k.goingOutCells&&k.goingOutCovered!=null?k.goingOutCovered/k.goingOutCells:null};};
   // Whole blocks overhang a small commune's border, and some tiled boxes pass the municipality: at most 100 %.
-  const rows=s.cities.map(c=>{const v=candidate(c)?{rank:0,km2:0,label:'none'}:coverage(c);
-    if(v.rank===1&&wholeByNumbers(c,v.km2,countsRow(c))){v.rank=2;v.label='whole';}
-    const code=ladderCode(c,Object.assign({covRank:v.rank},ladderInputs(c)));
-    return Object.assign({},c,{code,step:code==='done'?'done':code+' · '+LADDER[LADDER_RANK[code]][1],covRank:v.rank,covLabel:v.label,km2:v.km2,
+  const rows=s.cities.map(c=>{const v=coverage(c), code=ladderCode(c);
+    return Object.assign({},c,{code,step:ladderStep(code,c),covRank:v.rank,covLabel:v.label,km2:v.km2,
     areaShare:v.rank&&c.cityAreaKm2?Math.min(1,v.km2/c.cityAreaKm2):null},going(c,v.rank));});
   // The steps cities wait at, in the ladder's order: the filter and the counts above the table.
   const tally={}; for(const r of rows) tally[r.code]=(tally[r.code]||0)+1;
-  const steps=LADDER.filter(l=>tally[l[0]]).map(l=>rows.find(r=>r.code===l[0]).step);
+  const steps=LADDER.filter(l=>tally[l[0]]).map(l=>l[0]==='done'?'done':l[0]+' · '+l[1]);
   for(const t of steps){const o=document.createElement('option');o.value=t.split(' ')[0];o.textContent=t;$('reason').appendChild(o);}
   const countries=[...new Set(rows.map(r=>r.country))].sort(); for(const c of countries){const o=document.createElement('option');o.value=c;o.textContent=c;$('country').appendChild(o);}
   $('tally').innerHTML=steps.map(t=>{const k=t.split(' ')[0];return '<a href="#" data-reason="'+k+'">'+tally[k]+' at '+esc(t)+'</a>';}).join(' · ');

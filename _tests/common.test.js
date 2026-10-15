@@ -15,28 +15,28 @@ const row = C.countsRows([{ city: "London", country: "CA", lat: 42.98, lon: -81.
 assert.strictEqual(row({ city: "London", country: "GB", lat: 51.51, lon: -0.13 }).country, "GB");
 
 // The ingestion ladder: a city's code is the first step it has not done; a step that does not apply is skipped.
-const L = (r, x) => C.ladderCode(Object.assign({ status: "covered", reason: "Covered", checked: "districts" }, r), Object.assign({ covRank: 2, streets: true, lines: 100 }, x));
-assert.strictEqual(L({ status: "candidate" }), "1.1");
-assert.strictEqual(L({ status: "not surveyed", reason: "Not counted yet" }), "1.2");
-assert.strictEqual(L({ status: "not surveyed", reason: "Too quiet to survey" }), "1.3");
-assert.strictEqual(L({ status: "not planned" }), "1.4");
-assert.strictEqual(L({ status: "not surveyed", reason: "In the survey queue" }), "2.1");
-assert.strictEqual(L({ status: "unreachable" }, { covRank: 0 }), "2.2");
-assert.strictEqual(L({ status: "held for the owner" }), "2.3");
-assert.strictEqual(L({ status: "to measure" }), "2.4");
-assert.strictEqual(L({ status: "found, to wire" }), "3.1");
-assert.strictEqual(L({ status: "surveyed, nothing usable" }, { covRank: 0 }), "3.2");
-assert.strictEqual(L({}, { covRank: 0 }), "3.2");                       // covered in the CSV, not in the feed yet
-assert.strictEqual(L({ status: "measured, not offered" }, { covRank: 0 }), "3.3");
-assert.strictEqual(L({ status: "wired, to measure", checked: "none" }), "3.3");
-assert.strictEqual(L({}, { covRank: 1 }), "4.1");
-assert.strictEqual(L({}, { streets: false, lines: null }), "5.1");
-assert.strictEqual(L({}, { lines: null }), "6.1");
-assert.strictEqual(L({ checked: "seed" }, { lines: 0 }), "7.1");       // a build with no line: transit skipped
-assert.strictEqual(L({}), "done");
-assert.ok(C.LADDER.every((s, i) => C.LADDER_RANK[s[0]] === i) && C.LADDER.at(-1)[0] === "done");
-assert.deepStrictEqual(C.entriesAt([{ city: "Paris", box: [48.688, 2.146, 49.012, 2.616] }, { city: "Lyon", box: [45.7, 4.7, 45.8, 4.9] }], { lat: 48.842, lon: 2.419 }).map((e) => e.city), ["Paris"]);
-assert.deepStrictEqual(C.entriesAt([{ city: "Paris", box: [48.688, 2.146, 49.012, 2.616] }], { lat: null }), []);
+const done = { status: "covered", reason: "Covered", venues: true, terraces: "osm", buildings: true, offered: true, coverage: "whole",
+  streets: true, listings: true, transit: 100, check: "pass", districtsOffered: 2 };
+const L = (r) => C.ladderCode(Object.assign({}, done, r));
+const cases = [
+  [{ status: "candidate" }, "1.1"], [{ status: "not surveyed", reason: "Not counted yet" }, "1.2"],
+  [{ status: "not surveyed", reason: "Too quiet to survey" }, "1.3"], [{ status: "not planned" }, "1.4"],
+  [{ status: "not surveyed", reason: "In the survey queue" }, "2.1"], [{ status: "unreachable" }, "2.2"],
+  [{ status: "held for the owner" }, "2.3"], [{ status: "to measure" }, "2.4"], [{ status: "found, to wire" }, "3.1"],
+  [{ status: "surveyed, nothing usable", venues: null, terraces: null, buildings: null, offered: false }, "3.2"],
+  [{ venues: false, check: "failed" }, "3.2"],                         // Périgny: tiled, no venue on record, its check failed
+  [{ terraces: "none" }, "3.3"], [{ buildings: false }, "3.4"],
+  [{ status: "wired, to measure", offered: false }, "3.5"],
+  [{ status: "measured, not offered", venues: null, offered: false }, "3.6"],
+  [{ coverage: "core" }, "4.1"], [{ streets: false }, "5.1"], [{ listings: false }, "5.2"], [{ transit: null }, "6.1"],
+  [{ transit: "none" }, "done"],                                       // no network: transit skipped
+  [{ check: "weather" }, "7.1"], [{ check: null }, "7.1"], [{ districtsOffered: 0 }, "7.2"], [{}, "done"]];
+for (const [r, code] of cases) assert.strictEqual(L(r), code, JSON.stringify(r));
+assert.ok(C.LADDER.every((s, i) => C.LADDER_RANK[s[0]] === i && (s[0] === "done" || C.STAGES[s[0][0]])) && C.LADDER.at(-1)[0] === "done");
+assert.strictEqual(C.ladderStep("7.1", { check: "weather" }), "7.1 · Seed check (weather)");
+assert.strictEqual(C.ladderStep("7.1", {}), "7.1 · Seed check (not run)");
+assert.strictEqual(C.ladderStep("3.2"), "3.2 · Venues");
+assert.strictEqual(C.ladderStep("done"), "done");
 
 const common = fs.readFileSync(path.join(root, "common.js"), "utf8");
 for (const page of ["cities.html", "coverage.html", "overview.html"]) {

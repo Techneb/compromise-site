@@ -18,7 +18,7 @@ table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font
 th,td{text-align:left;padding:6px 6px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;vertical-align:bottom;user-select:none;background:var(--bg)}
 th[data-k]{cursor:pointer}
 .btn{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:inherit}.btn:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.short{display:none}ul.why{margin:4px 0 8px;padding-left:20px;color:var(--muted)}ul.why li{margin-bottom:6px}.ex{color:var(--fg);font-size:13px;overflow-wrap:anywhere}.ex small{white-space:nowrap}.ex .btn{color:var(--accent)}tr.more td{padding-top:10px}th.on{color:var(--accent)}th.on::after{content:' ▾'}th.on.asc::after{content:' ▴'}
+.short{display:none}ul.why{margin:4px 0 8px;padding-left:20px;color:var(--muted)}ul.why li{margin-bottom:6px}ul.why li.stage{list-style:none;margin:10px 0 4px -20px;color:var(--fg);font-weight:600}.ex{color:var(--fg);font-size:13px;overflow-wrap:anywhere}.ex small{white-space:nowrap}.ex .btn{color:var(--accent)}tr.more td{padding-top:10px}th.on{color:var(--accent)}th.on::after{content:' ▾'}th.on.asc::after{content:' ▴'}
 td.n,th.n{text-align:right}td.n{white-space:nowrap}
 tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}tr.c .btn::before{content:'▸ ';color:var(--muted)}tr.c.open .btn::before{content:'▾ '}
 tr.sub>td{padding:0 0 10px 18px;border-top:0}tr.sub table{font-size:12px}
@@ -67,26 +67,23 @@ const marks=(tbody,{key,asc})=>tbody.closest('table').querySelectorAll('th[data-
   on?th.setAttribute('aria-sort',asc?'ascending':'descending'):th.removeAttribute('aria-sort');});
 
 const status=get(STATUS), coverage=get(TILES+'areas.json').catch(()=>get(TILES+'coverage.json')).catch(()=>({areas:[]})), counts=get(TILES+'counts.json').catch(()=>({cities:[]}));
-const cities=get(TILES+'cities.json').catch(()=>[]), stats=get(TILES+'stats.json').catch(()=>null);
+const stats=get(TILES+'stats.json').catch(()=>null);
 
 // Each section opens or closes as this viewer last left it.
 document.querySelectorAll('details[id]').forEach(d=>{const k='ov:open:'+d.id;
   try{const v=localStorage.getItem(k);if(v!==null)d.open=v==='1';}catch(e){}
   d.addEventListener('toggle',()=>{try{localStorage.setItem(k,d.open?'1':'0');}catch(e){}});});
 
-// ---- the cities: cities.html's joins (a name and a place: an area's box holds the city's point give or take 12 km)
-Promise.all([status,coverage,counts,cities]).then(([s,feed,cnts,tiled])=>{
+// ---- the cities: the status feed, joined to the counts as on cities.html (a name and a place within 12 km)
+Promise.all([status,coverage,counts]).then(([s,feed,cnts])=>{
   const countsRow=countsRows(cnts.cities);
-  const streetNames=new Set((Array.isArray(tiled)?tiled:[]).filter(e=>e.streets===true).map(e=>e.city));
-  const rows=s.cities.map(c=>{const cand=c.status==='candidate';
-    const areas=cand?[]:(feed.areas||[]).filter(a=>a.city===c.city&&a.box&&holds(a.box,c));
-    let rank=0; for(const a of areas){const whole=wholeName(a);rank=Math.max(rank,whole?2:1);}
-    const k=cand?null:countsRow(c);
-    if(rank===1&&wholeByNumbers(c,areas.reduce((t,a)=>t+(a.km2||0),0),k))rank=2;
+  // Whole city or core, streets and transit lines: the status feed's own fields (cities_status.py), as on cities.html;
+  // computed here from several feeds, the whole/core split once changed with the feed that failed to load.
+  const rows=s.cities.map(c=>{const cand=c.status==='candidate', rank=c.coverage==='whole'?2:c.coverage==='core'?1:0;
+    const k=cand?null:countsRow(c), code=ladderCode(c);
     const g=!k?{goingOut:c.goingOut,sq:!!c.extent&&!/^(municipality|commune)$/.test(c.extent)}
       :k.extent==='tiled box'?{goingOut:k.goingOutCellsWide,sq:true}:{goingOut:k.goingOutCells,sq:!/^(municipality|commune)$/.test(k.extent)};
-    const tl=rank&&feed.transit&&feed.transit[c.city];
-    return Object.assign({},c,g,{rank,streets:streetNames.has(c.city),lines:tl?tl.lines:0});});
+    return Object.assign({},c,g,{rank,code,step:ladderStep(code,c),streets:!!rank&&c.streets===true,lines:rank&&typeof c.transit==='number'?c.transit:0});});
   const covered=rows.filter(r=>r.rank);
 
   // ---- 1. totals in three groups: depth first (growth stopped 2026-10-15, the page follows consolidation), then reach (the Storage section holds the tile store).
@@ -101,28 +98,28 @@ Promise.all([status,coverage,counts,cities]).then(([s,feed,cnts,tiled])=>{
   const part=(n,label,o)=>kpi(n==null?null:fmt(n),label,o.share,o.tip);
   const sum=k=>(feed.areas||[]).reduce((t,a)=>t+(a[k]||0),0);
   const countries=new Set(covered.map(r=>r.country)), whole=covered.filter(r=>r.rank===2).length;
-  // Cities with transit lines: the feed's "transit" key, a dash until a feed carries it.
-  const transit=feed.transit?Object.keys(feed.transit).filter(c=>feed.transit[c].lines>0).length:null;
+  const streets=covered.filter(r=>r.streets).length, transit=covered.filter(r=>r.lines>0).length;
   // The sunny filter in blocks, in coverage.html's words: it works where a block passes, and judges the terrace itself where a terrace is on record.
   const passing=sum('passing'), known=sum('terracesKnown');
   // Each row opens on its denominator, the base of the row's percentages (the two block KPIs excepted: their tooltips name their own base).
   const base=(n,label,tip)=>kpi(fmt(n),label,null,tip);
   const groups=[
     ['Depth',[base(covered.length,'covered cities','Base of this row\'s percentages (the two block figures excepted)'),part(whole,'whole city',ofCov(whole)),part(covered.length-whole,'core only',ofCov(covered.length-whole)),
-      part(streetNames.size,'cities with streets',ofCov(streetNames.size)),part(transit,'cities with transit lines',ofCov(transit)),
+      part(streets,'cities with streets',ofCov(streets)),part(transit,'cities with transit lines',ofCov(transit)),
       part(passing,'blocks where the sunny filter works',of(passing,sum('tiled'),'blocks with data (not covered cities)')),
       part(known,'blocks with terrace records',of(known,passing,'blocks where the filter works (not covered cities)'))]],
     ['Reach',[base(rows.length,'cities in the database','Base of the cities-covered percentage'),part(covered.length,'cities covered',of(covered.length,rows.length,'cities in the database')),part(countries.size,'countries covered',{}),
       part(covered.reduce((t,r)=>t+(r.population||0),0),'population covered',{})]]];
   $('totals').innerHTML=groups.map(([h,list])=>'<div class="grp"><h3>'+h+'</h3><div class="big">'+list.join('')+'</div></div>').join('');
-  const tally=s.reasons||rows.reduce((t,r)=>(t[r.reason]=(t[r.reason]||0)+1,t),{});
-  // Each reason names its biggest cities (by inhabitants, then going-out blocks); a button shows the rest in place.
-  const byReason={}; for(const r of rows)(byReason[r.reason]=byReason[r.reason]||[]).push(r);
+  // Why not covered: the cities short of the ladder's stage 4 (cities.html's legend), by stage and step, each step naming
+  // its biggest cities (by inhabitants, then going-out blocks); a button shows the rest in place.
+  const byReason={}; for(const r of rows) if(LADDER_RANK[r.code]<LADDER_RANK['4.1'])(byReason[r.code]=byReason[r.code]||[]).push(r);
   const big=(a,b)=>(b.population||0)-(a.population||0)||(b.goingOut||0)-(a.goingOut||0)||a.city.localeCompare(b.city);
   const place=r=>{const m=/^(.*) \((.*)\)$/.exec(r.city);return esc(m?m[1]:r.city)+' <small>('+esc([m&&m[2],r.country].filter(Boolean).join(', '))+')</small>';};
-  $('tally').innerHTML=Object.entries(tally).filter(([k])=>k&&k.toLowerCase()!=='covered').sort((a,b)=>b[1]-a[1]).map(([k,n],i)=>{
-    const list=(byReason[k]||[]).slice().sort(big), rest=list.length-5;
-    return '<li>'+fmt(n)+' '+esc(k.toLowerCase())+(list.length?'<div class="ex">'+list.slice(0,5).map(place).join(', ')
+  let stage='';
+  $('tally').innerHTML=LADDER.filter(([k])=>byReason[k]).map(([k,name],i)=>{
+    const list=byReason[k].slice().sort(big), n=list.length, rest=n-5, head=k[0]!==stage; stage=k[0];
+    return (head?'<li class="stage">'+k[0]+' · '+esc(STAGES[k[0]])+'</li>':'')+'<li>'+fmt(n)+' at '+k+' · '+esc(name)+(list.length?'<div class="ex">'+list.slice(0,5).map(place).join(', ')
       +(rest>0?'<span id="why-'+i+'" hidden>, '+list.slice(5).map(place).join(', ')+'</span> <button type="button" class="btn" aria-expanded="false" aria-controls="why-'+i+'" data-n="'+rest+'" title="'+esc(list.map(r=>r.city).join(', '))+'">+'+fmt(rest)+' more</button>':'')+'</div>':'')+'</li>';}).join('');
   $('tally').onclick=e=>{const b=e.target.closest('button[aria-controls]');if(!b)return;const o=b.getAttribute('aria-expanded')!=='true';
     b.setAttribute('aria-expanded',o);$(b.getAttribute('aria-controls')).hidden=!o;b.textContent=o?'show fewer':'+'+fmt(+b.dataset.n)+' more';};
@@ -140,7 +137,7 @@ Promise.all([status,coverage,counts,cities]).then(([s,feed,cnts,tiled])=>{
       +c.top.map(r=>esc(r.city)+' <small>'+fmt(r.goingOut)+'</small>').join(', ')+'</td><td class="n">'+(c.population?fmt(c.population):'')+'</td><td class="n">'+(c.streets?fmt(c.streets):'')+'</td><td class="n">'+(c.transit==null?'–':c.transit?fmt(c.transit):'')+'</td></tr>'
       +(o?'<tr class="sub"><td colspan="7"><table><thead><tr><th>City</th><th>Coverage</th><th class="n"><span class="long">Going-out blocks</span><span class="short">Going-out</span></th><th class="n"><span class="long">Inhabitants</span><span class="short">People</span></th><th class="hide">Waiting for</th><th>Streets</th><th class="n"><span class="long">Transit lines</span><span class="short">Transit</span></th></tr></thead><tbody>'
         +c.list.slice().sort((a,b)=>b.rank-a.rank||(b.goingOut||0)-(a.goingOut||0)).map(r=>'<tr><td>'+(r.rank?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+esc(r.city)+'</a>':esc(r.city))+'</td><td>'+covTag(r)+'</td><td class="n">'+outCell(r)+'</td><td class="n">'+fmt(r.population)+'</td><td class="hide">'
-          +(r.rank===2||r.reason==='Covered'?'':esc(r.reason))+'</td><td>'+(r.streets?'yes':'')+'</td><td class="n">'+(r.lines?fmt(r.lines):'')+'</td></tr>').join('')+'</tbody></table></td></tr>':'');};
+          +esc(r.step)+'</td><td>'+(r.streets?'yes':'')+'</td><td class="n">'+(r.lines?fmt(r.lines):'')+'</td></tr>').join('')+'</tbody></table></td></tr>':'');};
   // Countries with a covered city first; the others wait behind a button.
   const drawCountries=()=>{sortRows(ctry,cState);marks($('countries'),cState);const zero=ctry.filter(c=>!c.covered);
     $('countries').innerHTML=ctry.filter(c=>c.covered).map(row).join('')

@@ -22,10 +22,11 @@ a{color:var(--accent)}small{color:var(--muted)}
 details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;font-weight:600}dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;margin:6px 0 0}dt{color:var(--fg)}dd{margin:0}
 @media (max-width:700px){dl{grid-template-columns:1fr}dd{margin-bottom:4px}.hide{display:none}.scroll{overflow-x:auto}select{max-width:100%}}
 .empty{display:none}
+.ladder th{cursor:default;position:static}.ladder th[colspan]{color:var(--fg);font-weight:600;padding-top:10px}.ladder td:first-child,td.code{white-space:nowrap}
 </style><link rel="icon" type="image/png" href="logo.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"></head><body><main>
 <nav><a href="coverage.html">Map</a><a class="on" href="cities.html">Cities</a><a href="overview.html">Overview</a></nav>
 <h1>City coverage</h1>
-<p>Every city we have looked at for the sunny filter, and how much of it the sunny filter covers. A city missing from the list has not been looked at yet. For the others, the list says what they are waiting for. Cities of over 300,000 in Europe, North America and Oceania with enough going-out blocks to be surveyed are listed too, as <em>Meets the survey rule, not listed yet</em>, until they are added.</p>
+<p>Every city we have looked at for the sunny filter, and how much of it the sunny filter covers. A city missing from the list has not been looked at yet. For the others, the list says the step of the ingestion ladder they are waiting for. Cities of over 300,000 in Europe, North America and Oceania with enough going-out blocks to be surveyed are listed too, as <em>Meets the survey rule, not listed yet</em>, until they are added.</p>
 <p id="status">Loading…</p>
 <p id="tally"></p>
 <details open><summary>How to read it</summary><dl>
@@ -39,11 +40,12 @@ details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;
 <dt>Covered (km²)</dt><dd>The surface where the sunny filter works.</dd>
 <dt>Covered (% of area)</dt><dd>That surface, as a share of the city's surface (at most 100 %).</dd>
 <dt>Covered (% of going-out)</dt><dd>The going-out blocks where the sunny filter works, as a share of the Going-out blocks column.</dd>
-<dt>Waiting for</dt><dd>What a city not yet covered whole needs first, for example <em>In the survey queue</em>, <em>Not planned</em>, <em>Data found, not wired yet</em> or <em>City portal unreachable</em>. The counts above the table say how many cities wait for each; tap one to show only those.</dd>
+<dt>Waiting for</dt><dd>The first step of the ingestion ladder (below) that the city has not done: the higher the code, the further along it is; <em>done</em> when every step that applies is. Hover a cell for the feed's own reason. The counts above the table say how many cities wait at each step; tap one to show only those.</dd>
 <dt>Blank cell</dt><dd>Nothing to show for that city; a column blank for every row shown is hidden.</dd>
 </dl></details>
+<details><summary>Ingestion ladder</summary><table class="ladder"><thead><tr><th>Code</th><th>Step</th><th>Done when</th></tr></thead><tbody id="ladder"></tbody></table></details>
 <div class="bar">
-  <select id="reason"><option value="">Waiting for anything</option></select>
+  <select id="reason"><option value="">Waiting for any step</option></select>
   <select id="cov"><option value="">Any coverage</option><option value="none" selected>Not covered</option><option value="core">Core only</option><option value="whole">Whole city</option></select>
   <select id="chk"><option value="">Any check</option><option value="districts">Districts</option><option value="seed">One spot</option><option value="none">Not yet</option></select>
   <select id="country"><option value="">Any country</option></select>
@@ -51,7 +53,7 @@ details{margin:0 0 8px;color:var(--muted);font-size:13px}summary{cursor:pointer;
   <select id="recent"><option value="">Updated any time</option><option value="7">Updated in the last 7 days</option><option value="30">Updated in the last 30 days</option></select>
 </div>
 <div class="scroll"><table><thead><tr>
-<th data-k="city" title="The city. A link opens it on the map when the sunny filter covers it.">City</th><th data-k="country" title="The city&#x27;s country." class="hide">Country</th><th data-k="population" title="Inhabitants of the municipality (the commune in France)." class="n">Inhabitants</th><th data-k="cityAreaKm2" title="Surface of the municipality, in km²." class="n">Surface (km²)</th><th data-k="blocks" title="How many blocks the municipality holds. A block is a square of about 200 m." class="n hide">Blocks</th><th data-k="goingOut" title="Going-out blocks: blocks with at least 10 bars, cafés and restaurants within 400 m, counted in the municipality.&#10;* counted in a 24 km square around the centre instead (a city covered only in its core, or not yet covered).&#10;&#x27;not counted&#x27;: no count yet." class="n">Going-out blocks</th><th data-k="terraceShare" title="Share of the going-out blocks where outdoor seating is on record.&#10;Blank for a city covered only in its core." class="n hide">Terraces (%)</th><th data-k="covRank" title="How much of the city the sunny filter covers.&#10;whole city (green): all of it.&#10;core (amber): the part where people go out.&#10;none (grey): not covered.">Coverage</th><th data-k="checked" title="How far the sunny filter has been checked on screen.&#10;Districts (green): in several districts.&#10;One spot (amber): in one place.&#10;Not yet (grey): not checked.&#10;Blank: no check on record.">Checked</th><th data-k="km2" title="Surface where the sunny filter works, in km²." class="n">Covered (km²)</th><th data-k="areaShare" title="Covered surface as a share of the city&#x27;s surface (at most 100 %)." class="n">Covered (% of area)</th><th data-k="outShare" title="Going-out blocks where the sunny filter works, as a share of the Going-out blocks column." class="n">Covered (% of going-out)</th><th data-k="reason" title="What a city not covered whole needs first, e.g. In the survey queue, Not planned, Data found, not wired yet.&#10;The counts above the table give each reason; tap one to filter.">Waiting for</th><th data-k="next" title="The next step planned for the city." class="hide">Next step</th><th data-k="updated" title="When the city&#x27;s row last changed (year-month-day)." class="n hide">Updated</th>
+<th data-k="city" title="The city. A link opens it on the map when the sunny filter covers it.">City</th><th data-k="country" title="The city&#x27;s country." class="hide">Country</th><th data-k="population" title="Inhabitants of the municipality (the commune in France)." class="n">Inhabitants</th><th data-k="cityAreaKm2" title="Surface of the municipality, in km²." class="n">Surface (km²)</th><th data-k="blocks" title="How many blocks the municipality holds. A block is a square of about 200 m." class="n hide">Blocks</th><th data-k="goingOut" title="Going-out blocks: blocks with at least 10 bars, cafés and restaurants within 400 m, counted in the municipality.&#10;* counted in a 24 km square around the centre instead (a city covered only in its core, or not yet covered).&#10;&#x27;not counted&#x27;: no count yet." class="n">Going-out blocks</th><th data-k="terraceShare" title="Share of the going-out blocks where outdoor seating is on record.&#10;Blank for a city covered only in its core." class="n hide">Terraces (%)</th><th data-k="covRank" title="How much of the city the sunny filter covers.&#10;whole city (green): all of it.&#10;core (amber): the part where people go out.&#10;none (grey): not covered.">Coverage</th><th data-k="checked" title="How far the sunny filter has been checked on screen.&#10;Districts (green): in several districts.&#10;One spot (amber): in one place.&#10;Not yet (grey): not checked.&#10;Blank: no check on record.">Checked</th><th data-k="km2" title="Surface where the sunny filter works, in km²." class="n">Covered (km²)</th><th data-k="areaShare" title="Covered surface as a share of the city&#x27;s surface (at most 100 %)." class="n">Covered (% of area)</th><th data-k="outShare" title="Going-out blocks where the sunny filter works, as a share of the Going-out blocks column." class="n">Covered (% of going-out)</th><th data-k="code" title="The first step of the ingestion ladder the city has not done (see Ingestion ladder above); sorts by code.&#10;The counts above the table give each step; tap one to filter.">Waiting for</th><th data-k="next" title="The next step planned for the city." class="hide">Next step</th><th data-k="updated" title="When the city&#x27;s row last changed (year-month-day)." class="n hide">Updated</th>
 </tr></thead><tbody id="list"></tbody></table></div>
 </main>
 <script src="/common.js"></script>
@@ -64,10 +66,11 @@ const COUNTS='https://tiles.alephb.uk/counts.json';
 const CHECK={districts:'Districts',seed:'One spot',none:'Not yet'}, CHECK_RANK={districts:3,seed:2,none:1};
 const km=n=>n==null?'':Number(n).toLocaleString(undefined,{maximumFractionDigits:n<10?1:0});
 Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>get(FEEDS[2])).catch(()=>({areas:[]})), get(COUNTS).catch(()=>({cities:[]}))]).then(([s,feed,counts])=>{
-  // Coverage per city from the feed's areas: a municipality or commune entry is the whole city, a district the core.
-  const coverage=c=>{const v={rank:0,km2:0,label:'none'};
-    for(const a of feed.areas||[]){if(a.city!==c.city||!a.box||!holds(a.box,c))continue;const whole=wholeName(a);
-      v.km2+=a.km2||0; if(whole&&v.rank<2){v.rank=2;v.label='whole';} else if(!whole&&v.rank<1){v.rank=1;v.label='core';}}
+  $('ladder').innerHTML=LADDER.map(([c,n,m])=>(c.endsWith('.1')?'<tr><th colspan="3">'+c[0]+' · '+STAGES[c[0]]+'</th></tr>':'')
+    +'<tr><td>'+c+'</td><td>'+esc(n)+'</td><td>'+esc(m)+'</td></tr>').join('');
+  // Whole city or core: the status feed's own verdict (cities_status.py), the one every page reads. The km² from the areas.
+  const coverage=c=>{const rank=c.coverage==='whole'?2:c.coverage==='core'?1:0, v={rank,km2:0,label:['none','core','whole'][rank]};
+    if(rank) for(const a of feed.areas||[]) if(a.city===c.city&&a.box&&holds(a.box,c)) v.km2+=a.km2||0;
     return v;};
   // Going-out numbers from the counts job, read by each row's extent: a municipality or commune is counted over the
   // city itself; a tiled box (a city covered only in its core) and a 24 km square are shown over the square (marked *).
@@ -81,34 +84,34 @@ Promise.all([get(STATUS[0]), get(FEEDS[0]).catch(()=>get(FEEDS[1])).catch(()=>ge
     return {goingOut:k.goingOutCells,terraceShare:k.terraceShare,sq:!/^(municipality|commune)$/.test(k.extent),
       outShare:rank&&k.goingOutCells&&k.goingOutCovered!=null?k.goingOutCovered/k.goingOutCells:null};};
   // Whole blocks overhang a small commune's border, and some tiled boxes pass the municipality: at most 100 %.
-  const rows=s.cities.map(c=>{const v=candidate(c)?{rank:0,km2:0,label:'none'}:coverage(c);
-    if(v.rank===1&&wholeByNumbers(c,v.km2,countsRow(c))){v.rank=2;v.label='whole';}
-    return Object.assign({},c,{covRank:v.rank,covLabel:v.label,km2:v.km2,
+  const rows=s.cities.map(c=>{const v=coverage(c), code=ladderCode(c);
+    return Object.assign({},c,{code,step:ladderStep(code,c),covRank:v.rank,covLabel:v.label,km2:v.km2,
     areaShare:v.rank&&c.cityAreaKm2?Math.min(1,v.km2/c.cityAreaKm2):null},going(c,v.rank));});
-  const reasons=[...new Set(rows.map(r=>r.reason))].sort(); for(const r of reasons){const o=document.createElement('option');o.value=r;o.textContent=r;$('reason').appendChild(o);}
+  // The steps cities wait at, in the ladder's order: the filter and the counts above the table.
+  const tally={}; for(const r of rows) tally[r.code]=(tally[r.code]||0)+1;
+  const steps=LADDER.filter(l=>tally[l[0]]).map(l=>l[0]==='done'?'done':l[0]+' · '+l[1]);
+  for(const t of steps){const o=document.createElement('option');o.value=t.split(' ')[0];o.textContent=t;$('reason').appendChild(o);}
   const countries=[...new Set(rows.map(r=>r.country))].sort(); for(const c of countries){const o=document.createElement('option');o.value=c;o.textContent=c;$('country').appendChild(o);}
-  // The stats: how many cities give each reason (the feed's own tally when it has one), each a filter.
-  const tally=s.reasons||rows.reduce((t,r)=>(t[r.reason]=(t[r.reason]||0)+1,t),{});
-  $('tally').innerHTML=Object.entries(tally).sort((a,b)=>b[1]-a[1]).map(([k,n])=>'<a href="#" data-reason="'+esc(k)+'">'+n+' '+esc(k.toLowerCase())+'</a>').join(' · ');
+  $('tally').innerHTML=steps.map(t=>{const k=t.split(' ')[0];return '<a href="#" data-reason="'+k+'">'+tally[k]+' at '+esc(t)+'</a>';}).join(' · ');
   $('tally').onclick=e=>{const a=e.target.closest('a[data-reason]');if(!a)return;e.preventDefault();$('reason').value=a.dataset.reason;$('cov').value='';$('chk').value='';render();};
   let sortKey='goingOut', asc=false;
   const render=()=>{
     const q=fold($('q').value.trim()), reason=$('reason').value, cv=$('cov').value, chk=$('chk').value, ctry=$('country').value, rec=$('recent').value;
     const since=rec?Date.now()-rec*864e5:0;
-    const shown=rows.filter(r=>(!q||fold(r.city).includes(q))&&(!reason||r.reason===reason)&&(!cv||r.covLabel===cv)&&(!chk||r.checked===chk)&&(!ctry||r.country===ctry)&&(!since||(r.updated&&Date.parse(r.updated)>=since)));
-    const val=r=>sortKey==='checked'?(CHECK_RANK[r.checked]||-1):typeof r[sortKey]==='string'?r[sortKey].toLowerCase():(r[sortKey]==null?-1:r[sortKey]);
+    const shown=rows.filter(r=>(!q||fold(r.city).includes(q))&&(!reason||r.code===reason)&&(!cv||r.covLabel===cv)&&(!chk||r.checked===chk)&&(!ctry||r.country===ctry)&&(!since||(r.updated&&Date.parse(r.updated)>=since)));
+    const val=r=>sortKey==='checked'?(CHECK_RANK[r.checked]||-1):sortKey==='code'?LADDER_RANK[r.code]:typeof r[sortKey]==='string'?r[sortKey].toLowerCase():(r[sortKey]==null?-1:r[sortKey]);
     shown.sort((x,y)=>{const p=val(x),q2=val(y);return (p<q2?-1:p>q2?1:0)*(asc?1:-1);});
     document.querySelectorAll('th[data-k]').forEach(th=>{th.classList.toggle('on',th.dataset.k===sortKey);th.classList.toggle('asc',th.dataset.k===sortKey&&asc);});
     $('list').innerHTML=shown.map(r=>'<tr><td>'+(r.covRank?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+esc(r.city)+'</a>':esc(r.city))+'</td><td class="hide">'+esc(r.country)+'</td><td class="n">'+fmt(r.population)+'</td><td class="n">'+km(r.cityAreaKm2)+'</td><td class="n hide">'+fmt(r.blocks)+'</td><td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut)+(r.sq?'<small>*</small>':''))+'</td><td class="n hide">'+(r.terraceShare==null?'':Math.round(100*r.terraceShare)+' %')+'</td>'
-      +'<td><span class="tag '+(r.covRank===2?'ok':r.covRank===1?'part':'')+'">'+(r.covRank===2?'whole city':r.covRank===1?'core':'none')+'</span></td><td>'+(CHECK[r.checked]?'<span class="tag '+(r.checked==='districts'?'ok':r.checked==='seed'?'part':'')+'">'+CHECK[r.checked]+'</span>':'')+'</td><td class="n">'+(r.km2?r.km2.toFixed(1):'')+'</td><td class="n">'+pct(r.areaShare)+'</td><td class="n">'+pct(r.outShare)+'</td><td>'+(r.covRank===2||r.reason==='Covered'?'':esc(r.reason))+'</td><td class="hide"><small>'+esc(r.next)+'</small></td><td class="n hide"><small>'+esc(r.updated)+'</small></td></tr>').join('');
-    // A column empty for every row shown (the shares for uncovered cities, the reason for whole ones) is hidden.
+      +'<td><span class="tag '+(r.covRank===2?'ok':r.covRank===1?'part':'')+'">'+(r.covRank===2?'whole city':r.covRank===1?'core':'none')+'</span></td><td>'+(CHECK[r.checked]?'<span class="tag '+(r.checked==='districts'?'ok':r.checked==='seed'?'part':'')+'">'+CHECK[r.checked]+'</span>':'')+'</td><td class="n">'+(r.km2?r.km2.toFixed(1):'')+'</td><td class="n">'+pct(r.areaShare)+'</td><td class="n">'+pct(r.outShare)+'</td><td class="code" title="'+esc(r.reason)+'">'+esc(r.step)+'</td><td class="hide"><small>'+esc(r.next)+'</small></td><td class="n hide"><small>'+esc(r.updated)+'</small></td></tr>').join('');
+    // A column empty for every row shown (the shares for uncovered cities) is hidden.
     const trs=[...$('list').rows];
-    document.querySelectorAll('thead th').forEach((th,i)=>{const empty=trs.length>0&&trs.every(tr=>{const t=tr.cells[i].textContent.trim();return !t||t==='NaN';});
+    $('list').parentNode.querySelectorAll('thead th').forEach((th,i)=>{const empty=trs.length>0&&trs.every(tr=>{const t=tr.cells[i].textContent.trim();return !t||t==='NaN';});
       th.classList.toggle('empty',empty); for(const tr of trs) tr.cells[i].classList.toggle('empty',empty);});
     const listed=s.listed!=null?s.listed:rows.length;
     $('status').textContent=shown.length+' of '+rows.length+' cities shown ('+listed+' listed'+(rows.length>listed?', '+(rows.length-listed)+' not listed yet':'')+'). Updated '+([s.updated,feed.updated].filter(Boolean).sort().pop()||'').slice(0,10)+'.';
   };
-  document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=(k==='city'||k==='country'||k==='reason');}render();});
+  document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=(k==='city'||k==='country'||k==='code');}render();});
   for(const id of ['q','reason','cov','chk','country','recent']) $(id).oninput=render;
   render();
 }).catch(err=>{$('status').textContent='The data did not load ('+err.message+'). Try again later.';});

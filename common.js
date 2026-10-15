@@ -71,4 +71,10 @@ const ladderCode=r=>{const s=r.status;
   return 'done';};
 // The code's label: "3.2 · Venues", "7.1 · Seed check (weather)", "done".
 const ladderStep=(code,r)=>code==='done'?'done':code+' · '+LADDER[LADDER_RANK[code]][1]+(code==='7.1'?' ('+(r&&r.check||'not run')+')':'');
-if(typeof module!=='undefined'&&module.exports)module.exports={esc,fmt,pct,fold,near,holds,countsRows,STAGES,LADDER,LADDER_RANK,ladderCode,ladderStep};
+// Consolidation (owner, 2026-10-15: no new cities): a row's stage ('1'..'7', 'done'), whether it is parked (stages 1 and 2,
+// and the #441 batch the status feed marks `parked`), and the main-city order within a code: French cities first, then
+// the most inhabitants (the owner's order is the capitals and big tourist cities, French first; no list holds it yet).
+const stageOf=code=>code==='done'?'done':code[0];
+const parked=r=>!!r.parked||+stageOf(r.code)<=2;
+const mainOrder=(a,b)=>(b.country==='France')-(a.country==='France')||(b.population||0)-(a.population||0)||a.city.localeCompare(b.city);
+if(typeof module!=='undefined'&&module.exports)module.exports={esc,fmt,pct,fold,near,holds,countsRows,STAGES,LADDER,LADDER_RANK,ladderCode,ladderStep,stageOf,parked,mainOrder};

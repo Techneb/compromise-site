@@ -75,7 +75,7 @@ document.querySelectorAll('details[id]').forEach(d=>{const k='ov:open:'+d.id;
   d.addEventListener('toggle',()=>{try{localStorage.setItem(k,d.open?'1':'0');}catch(e){}});});
 
 // ---- the cities: cities.html's joins (a name and a place: an area's box holds the city's point give or take 12 km)
-Promise.all([status,coverage,counts,cities,stats]).then(([s,feed,cnts,tiled,st])=>{
+Promise.all([status,coverage,counts,cities]).then(([s,feed,cnts,tiled])=>{
   const countsRow=countsRows(cnts.cities);
   const streetNames=new Set((Array.isArray(tiled)?tiled:[]).filter(e=>e.streets===true).map(e=>e.city));
   const rows=s.cities.map(c=>{const cand=c.status==='candidate';
@@ -89,7 +89,7 @@ Promise.all([status,coverage,counts,cities,stats]).then(([s,feed,cnts,tiled,st])
     return Object.assign({},c,g,{rank,streets:streetNames.has(c.city),lines:tl?tl.lines:0});});
   const covered=rows.filter(r=>r.rank);
 
-  // ---- 1. totals in three groups: depth first (growth stopped 2026-10-15, the page follows consolidation), then reach, then the tile store.
+  // ---- 1. totals in three groups: depth first (growth stopped 2026-10-15, the page follows consolidation), then reach (the Storage section holds the tile store).
   // A KPI with a share shows it beside the number and spells it out on hover or focus.
   let tt=0;
   const kpi=(v,label,share,tip)=>{if(v==null||v==='')return '<div><b>–</b><span>'+label+'</span></div>';
@@ -105,18 +105,13 @@ Promise.all([status,coverage,counts,cities,stats]).then(([s,feed,cnts,tiled,st])
   const transit=feed.transit?Object.keys(feed.transit).filter(c=>feed.transit[c].lines>0).length:null;
   // The sunny filter in blocks, in coverage.html's words: it works where a block passes, and judges the terrace itself where a terrace is on record.
   const passing=sum('passing'), known=sum('terracesKnown');
-  const builds=st&&st.builds?Object.entries(st.builds):[], last=builds.map(([,b])=>b.date).sort().pop(), failed=builds.filter(([,b])=>b.result!=='success');
-  const free=st&&(st.freeBytes||1e10);
   const groups=[
     ['Depth',[part(whole,'whole city',ofCov(whole)),part(covered.length-whole,'core only',ofCov(covered.length-whole)),
       part(streetNames.size,'cities with streets',ofCov(streetNames.size)),part(transit,'cities with transit lines',ofCov(transit)),
       part(passing,'blocks where the sunny filter works',of(passing,sum('tiled'),'blocks with data')),
       part(known,'blocks with terrace records',of(known,passing,'blocks where the filter works'))]],
     ['Reach',[part(covered.length,'cities covered',of(covered.length,rows.length,'cities in the database')),part(countries.size,'countries covered',{}),
-      part(covered.reduce((t,r)=>t+(r.population||0),0),'population covered',{})]],
-    ['Tiles',[kpi(st&&st.bytes!=null?size(st.bytes):null,'stored',st&&st.bytes/free,st&&size(st.bytes)+' of '+size(free)+' free, '+pct(st.bytes/free)),
-      kpi(last?day(last):null,'last tile build',null,last?fmt(builds.filter(([,b])=>b.date===last).length)+' cities built that day':''),
-      part(builds.length?failed.length:null,'failed builds',failed.length?{tip:failed.map(([c])=>c).join(', ')}:{})]]];
+      part(covered.reduce((t,r)=>t+(r.population||0),0),'population covered',{})]]];
   $('totals').innerHTML=groups.map(([h,list])=>'<div class="grp"><h3>'+h+'</h3><div class="big">'+list.join('')+'</div></div>').join('');
   const tally=s.reasons||rows.reduce((t,r)=>(t[r.reason]=(t[r.reason]||0)+1,t),{});
   // Each reason names its biggest cities (by inhabitants, then going-out blocks); a button shows the rest in place.

@@ -27,16 +27,17 @@ tr.sub>td{padding:0 0 10px 18px;border-top:0}tr.sub table{font-size:12px}
 .tip{position:relative;cursor:help;outline:none}.tip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 .tip em{display:none;position:absolute;top:100%;left:0;z-index:2;margin-top:4px;padding:4px 8px;border-radius:6px;background:var(--fg);color:var(--bg);font-style:normal;font-size:12px;white-space:nowrap}
 .tip:hover em,.tip:focus em{display:block}
+.grp{display:flex;gap:12px;align-items:baseline;border-top:1px solid var(--line);padding-top:4px}.grp h3{flex:none;width:4.5em;margin:0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}.grp .big{margin:4px 0 10px;row-gap:8px}.big b small{font-size:13px;font-weight:400;margin-left:4px}
 .meter.total{height:12px;margin:6px 0 10px;max-width:640px}
 a{color:var(--accent)}small{color:var(--muted)}
-@media (max-width:700px){.tip em{position:static;white-space:normal;max-width:60vw}.hide,.long{display:none}.short{display:inline}.scroll{overflow-x:auto}.big{gap:18px}th,td{padding:6px 4px}th[data-k]{white-space:nowrap}tr.sub>td{padding-left:8px}tr.sub td td,tr.sub th{padding:5px 3px}}
+@media (max-width:700px){.grp{display:block}.grp .big{margin-top:2px}.tip em{position:static;white-space:normal;max-width:60vw}.hide,.long{display:none}.short{display:inline}.scroll{overflow-x:auto}.big{gap:18px}th,td{padding:6px 4px}th[data-k]{white-space:nowrap}tr.sub>td{padding-left:8px}tr.sub td td,tr.sub th{padding:5px 3px}}
 </style><link rel="icon" type="image/png" href="logo.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"></head><body><main>
 <nav><a href="coverage.html">Map</a><a href="cities.html">Cities</a><a class="on" aria-current="page" href="overview.html">Overview</a></nav>
 <h1>Overview</h1>
 <p id="status">Loading…</p>
 
 <details id="sec-totals" open><summary><h2>Totals</h2></summary>
-<div class="big" id="totals"></div>
+<div id="totals"></div>
 <details id="sec-why"><summary>Why not covered</summary><ul class="why" id="tally"></ul></details>
 </details>
 
@@ -88,15 +89,30 @@ Promise.all([status,coverage,counts,cities]).then(([s,feed,cnts,tiled])=>{
     return Object.assign({},c,g,{rank,streets:streetNames.has(c.city),lines:tl?tl.lines:0});});
   const covered=rows.filter(r=>r.rank);
 
-  // ---- 1. totals, and the status breakdown in cities.html's words
-  const countries=new Set(covered.map(r=>r.country));
-  $('totals').innerHTML=[[covered.length,'cities covered'],[countries.size,'countries covered'],[covered.filter(r=>r.rank===2).length,'whole city'],[covered.filter(r=>r.rank===1).length,'core only'],
-    [rows.length,'cities in the database'],[streetNames.size,'cities with streets']].map(([n,t])=>'<div><b>'+fmt(n)+'</b><span>'+t+'</span></div>').join('');
-  // Cities with transit lines (the feed's "transit" key; a dash until a feed carries it), the share of covered cities on hover or focus.
+  // ---- 1. totals in three groups: depth first (growth stopped 2026-10-15, the page follows consolidation), then reach (the Storage section holds the tile store).
+  // A KPI with a share shows it beside the number and spells it out on hover or focus.
+  let tt=0;
+  const kpi=(v,label,share,tip)=>{if(v==null||v==='')return '<div><b>–</b><span>'+label+'</span></div>';
+    const b='<b>'+v+(share==null?'':'<small>'+pct(share)+'</small>')+'</b><span>'+label+'</span>';
+    if(!tip)return '<div>'+b+'</div>';const id='tt-'+(++tt);
+    return '<div class="tip" tabindex="0" title="'+esc(tip)+'" aria-describedby="'+id+'">'+b+'<em role="tooltip" id="'+id+'">'+esc(tip)+'</em></div>';};
+  const of=(n,d,what)=>n==null||!d?{}:{share:n/d,tip:fmt(n)+' of '+fmt(d)+' '+what+', '+pct(n/d)};
+  const ofCov=n=>of(n,covered.length,'covered cities');
+  const part=(n,label,o)=>kpi(n==null?null:fmt(n),label,o.share,o.tip);
+  const sum=k=>(feed.areas||[]).reduce((t,a)=>t+(a[k]||0),0);
+  const countries=new Set(covered.map(r=>r.country)), whole=covered.filter(r=>r.rank===2).length;
+  // Cities with transit lines: the feed's "transit" key, a dash until a feed carries it.
   const transit=feed.transit?Object.keys(feed.transit).filter(c=>feed.transit[c].lines>0).length:null;
-  const tip=transit==null?'':fmt(transit)+' of '+fmt(covered.length)+' covered cities, '+(covered.length?Math.round(100*transit/covered.length):0)+' %';
-  $('totals').insertAdjacentHTML('beforeend',transit==null?'<div><b>–</b><span>cities with transit lines</span></div>'
-    :'<div class="tip" tabindex="0" title="'+tip+'" aria-describedby="tt-transit"><b>'+fmt(transit)+'</b><span>cities with transit lines</span><em role="tooltip" id="tt-transit">'+tip+'</em></div>');
+  // The sunny filter in blocks, in coverage.html's words: it works where a block passes, and judges the terrace itself where a terrace is on record.
+  const passing=sum('passing'), known=sum('terracesKnown');
+  const groups=[
+    ['Depth',[part(whole,'whole city',ofCov(whole)),part(covered.length-whole,'core only',ofCov(covered.length-whole)),
+      part(streetNames.size,'cities with streets',ofCov(streetNames.size)),part(transit,'cities with transit lines',ofCov(transit)),
+      part(passing,'blocks where the sunny filter works',of(passing,sum('tiled'),'blocks with data')),
+      part(known,'blocks with terrace records',of(known,passing,'blocks where the filter works'))]],
+    ['Reach',[part(covered.length,'cities covered',of(covered.length,rows.length,'cities in the database')),part(countries.size,'countries covered',{}),
+      part(covered.reduce((t,r)=>t+(r.population||0),0),'population covered',{})]]];
+  $('totals').innerHTML=groups.map(([h,list])=>'<div class="grp"><h3>'+h+'</h3><div class="big">'+list.join('')+'</div></div>').join('');
   const tally=s.reasons||rows.reduce((t,r)=>(t[r.reason]=(t[r.reason]||0)+1,t),{});
   // Each reason names its biggest cities (by inhabitants, then going-out blocks); a button shows the rest in place.
   const byReason={}; for(const r of rows)(byReason[r.reason]=byReason[r.reason]||[]).push(r);

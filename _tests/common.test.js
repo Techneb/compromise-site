@@ -38,6 +38,11 @@ assert.strictEqual(C.ladderStep("7.1", {}), "7.1 · Seed check (not run)");
 assert.strictEqual(C.ladderStep("3.2"), "3.2 · Venues");
 assert.strictEqual(C.ladderStep("done"), "done");
 
+assert.strictEqual(C.stageOf("4.1"), "4"); assert.strictEqual(C.stageOf("done"), "done");
+assert.ok(C.parked({ code: "2.4" }) && C.parked({ code: "3.1", parked: true }) && !C.parked({ code: "3.1" }) && !C.parked({ code: "done" }));
+assert.deepStrictEqual([{ city: "Big", country: "Spain", population: 9 }, { city: "Lyon", country: "France", population: 1 }, { city: "Small", country: "Spain", population: 2 }]
+  .sort(C.mainOrder).map((r) => r.city), ["Lyon", "Big", "Small"]);
+
 const common = fs.readFileSync(path.join(root, "common.js"), "utf8");
 for (const page of ["cities.html", "coverage.html", "overview.html"]) {
   const html = fs.readFileSync(path.join(root, page), "utf8");

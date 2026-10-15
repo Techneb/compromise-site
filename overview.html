@@ -101,6 +101,10 @@ Promise.all([status,coverage,counts]).then(([s,feed,cnts])=>{
   const streets=covered.filter(r=>r.streets).length, transit=covered.filter(r=>r.lines>0).length;
   // The sunny filter in blocks, in coverage.html's words: it works where a block passes, and judges the terrace itself where a terrace is on record.
   const passing=sum('passing'), known=sum('terracesKnown');
+  const det=r=>r.detail||{}, cnt=f=>covered.filter(f).length;
+  const offered=cnt(r=>r.offered), passed=cnt(r=>r.check==='pass'), districts=cnt(r=>r.districtsOffered>0);
+  const withIssues=cnt(r=>(det(r).issues||[]).length), stale=cnt(r=>((det(r).freshness||{}).stale||[]).length);
+  const goCovered=covered.reduce((t,r)=>t+((det(r).goingOut||{}).covered||0),0), goTiled=covered.reduce((t,r)=>t+((det(r).goingOut||{}).inTiles||0),0);
   // Each row opens on its denominator, the base of the row's percentages (the two block KPIs excepted: their tooltips name their own base).
   const base=(n,label,tip)=>kpi(fmt(n),label,null,tip);
   const groups=[
@@ -108,6 +112,11 @@ Promise.all([status,coverage,counts]).then(([s,feed,cnts])=>{
       part(streets,'cities with streets',ofCov(streets)),part(transit,'cities with transit lines',ofCov(transit)),
       part(passing,'blocks where the sunny filter works',of(passing,sum('tiled'),'blocks with data (not covered cities)')),
       part(known,'blocks with terrace records',of(known,passing,'blocks where the filter works (not covered cities)'))]],
+    // Health (2026-10-15): the status feed's detail (cities_status.py), over the covered cities.
+    ['Health',[base(covered.length,'covered cities','Base of this row\'s percentages (the going-out blocks excepted)'),part(offered,'sunny filter offered',ofCov(offered)),
+      part(passed,'seed check passed',ofCov(passed)),part(districts,'with a district checked',ofCov(districts)),
+      part(withIssues,'with open issues',ofCov(withIssues)),part(stale,'with stale data',ofCov(stale)),
+      part(goCovered,'going-out blocks where the sunny filter works',of(goCovered,goTiled,'going-out blocks in the tiles'))]],
     ['Reach',[base(rows.length,'cities in the database','Base of the cities-covered percentage'),part(covered.length,'cities covered',of(covered.length,rows.length,'cities in the database')),part(countries.size,'countries covered',{}),
       part(covered.reduce((t,r)=>t+(r.population||0),0),'population covered',{})]]];
   $('totals').innerHTML=groups.map(([h,list])=>'<div class="grp"><h3>'+h+'</h3><div class="big">'+list.join('')+'</div></div>').join('');

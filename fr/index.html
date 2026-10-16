@@ -15,7 +15,7 @@ const BETA_URL = "{{ site.beta_url }}";
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://compromise.alephb.uk/fr/">
 {% include hreflang.html %}
-<link rel="stylesheet" href="/landing.css">
+<link rel="stylesheet" href="/landing.css?v={{ site.time | date: '%s' }}">
 <link rel="icon" type="image/png" href="/logo.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
 <body>

@@ -1,3 +1,6 @@
+---
+layout: null
+---
 <!doctype html>
 <html lang="en">
 <head>
@@ -154,7 +157,7 @@ footer a { color: var(--muted); }
     <div class="links"><a href="/privacy">Privacy policy</a></div>
   </footer>
 </div>
-<script src="/grouplink.js"></script>
+<script src="/grouplink.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function () {
   "use strict";

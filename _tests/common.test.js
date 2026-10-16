@@ -53,10 +53,19 @@ const rows = [{ city: "Big", country: "Spain", population: 9, code: "5.1" }, { c
 assert.deepStrictEqual(rows.slice().sort(C.byCode(true)).map((r) => r.city), ["Pau", "Nice", "Lyon", "Big", "Oslo", "Rome"]);
 assert.deepStrictEqual(rows.slice().sort(C.byCode(false)).map((r) => r.city), ["Rome", "Oslo", "Nice", "Lyon", "Big", "Pau"]);
 
+// Cache busting: every local script and stylesheet carries the build's time, and its page has front matter so Jekyll renders it
+// (a fresh page with a cached common.js used to come up empty for up to ten minutes after a deploy).
+const V = "?v={{ site.time | date: '%s' }}";
+for (const f of ["cities.html", "coverage.html", "overview.html", "index.html", "en/index.html", "fr/index.html", "es/index.html", "de/index.html",
+  "join/index.html", "spots/index.html", "privacy.html", "_includes/landing-en.html"]) {
+  const html = fs.readFileSync(path.join(root, f), "utf8");
+  for (const m of html.matchAll(/(?:src|href)="(\/[^"]+\.(?:js|css)[^"]*)"/g)) assert.ok(m[1].endsWith(V), f + ": " + m[1]);
+  if (!f.startsWith("_includes") && /(?:src|href)="\/[^"]+\.(?:js|css)/.test(html)) assert.ok(html.startsWith("---\n"), f + " has no front matter");
+}
 const common = fs.readFileSync(path.join(root, "common.js"), "utf8");
 for (const page of ["cities.html", "coverage.html", "overview.html"]) {
   const html = fs.readFileSync(path.join(root, page), "utf8");
-  assert.ok(html.includes('<script src="/common.js"></script>'), page);
+  assert.ok(html.includes(`<script src="/common.js${V}"></script>`), page);
   const inline = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join("\n");
   new vm.Script(common + "\n" + inline, { filename: page });   // throws on a name common.js already declares
 }

@@ -55,7 +55,7 @@ small{color:var(--muted)}
 <p id="none" role="status" aria-live="polite"></p>
 <table><thead><tr><th><span class="s" data-k="city">Area</span></th><th><span class="s" data-k="km2">km²</span></th><th id="h1"></th><th id="h2"></th></tr></thead><tbody id="list"></tbody></table>
 </aside>
-<script src="/common.js"></script>
+<script src="/common.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 // areas.json first: the areas and an index of 1° squares of blocks (coverage/<square>.json), each loaded when the map
 // shows it close enough to see a block. Without it, the whole feed (tens of MB): the store, the tile repository's copy,

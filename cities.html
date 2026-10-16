@@ -75,7 +75,7 @@ details.legend dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12p
 <div class="scroll"><table><thead><tr><th data-k="code">Code</th><th>City</th><th class="hide">Country</th><th class="n">Inhabitants</th><th class="n">Going-out</th><th>Waiting for</th></tr></thead><tbody id="plist"></tbody></table></div>
 </details>
 </main>
-<script src="/common.js"></script>
+<script src="/common.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 const STATUS='https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json';
 const km=n=>n==null?'':Number(n).toLocaleString(undefined,{maximumFractionDigits:n<10?1:0});

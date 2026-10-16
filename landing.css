@@ -4,9 +4,10 @@
   --bg: #F6F9FA; --surface: #FFFFFF; --fg: #0F2328; --muted: #50686E; --hair: #DCE6E8;
   --tint: #2F7F90; --on-tint: #FFFFFF; --p1: #368B9C; --p2: #DB7116; --p3: #8E5BB5; --sun: #E8A317; --shade: #37565C;
   --map: #E9F0EE; --street: #FFFFFF; --park: #D6E8D5; --water: #CFE6EE;
-  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Brand type (owner, 2026-10-16): Nunito for titles, Nunito Sans for text, from Google Fonts (the <link> in each page's head). */
+  --font: "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --display: Nunito, ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --round: var(--display);
 }
 @media (prefers-color-scheme: dark) { :root {
   --bg: #0B1416; --surface: #132126; --fg: #E4EFF1; --muted: #98B0B6; --hair: #22363B;
@@ -20,8 +21,8 @@ a { color: var(--tint); }
 a:focus-visible { outline: 2px solid var(--tint); outline-offset: 3px; border-radius: 4px; }
 .wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; }
 h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
-h1 { font-size: clamp(40px, 7vw, 68px); line-height: 1.02; font-weight: 700; }
-h2 { font-size: clamp(28px, 4.2vw, 42px); line-height: 1.08; font-weight: 700; }
+h1 { font-size: clamp(40px, 7vw, 68px); line-height: 1.02; font-weight: 800; }
+h2 { font-size: clamp(28px, 4.2vw, 42px); line-height: 1.08; font-weight: 800; }
 h3 { font-size: 20px; line-height: 1.25; font-weight: 650; letter-spacing: -0.01em; }
 p { margin: 0; }
 .muted { color: var(--muted); }
@@ -77,8 +78,8 @@ nav .links .globe a:hover { background: var(--bg); }
 .rank { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 700 11px/1 var(--round); color: #fff; background: var(--shade); flex: none; }
 .spot:first-of-type .rank { background: var(--p1); }
 .spot-name { font: 650 13.5px/1.2 var(--font); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gap { font: 600 11px/1 var(--font); color: var(--muted); white-space: nowrap; }
-.sun-cap { display: inline-flex; align-items: center; gap: 4px; font: 600 10.5px/1 var(--font); color: var(--fg); margin: 5px 0 0 28px; }
+.gap { font: 600 11px/1 var(--font); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sun-cap { display: inline-flex; align-items: center; gap: 4px; font: 600 10.5px/1 var(--font); color: var(--fg); margin: 5px 0 0 28px; font-variant-numeric: tabular-nums; }
 .sun-cap::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--sun); }
 .bars { display: grid; gap: 3px; margin: 6px 0 0 28px; }
 .bar { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 6px; font: 500 10px/1 var(--font); color: var(--muted); }
@@ -131,7 +132,7 @@ section + section { border-top: 1px solid var(--hair); }
 .member { display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--hair); font-size: 15px; }
 .member i { width: 12px; height: 12px; border-radius: 50%; }
 .member b { font-weight: 650; }
-.member small { font-size: 13px; color: var(--muted); text-align: right; }
+.member small { font-size: 13px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
 .member small.live { color: var(--tint); font-weight: 600; }
 .beta-tag { display: inline-block; margin-left: 8px; padding: 3px 8px; border-radius: 999px; font: 700 11px/1.2 var(--font); letter-spacing: 0.06em; vertical-align: middle; background: color-mix(in srgb, var(--p2) 16%, transparent); color: var(--p2); }
 
@@ -188,7 +189,7 @@ footer a { color: var(--muted); }
 .member { display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--hair); font-size: 15px; }
 .member i { width: 12px; height: 12px; border-radius: 50%; }
 .member b { font-weight: 650; }
-.member small { font-size: 13px; color: var(--muted); text-align: right; }
+.member small { font-size: 13px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
 .member small.live { color: var(--tint); font-weight: 600; }
 .beta-tag { display: inline-block; margin-left: 8px; padding: 3px 8px; border-radius: 999px; font: 700 11px/1.2 var(--font); letter-spacing: 0.06em; vertical-align: middle; background: color-mix(in srgb, var(--p2) 16%, transparent); color: var(--p2); }
 
@@ -207,7 +208,7 @@ footer a { color: var(--muted); }
 .member { display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--hair); font-size: 15px; }
 .member i { width: 12px; height: 12px; border-radius: 50%; }
 .member b { font-weight: 650; }
-.member small { font-size: 13px; color: var(--muted); text-align: right; }
+.member small { font-size: 13px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
 .member small.live { color: var(--tint); font-weight: 600; }
 .beta-tag { display: inline-block; margin-left: 8px; padding: 3px 8px; border-radius: 999px; font: 700 11px/1.2 var(--font); letter-spacing: 0.06em; vertical-align: middle; background: color-mix(in srgb, var(--p2) 16%, transparent); color: var(--p2); }
 

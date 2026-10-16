@@ -43,6 +43,16 @@ assert.ok(C.parked({ code: "2.4" }) && C.parked({ code: "3.1", parked: true }) &
 assert.deepStrictEqual([{ city: "Big", country: "Spain", population: 9 }, { city: "Lyon", country: "France", population: 1 }, { city: "Small", country: "Spain", population: 2 }]
   .sort(C.mainOrder).map((r) => r.city), ["Lyon", "Big", "Small"]);
 
+// The code order: 4 → 7, done, then 3, 2, 1; sub-steps as numbers; descending reverses the codes, not the tie-break.
+const codes = ["3.10", "done", "1.1", "7.2", "3.2", "4.1", "2.4", "5.2", "3.1", "6.1", "5.1", "7.1"];
+assert.deepStrictEqual(codes.slice().sort(C.codeOrder), ["4.1", "5.1", "5.2", "6.1", "7.1", "7.2", "done", "3.1", "3.2", "3.10", "2.4", "1.1"]);
+assert.strictEqual(C.stageOf("10.1"), "10");
+const rows = [{ city: "Big", country: "Spain", population: 9, code: "5.1" }, { city: "Lyon", country: "France", population: 1, code: "5.1" },
+  { city: "Rome", country: "Italy", population: 3, code: "3.2" }, { city: "Pau", country: "France", population: 1, code: "4.1" },
+  { city: "Oslo", country: "Norway", population: 1, code: "done" }, { city: "Nice", country: "France", population: 2, code: "5.1" }];
+assert.deepStrictEqual(rows.slice().sort(C.byCode(true)).map((r) => r.city), ["Pau", "Nice", "Lyon", "Big", "Oslo", "Rome"]);
+assert.deepStrictEqual(rows.slice().sort(C.byCode(false)).map((r) => r.city), ["Rome", "Oslo", "Nice", "Lyon", "Big", "Pau"]);
+
 const common = fs.readFileSync(path.join(root, "common.js"), "utf8");
 for (const page of ["cities.html", "coverage.html", "overview.html"]) {
   const html = fs.readFileSync(path.join(root, page), "utf8");

@@ -40,7 +40,7 @@ tr.d>td{padding:0;border-top:0}
 details{margin:8px 0}summary{cursor:pointer;font-weight:600;color:var(--muted)}
 details.legend dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;margin:6px 0;font-size:13px;color:var(--muted)}details.legend dt{color:var(--fg)}details.legend dd{margin:0}
 .ladder{font-size:12px;max-width:900px}.ladder th[colspan]{color:var(--fg);font-weight:600;padding-top:8px}
-#parked{margin-top:18px}
+#parked{margin-top:18px}h2.sum{display:block;margin:12px 0 6px}
 @media (max-width:700px){.hide{display:none}.chip{min-width:0;flex:1 1 28%}.arrow{display:none}details.legend dl{grid-template-columns:1fr}details.legend dd{margin-bottom:4px}}
 </style><link rel="icon" type="image/png" href="logo.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"></head><body><main>
 <nav><a href="coverage.html">Map</a><a class="on" aria-current="page" href="cities.html">Cities</a><a href="overview.html">Overview</a></nav>
@@ -50,7 +50,7 @@ details.legend dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12p
 <div class="stages" id="stages"></div>
 <details class="legend"><summary>How to read it</summary><dl>
 <dt>Code</dt><dd>The first step of the ladder (below) the city has not done; <em>done</em> when every step that applies is.</dd>
-<dt>Coverage</dt><dd><span class="tag ok">whole</span> the whole municipality; <span class="tag part">core</span> the part where people go out. The km² where the sunny filter works, and their share of the city's surface.</dd>
+<dt>Coverage</dt><dd><span class="tag ok">whole</span> the whole municipality; <span class="tag part">core</span> the part where people go out; <span class="tag bad">not covered</span> at stage 3 with no tiles offered yet. The km² where the sunny filter works, and their share of the city's surface.</dd>
 <dt>Going-out</dt><dd>Blocks of about 200 m with at least 10 bars, cafés and restaurants within 400 m; the share is the part where the sunny filter works.</dd>
 <dt>Sun data</dt><dd>Where outdoor seating comes from (a city permit feed or OpenStreetMap), and whether the sunny filter is offered.</dd>
 <dt>Home</dt><dd>Streets built, the municipal outline, and the listing sites linked for its country.</dd>
@@ -67,11 +67,12 @@ details.legend dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12p
   <label><input type="checkbox" id="issues"> With issues</label>
   <label><input type="checkbox" id="stale"> Stale data</label>
 </div>
+<h2 id="mainSum" class="sum">Cities being consolidated</h2>
 <div class="scroll"><table><thead><tr>
 <th data-k="code">Code</th><th data-k="city">City</th><th data-k="country" class="hide">Country</th><th data-k="cov">Coverage</th><th data-k="goingOut" class="n">Going-out</th><th data-k="sun">Sun data</th><th data-k="home">Home</th><th data-k="lines" class="n">Transit</th><th data-k="checkDate">Check</th><th data-k="built">Data</th><th data-k="nIssues" title="Open issues">⚑</th>
 </tr></thead><tbody id="list"></tbody></table></div>
 <details id="parked"><summary id="parkedSum">Parked and survey only</summary>
-<p>Stages 1 and 2 (found and surveyed, no tiles yet) and the cities set aside until the app work has moved on (the #441 batch). Nothing is planned for them now.</p>
+<p id="parkedText">Stages 1 and 2 (found and surveyed, no tiles yet) and the cities set aside until the app work has moved on (the #441 batch). Nothing is planned for them now.</p>
 <div class="scroll"><table><thead><tr><th data-k="code">Code</th><th>City</th><th class="hide">Country</th><th class="n">Inhabitants</th><th class="n">Going-out</th><th>Waiting for</th></tr></thead><tbody id="plist"></tbody></table></div>
 </details>
 </main>
@@ -94,7 +95,10 @@ get(STATUS).then(s=>{
       home:(c.streets?2:0)+(c.outline?1:0)+(c.listings?1:0),
       lines:typeof c.transit==='number'?c.transit:c.transit==='none'?-0.5:-1,
       nIssues:iss.length, isStale:!!(fr.stale&&fr.stale.length)});});
-  const main=rows.filter(r=>!parked(r)), park=rows.filter(parked);
+  // The split both pages count from (common.js): covered, stage 3 not covered yet, parked or survey only.
+  const sp=split(rows), main=sp.main, park=sp.park, early=park.filter(r=>+stageOf(r.code)<=2).length;
+  $('mainSum').textContent=fmt(main.length)+' cities being consolidated: '+fmt(sp.covered.length)+' covered + '+fmt(sp.tiled.length)+' at stage 3, not offered yet';
+  $('parkedText').textContent=fmt(early)+' at stages 1 and 2 (found or surveyed, no tiles yet)'+(park.length>early?' and '+fmt(park.length-early)+' set aside at stage 3 until the app work has moved on (the #441 batch)':'')+'. Nothing is planned for them now.';
   // Stage chips: cities per stage, a tap filters to it (again: all).
   const per={}; for(const r of main){const k=stageOf(r.code);per[k]=(per[k]||0)+1;}
   let stage='';
@@ -138,7 +142,7 @@ get(STATUS).then(s=>{
   const cell=r=>{const d=r.d, cv=d.coverage||{}, go=d.goingOut||{}, ch=d.checks||{}, fr=d.freshness||{}, ho=d.home||{};
     const dist=(ch.districts||[]).length;
     return '<td class="code" title="'+esc(r.step)+'">'+esc(r.code)+'</td><td>'+(r.coverage?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+esc(r.city)+'</a>':esc(r.city))+'</td><td class="hide">'+esc(r.country)+'</td>'
-      +'<td>'+(r.coverage?'<span class="tag '+(r.coverage==='whole'?'ok':'part')+'">'+r.coverage+'</span> <small>'+(cv.km2!=null?km(cv.km2)+' km²':'')+(cv.share!=null?' · '+pct(cv.share):'')+'</small>':'<span class="dim">none</span>')+'</td>'
+      +'<td>'+(isCovered(r)?'<span class="tag '+(r.coverage==='whole'?'ok':'part')+'">'+r.coverage+'</span> <small>'+(cv.km2!=null?km(cv.km2)+' km²':'')+(cv.share!=null?' · '+pct(cv.share):'')+'</small>':'<span class="tag bad">not covered</span>')+'</td>'
       +'<td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut))+(go.share!=null?'<br><small>'+pct(go.share)+' sunny</small>':'')+'</td>'
       +'<td>'+(r.offered?'<span class="tag ok">offered</span>':'<span class="tag">not offered</span>')+'<br><small>'+esc(r.terraces==='permits'?'permits':r.terraces==='osm'?'OSM':r.terraces==='none'?'no terraces':'')+(r.heights?' · '+esc(r.heights==='city'?'city heights':r.heights+' heights'):'')+'</small></td>'
       +'<td><small>'+yes(r.streets,'streets')+'<br>'+yes(r.outline,'outline')+' · '+(r.listings?fmt((ho.sites||[]).length||'')+' sites':'<span class="dim">no sites</span>')+'</small></td>'
@@ -157,7 +161,7 @@ get(STATUS).then(s=>{
     $('list').closest('table').querySelectorAll('th[data-k]').forEach(th=>{const on=th.dataset.k===sortKey;th.classList.toggle('on',on);th.classList.toggle('asc',on&&asc);});
     $('list').innerHTML=shown.map(r=>{const o=open.has(r.city);return '<tr class="c'+(o?' open':'')+'" data-c="'+esc(r.city)+'" tabindex="0" aria-expanded="'+o+'">'+cell(r)+'</tr>'+(o?'<tr class="d"><td colspan="11">'+detail(r)+'</td></tr>':'');}).join('')
       ||'<tr><td colspan="11" class="dim">No city matches.</td></tr>';
-    $('status').textContent=shown.length+' of '+main.length+' cities in consolidation shown · '+park.length+' parked or survey only · updated '+day(s.updated)+'.';
+    $('status').textContent=fmt(sp.covered.length)+' covered + '+fmt(sp.tiled.length)+' at stage 3 + '+fmt(park.length)+' parked or survey only = '+fmt(sp.total)+' cities on record · '+fmt(shown.length)+' of '+fmt(main.length)+' shown · updated '+day(s.updated)+'.';
   };
   const toggle=tr=>{const k=tr.dataset.c;open.has(k)?open.delete(k):open.add(k);render();};
   $('list').onclick=e=>{if(e.target.closest('a'))return;const tr=e.target.closest('tr.c');if(tr)toggle(tr);};
@@ -170,7 +174,7 @@ get(STATUS).then(s=>{
   const drawParked=()=>{park.sort(byCode(pasc));const th=$('plist').closest('table').querySelector('th[data-k]');th.classList.add('on');th.classList.toggle('asc',pasc);
   $('plist').innerHTML=park.map(r=>'<tr><td class="code">'+esc(r.code)+'</td><td>'+esc(r.city)+'</td><td class="hide">'+esc(r.country)+'</td><td class="n">'+fmt(r.population)+'</td><td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut))+'</td><td><small>'+esc(r.step)+(r.parked?' · parked':'')+'</small></td></tr>').join('');};
   $('plist').closest('table').querySelector('th[data-k]').onclick=()=>{pasc=!pasc;drawParked();};
-  $('parkedSum').textContent='Parked and survey only ('+fmt(park.length)+')';
+  $('parkedSum').textContent='Parked and survey only ('+fmt(park.length)+'): '+fmt(early)+' at stages 1–2'+(park.length>early?', '+fmt(park.length-early)+' parked at stage 3':'');
   drawParked();
   // coverage.html#City (the map's links): that city, its row open.
   const h=decodeURIComponent(location.hash.slice(1));

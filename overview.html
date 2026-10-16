@@ -6,8 +6,8 @@ layout: null
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
 <title>Compromise overview</title>
 <style>
-:root{--bg:#fbfcfc;--fg:#1d2a2d;--muted:#5b6b6f;--line:#dde3e4;--accent:#368B9C;--panel:#fff;--ok:#157a42;--part:#e0a030}
-@media (prefers-color-scheme:dark){:root{--bg:#15191a;--fg:#e6ecec;--muted:#9aa8ab;--line:#2b3336;--accent:#16B9DB;--panel:#1c2224;color-scheme:dark}}
+:root{--bg:#fbfcfc;--fg:#1d2a2d;--muted:#5b6b6f;--line:#dde3e4;--accent:#368B9C;--panel:#fff;--ok:#157a42;--part:#e0a030;--bad:#c0392b}
+@media (prefers-color-scheme:dark){:root{--bg:#15191a;--fg:#e6ecec;--muted:#9aa8ab;--line:#2b3336;--accent:#16B9DB;--panel:#1c2224;--bad:#e8705f;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,system-ui,sans-serif}
 main{max-width:1400px;margin:0 auto;padding:16px}
 nav{display:flex;gap:14px;align-items:center;margin-bottom:10px}nav a{color:var(--muted);text-decoration:none;font-weight:600}nav a.on{color:var(--accent);border-bottom:2px solid var(--accent)}
@@ -18,7 +18,7 @@ table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font
 th,td{text-align:left;padding:6px 6px;border-top:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;vertical-align:bottom;user-select:none;background:var(--bg)}
 th[data-k]{cursor:pointer}
 .btn{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:inherit}.btn:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.short{display:none}ul.why{margin:4px 0 8px;padding-left:20px;color:var(--muted)}ul.why li{margin-bottom:6px}ul.why li.stage{list-style:none;margin:10px 0 4px -20px;color:var(--fg);font-weight:600}.ex{color:var(--fg);font-size:13px;overflow-wrap:anywhere}.ex small{white-space:nowrap}.ex .btn{color:var(--accent)}tr.more td{padding-top:10px}th.on{color:var(--accent)}th.on::after{content:' ▾'}th.on.asc::after{content:' ▴'}
+.short{display:none}ul.why{margin:4px 0 8px;padding-left:20px;color:var(--muted)}ul.why li{margin-bottom:6px}ul.why ul{padding-left:18px;margin:4px 0}ul.why li.check{list-style:none;margin-left:-20px;color:var(--fg);font-weight:600}ul.why .bad{color:var(--bad)}ul.why li.stage{list-style:none;margin:10px 0 4px -20px;color:var(--fg);font-weight:600}.ex{color:var(--fg);font-size:13px;overflow-wrap:anywhere}.ex small{white-space:nowrap}.ex .btn{color:var(--accent)}tr.more td{padding-top:10px}th.on{color:var(--accent)}th.on::after{content:' ▾'}th.on.asc::after{content:' ▴'}
 td.n,th.n{text-align:right}td.n{white-space:nowrap}
 tr.c{cursor:pointer}tr.c:hover td{color:var(--accent)}tr.c .btn::before{content:'▸ ';color:var(--muted)}tr.c.open .btn::before{content:'▾ '}
 tr.sub>td{padding:0 0 10px 18px;border-top:0}tr.sub table{font-size:12px}
@@ -38,7 +38,7 @@ a{color:var(--accent)}small{color:var(--muted)}
 
 <details id="sec-totals" open><summary><h2>Totals</h2></summary>
 <div id="totals"></div>
-<details id="sec-why"><summary>Why not covered</summary><ul class="why" id="tally"></ul></details>
+<details id="sec-why"><summary id="whySum">Why not covered</summary><ul class="why" id="tally"></ul></details>
 </details>
 
 <details id="sec-storage" open><summary><h2>Storage</h2></summary>
@@ -84,7 +84,8 @@ Promise.all([status,coverage,counts]).then(([s,feed,cnts])=>{
     const g=!k?{goingOut:c.goingOut,sq:!!c.extent&&!/^(municipality|commune)$/.test(c.extent)}
       :k.extent==='tiled box'?{goingOut:k.goingOutCellsWide,sq:true}:{goingOut:k.goingOutCells,sq:!/^(municipality|commune)$/.test(k.extent)};
     return Object.assign({},c,g,{rank,code,step:ladderStep(code,c),streets:!!rank&&c.streets===true,lines:rank&&typeof c.transit==='number'?c.transit:0});});
-  const covered=rows.filter(r=>r.rank);
+  // The split cities.html counts from (common.js): covered, stage 3 not covered yet, parked or survey only.
+  const sp=split(rows), covered=sp.covered, more3='+'+fmt(sp.tiled.length)+' being processed (stage 3)';
 
   // ---- 1. totals in three groups: depth first (growth stopped 2026-10-15, the page follows consolidation), then reach (the Storage section holds the tile store).
   // A KPI with a share shows it beside the number and spells it out on hover or focus.
@@ -108,28 +109,37 @@ Promise.all([status,coverage,counts]).then(([s,feed,cnts])=>{
   // Each row opens on its denominator, the base of the row's percentages (the two block KPIs excepted: their tooltips name their own base).
   const base=(n,label,tip)=>kpi(fmt(n),label,null,tip);
   const groups=[
-    ['Depth',[base(covered.length,'covered cities','Base of this row\'s percentages (the two block figures excepted)'),part(whole,'whole city',ofCov(whole)),part(covered.length-whole,'core only',ofCov(covered.length-whole)),
+    ['Depth',[base(covered.length,'covered cities',more3+' · base of this row\'s percentages (the two block figures excepted)'),part(whole,'whole city',ofCov(whole)),part(covered.length-whole,'core only',ofCov(covered.length-whole)),
       part(streets,'cities with streets',ofCov(streets)),part(transit,'cities with transit lines',ofCov(transit)),
       part(passing,'blocks where the sunny filter works',of(passing,sum('tiled'),'blocks with data (not covered cities)')),
       part(known,'blocks with terrace records',of(known,passing,'blocks where the filter works (not covered cities)'))]],
     // Health (2026-10-15): the status feed's detail (cities_status.py), over the covered cities.
-    ['Health',[base(covered.length,'covered cities','Base of this row\'s percentages (the going-out blocks excepted)'),part(offered,'sunny filter offered',ofCov(offered)),
+    ['Health',[base(covered.length,'covered cities',more3+' · base of this row\'s percentages (the going-out blocks excepted)'),part(offered,'sunny filter offered',ofCov(offered)),
       part(passed,'seed check passed',ofCov(passed)),part(districts,'with a district checked',ofCov(districts)),
       part(withIssues,'with open issues',ofCov(withIssues)),part(stale,'with stale data',ofCov(stale)),
       part(goCovered,'going-out blocks where the sunny filter works',of(goCovered,goTiled,'going-out blocks in the tiles'))]],
-    ['Reach',[base(rows.length,'cities in the database','Base of the cities-covered percentage'),part(covered.length,'cities covered',of(covered.length,rows.length,'cities in the database')),part(countries.size,'countries covered',{}),
+    ['Reach',[base(sp.total,'cities in the database','Base of the cities-covered percentage'),part(covered.length,'cities covered',(o=>(o.tip=o.tip+' · '+more3,o))(of(covered.length,sp.total,'cities in the database'))),part(countries.size,'countries covered',{}),
       part(covered.reduce((t,r)=>t+(r.population||0),0),'population covered',{})]]];
   $('totals').innerHTML=groups.map(([h,list])=>'<div class="grp"><h3>'+h+'</h3><div class="big">'+list.join('')+'</div></div>').join('');
-  // Why not covered: the cities short of the ladder's stage 4 (cities.html's legend), by stage and step, each step naming
-  // its biggest cities (by inhabitants, then going-out blocks); a button shows the rest in place.
-  const byReason={}; for(const r of rows) if(LADDER_RANK[r.code]<LADDER_RANK['4.1'])(byReason[r.code]=byReason[r.code]||[]).push(r);
+  // Why not covered (owner, 2026-10-16): every city not covered in exactly one group (common.js's whyGroups), by stage,
+  // step, then status (parked apart), each naming its biggest cities (by inhabitants, then going-out blocks); a button
+  // shows the rest in place. The check line turns red when the groups miss a city (a status common.js does not know).
+  const w=whyGroups(rows);
   const big=(a,b)=>(b.population||0)-(a.population||0)||(b.goingOut||0)-(a.goingOut||0)||a.city.localeCompare(b.city);
   const place=r=>{const m=/^(.*) \((.*)\)$/.exec(r.city);return esc(m?m[1]:r.city)+' <small>('+esc([m&&m[2],r.country].filter(Boolean).join(', '))+')</small>';};
+  let gi=0;
+  const names=list=>{list=list.slice().sort(big);const rest=list.length-5,i=++gi;return '<div class="ex">'+list.slice(0,5).map(place).join(', ')
+    +(rest>0?'<span id="why-'+i+'" hidden>, '+list.slice(5).map(place).join(', ')+'</span> <button type="button" class="btn" aria-expanded="false" aria-controls="why-'+i+'" data-n="'+rest+'" title="'+esc(list.map(r=>r.city).join(', '))+'">+'+fmt(rest)+' more</button>':'')+'</div>';};
+  const byStep={}; for(const g of w.groups)(byStep[g.code]=byStep[g.code]||[]).push(g);
   let stage='';
-  $('tally').innerHTML=LADDER.filter(([k])=>byReason[k]).map(([k,name],i)=>{
-    const list=byReason[k].slice().sort(big), n=list.length, rest=n-5, head=k[0]!==stage; stage=k[0];
-    return (head?'<li class="stage">'+k[0]+' · '+esc(STAGES[k[0]])+'</li>':'')+'<li>'+fmt(n)+' at '+k+' · '+esc(name)+(list.length?'<div class="ex">'+list.slice(0,5).map(place).join(', ')
-      +(rest>0?'<span id="why-'+i+'" hidden>, '+list.slice(5).map(place).join(', ')+'</span> <button type="button" class="btn" aria-expanded="false" aria-controls="why-'+i+'" data-n="'+rest+'" title="'+esc(list.map(r=>r.city).join(', '))+'">+'+fmt(rest)+' more</button>':'')+'</div>':'')+'</li>';}).join('');
+  const ok=!w.unmapped.length&&w.sum===w.total;
+  $('tally').innerHTML='<li class="check'+(ok?'':' bad')+'">'+fmt(w.total)+' not covered = '+w.groups.map(g=>fmt(g.rows.length)).join(' + ')+' = '+fmt(w.sum)
+    +(ok?' ✓':' ✗ '+fmt(w.total-w.sum)+' in no group')+'</li>'
+    +Object.entries(byStep).map(([k,gs])=>{const head=k[0]!==stage; stage=k[0];
+    return (head?'<li class="stage">'+k[0]+' · '+esc(STAGES[k[0]])+'</li>':'')+'<li>Waiting at <b>'+k+' · '+esc(LADDER[LADDER_RANK[k]][1])+'</b> ('+fmt(gs.reduce((t,g)=>t+g.rows.length,0))+')'
+      +'<ul>'+gs.map(g=>'<li>'+esc(g.status)+(g.parked?' · parked (the #441 batch)':'')+' ('+fmt(g.rows.length)+')'+names(g.rows)+'</li>').join('')+'</ul></li>';}).join('')
+    +(w.unmapped.length?'<li class="stage bad">Status not mapped in common.js ('+fmt(w.unmapped.length)+'): '+esc([...new Set(w.unmapped.map(r=>r.status))].join(', '))+names(w.unmapped)+'</li>':'');
+  $('whySum').textContent='Why not covered ('+fmt(w.total)+')';
   $('tally').onclick=e=>{const b=e.target.closest('button[aria-controls]');if(!b)return;const o=b.getAttribute('aria-expanded')!=='true';
     b.setAttribute('aria-expanded',o);$(b.getAttribute('aria-controls')).hidden=!o;b.textContent=o?'show fewer':'+'+fmt(+b.dataset.n)+' more';};
 

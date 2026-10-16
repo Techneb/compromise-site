@@ -82,4 +82,20 @@ const CODE_ORDER=['4','5','6','7','done','3','2','1'];
 const codeOrder=(a,b)=>CODE_ORDER.indexOf(stageOf(a))-CODE_ORDER.indexOf(stageOf(b))||(+a.split('.')[1]||0)-(+b.split('.')[1]||0);
 // Rows by code (descending reverses the codes only), then the main-city order.
 const byCode=asc=>(x,y)=>codeOrder(x.code,y.code)*(asc?1:-1)||mainOrder(x,y);
-if(typeof module!=='undefined'&&module.exports)module.exports={esc,fmt,pct,fold,near,holds,countsRows,STAGES,LADDER,LADDER_RANK,ladderCode,ladderStep,stageOf,parked,mainOrder,CODE_ORDER,codeOrder,byCode};
+// The one count both pages use (owner, 2026-10-16), so their numbers cannot drift. Rows carry their code. A city is
+// covered when it has tiles where people go out (whole city or core); the rest are either still at stage 3 and in
+// cities.html's main table ("tiled", not offered yet), or parked and survey only. The three add up to the feed.
+const isCovered=r=>r.coverage==='whole'||r.coverage==='core';
+const split=rows=>{const covered=[],tiled=[],park=[];for(const r of rows)(isCovered(r)?covered:parked(r)?park:tiled).push(r);
+  return {covered,tiled,park,main:covered.concat(tiled),total:rows.length};};
+// Every status the feed can carry (cities_status.py's REASON, and "candidate"). overview.html's "Why not covered"
+// groups the cities not covered by code, then status (parked apart); one with a status missing here shows red there.
+const STATUSES=['candidate','not planned','not surveyed','unreachable','held for the owner','surveyed','to measure','landmark only',
+  'found, to wire','surveyed, nothing usable','measured, not offered','wired, to measure','tiled','covered'];
+const whyGroups=rows=>{const by={},unmapped=[];let total=0;
+  for(const r of rows){if(isCovered(r))continue;total++;
+    if(!STATUSES.includes(r.status)){unmapped.push(r);continue;}
+    const k=r.code+'|'+r.status+'|'+!!r.parked;(by[k]=by[k]||{code:r.code,status:r.status,parked:!!r.parked,rows:[]}).rows.push(r);}
+  const groups=Object.values(by).sort((a,b)=>LADDER_RANK[a.code]-LADDER_RANK[b.code]||a.parked-b.parked||a.status.localeCompare(b.status));
+  return {groups,unmapped,total,sum:groups.reduce((t,g)=>t+g.rows.length,0)};};
+if(typeof module!=='undefined'&&module.exports)module.exports={esc,fmt,pct,fold,near,holds,countsRows,STAGES,LADDER,LADDER_RANK,ladderCode,ladderStep,stageOf,parked,mainOrder,CODE_ORDER,codeOrder,byCode,isCovered,split,STATUSES,whyGroups};

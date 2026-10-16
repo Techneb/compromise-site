@@ -90,6 +90,12 @@ const odd = C.whyGroups(sample.concat({ status: "brand new" }).map(withCode));
 assert.strictEqual(odd.unmapped.length, 1); assert.strictEqual(odd.sum, odd.total - 1);
 assert.deepStrictEqual(C.whyGroups(sample.map(withCode)).groups.map((g) => g.code + " " + g.status + (g.parked ? " P" : "")),
   ["1.1 candidate", "1.3 not surveyed", "2.4 to measure", "3.1 found, to wire", "3.1 found, to wire P", "3.6 measured, not offered"]);
+// Fonts are self-hosted: no landing page or its stylesheet calls Google, and every font the CSS names is in /fonts/.
+for (const f of ["_includes/landing-en.html", "fr/index.html", "es/index.html", "de/index.html", "landing.css"]) {
+  const src = fs.readFileSync(path.join(root, f), "utf8");
+  assert.ok(!/googleapis|gstatic/.test(src), f + " references Google Fonts");
+  for (const [, u] of src.matchAll(/(\/fonts\/[\w-]+\.woff2)/g)) assert.ok(fs.existsSync(path.join(root, u)), f + ": " + u + " missing");
+}
 console.log("ok");
 // The live feed, when the network answers (CI does): every status it holds is mapped and the groups sum to the total.
 fetch("https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json").then((r) => r.ok ? r.json() : null)

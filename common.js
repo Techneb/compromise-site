@@ -77,9 +77,12 @@ const ladderStep=(code,r)=>code==='done'?'done':code+' · '+LADDER[LADDER_RANK[c
 const stageOf=code=>code==='done'?'done':code.split('.')[0];
 const parked=r=>!!r.parked||+stageOf(r.code)<=2;
 const mainOrder=(a,b)=>(b.country==='France')-(a.country==='France')||(b.population||0)-(a.population||0)||a.city.localeCompare(b.city);
-// Codes in the consolidation order: stages 4 → 7, done, then 3, 2, 1; sub-steps compared as numbers (3.2 before 3.10).
+// The stage chips' order (cities.html): consolidation first, stages 4 → 7, done, then 3, 2, 1.
 const CODE_ORDER=['4','5','6','7','done','3','2','1'];
-const codeOrder=(a,b)=>CODE_ORDER.indexOf(stageOf(a))-CODE_ORDER.indexOf(stageOf(b))||(+a.split('.')[1]||0)-(+b.split('.')[1]||0);
+// Sorting by code is the plain ladder order (owner, 2026-10-16: the consolidation order read as a broken sort):
+// 1.1 → 7.2, then done; stage and sub-step compared as numbers (3.2 before 3.10, 9.1 before 10.1).
+const codeNum=c=>c==='done'?[Infinity,0]:c.split('.').map(Number);
+const codeOrder=(a,b)=>{const x=codeNum(a),y=codeNum(b);return x[0]-y[0]||(x[1]||0)-(y[1]||0);};
 // Rows by code (descending reverses the codes only), then the main-city order.
 const byCode=asc=>(x,y)=>codeOrder(x.code,y.code)*(asc?1:-1)||mainOrder(x,y);
 // The one count both pages use (owner, 2026-10-16), so their numbers cannot drift. Rows carry their code. A city is

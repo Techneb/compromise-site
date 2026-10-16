@@ -69,4 +69,29 @@ for (const page of ["cities.html", "coverage.html", "overview.html"]) {
   const inline = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join("\n");
   new vm.Script(common + "\n" + inline, { filename: page });   // throws on a name common.js already declares
 }
+
+// The counts (owner, 2026-10-16): covered + stage 3 + parked add up to the feed; every city not covered lands in exactly
+// one "Why not covered" group, and a status not in STATUSES is reported, never dropped.
+const withCode = (r) => Object.assign(r, { code: C.ladderCode(r) });
+for (const st of C.STATUSES) assert.ok(C.LADDER_RANK[C.ladderCode({ status: st })] != null, st);
+const checkFeed = (cities) => {
+  const rows = cities.map(withCode), sp = C.split(rows), w = C.whyGroups(rows);
+  assert.strictEqual(sp.covered.length + sp.tiled.length + sp.park.length, sp.total);
+  assert.deepStrictEqual(w.unmapped.map((r) => r.status), [], "statuses missing from STATUSES");
+  assert.strictEqual(w.sum, w.total); assert.strictEqual(w.total, sp.total - sp.covered.length);
+  for (const r of rows) assert.ok(C.STATUSES.includes(r.status), r.status);
+};
+const sample = [{ status: "covered", coverage: "whole" }, { status: "candidate" }, { status: "to measure" }, { status: "found, to wire", parked: true },
+  { status: "found, to wire" }, { status: "measured, not offered" }, { status: "not surveyed", reason: "Too quiet to survey" }];
+checkFeed(sample);
+const sp = C.split(sample.map(withCode));
+assert.deepStrictEqual([sp.covered.length, sp.tiled.length, sp.park.length], [1, 2, 4]);
+const odd = C.whyGroups(sample.concat({ status: "brand new" }).map(withCode));
+assert.strictEqual(odd.unmapped.length, 1); assert.strictEqual(odd.sum, odd.total - 1);
+assert.deepStrictEqual(C.whyGroups(sample.map(withCode)).groups.map((g) => g.code + " " + g.status + (g.parked ? " P" : "")),
+  ["1.1 candidate", "1.3 not surveyed", "2.4 to measure", "3.1 found, to wire", "3.1 found, to wire P", "3.6 measured, not offered"]);
 console.log("ok");
+// The live feed, when the network answers (CI does): every status it holds is mapped and the groups sum to the total.
+fetch("https://raw.githubusercontent.com/Techneb/compromise-tiles/master/cities-status.json").then((r) => r.ok ? r.json() : null)
+  .catch(() => null).then((s) => { if (!s) return console.log("live feed not reached: skipped");
+    checkFeed(s.cities); console.log("live feed ok (" + s.cities.length + " cities)"); });

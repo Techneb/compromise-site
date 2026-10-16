@@ -134,7 +134,8 @@ get(STATUS).then(s=>{
         ['Modes',tr.modes?Object.entries(tr.modes).sort((a,b)=>b[1]-a[1]).map(([m,n])=>esc(m)+' '+fmt(n)).join(', '):'']]))
       +sec('7 · Checks',dl([['Seed check',ch.result?esc(ch.result)+(ch.date?' · '+esc(ch.date):'')+(ch.mode?' · '+esc(ch.mode):''):'not run'],
         ['Districts',(ch.districts||[]).length?fmt(ch.districts.filter(x=>x.offered).length)+' of '+fmt(ch.districts.length)+' offered':'none on record'],
-        ['',(ch.districts||[]).map(x=>esc(x.name)+(x.offered?'':' <small>(not offered)</small>')).join(', ')]]))
+        ['',(ch.districts||[]).map(x=>esc(x.name)+(x.offered?'':' <small>(not offered)</small>')).join(', ')],
+        ['Data',ch.cacheNote?esc(ch.cacheNote):'']]))
       +sec('Data freshness',layers.length?'<table><thead><tr><th>Layer</th><th class="n">Tiles</th><th>Built</th><th></th></tr></thead><tbody>'
         +layers.map(([l,v])=>'<tr><td>'+esc(l)+(v.by?' <small>('+esc(v.by)+'\'s)</small>':'')+'</td><td class="n">'+fmt(v.tiles)+'</td><td>'+(v.newest?(v.oldest&&v.oldest!==v.newest?esc(v.oldest)+' – ':'')+esc(v.newest):'<small>not recorded</small>')+'</td><td>'+(v.stale?'<span class="tag part">stale</span>':'')+'</td></tr>').join('')
         +'</tbody></table>':'<span class="dim">No tiles.</span>',true)

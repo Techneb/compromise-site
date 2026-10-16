@@ -43,15 +43,17 @@ assert.ok(C.parked({ code: "2.4" }) && C.parked({ code: "3.1", parked: true }) &
 assert.deepStrictEqual([{ city: "Big", country: "Spain", population: 9 }, { city: "Lyon", country: "France", population: 1 }, { city: "Small", country: "Spain", population: 2 }]
   .sort(C.mainOrder).map((r) => r.city), ["Lyon", "Big", "Small"]);
 
-// The code order: 4 → 7, done, then 3, 2, 1; sub-steps as numbers; descending reverses the codes, not the tie-break.
-const codes = ["3.10", "done", "1.1", "7.2", "3.2", "4.1", "2.4", "5.2", "3.1", "6.1", "5.1", "7.1"];
-assert.deepStrictEqual(codes.slice().sort(C.codeOrder), ["4.1", "5.1", "5.2", "6.1", "7.1", "7.2", "done", "3.1", "3.2", "3.10", "2.4", "1.1"]);
+// The code order is the ladder's: 1.1 → 7.2, then done; numbers, not strings; descending reverses the codes, not the tie-break.
+const codes = ["3.10", "done", "1.1", "7.2", "3.2", "4.1", "2.4", "5.2", "3.1", "6.1", "5.1", "7.1", "10.1"];
+assert.deepStrictEqual(codes.slice().sort(C.codeOrder), ["1.1", "2.4", "3.1", "3.2", "3.10", "4.1", "5.1", "5.2", "6.1", "7.1", "7.2", "10.1", "done"]);
+// Every code the ladder knows sorts in the ladder's own order (the table's "Code" header must match the "How to read it" table).
+assert.deepStrictEqual(C.LADDER.map((s) => s[0]).reverse().sort(C.codeOrder), C.LADDER.map((s) => s[0]));
 assert.strictEqual(C.stageOf("10.1"), "10");
 const rows = [{ city: "Big", country: "Spain", population: 9, code: "5.1" }, { city: "Lyon", country: "France", population: 1, code: "5.1" },
   { city: "Rome", country: "Italy", population: 3, code: "3.2" }, { city: "Pau", country: "France", population: 1, code: "4.1" },
   { city: "Oslo", country: "Norway", population: 1, code: "done" }, { city: "Nice", country: "France", population: 2, code: "5.1" }];
-assert.deepStrictEqual(rows.slice().sort(C.byCode(true)).map((r) => r.city), ["Pau", "Nice", "Lyon", "Big", "Oslo", "Rome"]);
-assert.deepStrictEqual(rows.slice().sort(C.byCode(false)).map((r) => r.city), ["Rome", "Oslo", "Nice", "Lyon", "Big", "Pau"]);
+assert.deepStrictEqual(rows.slice().sort(C.byCode(true)).map((r) => r.city), ["Rome", "Pau", "Nice", "Lyon", "Big", "Oslo"]);
+assert.deepStrictEqual(rows.slice().sort(C.byCode(false)).map((r) => r.city), ["Oslo", "Nice", "Lyon", "Big", "Pau", "Rome"]);
 
 // Cache busting: every local script and stylesheet carries the build's time, and its page has front matter so Jekyll renders it
 // (a fresh page with a cached common.js used to come up empty for up to ten minutes after a deploy).

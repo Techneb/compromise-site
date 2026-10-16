@@ -152,7 +152,7 @@ get(STATUS).then(s=>{
       +'<td><small>'+esc(day(r.built))+'</small>'+(r.isStale?' <span class="tag part" title="'+esc(fr.stale.join(', '))+'">stale</span>':'')+'</td>'
       +'<td>'+(r.nIssues?'<span class="tag'+(r.offered?'':' bad')+'" title="'+esc((d.issues||[]).join('\n'))+'">'+r.nIssues+'</span>':'')+'</td>';};
   let sortKey='code', asc=true; const open=new Set();
-  // The code column sorts in the consolidation order (common.js's byCode); any other column on its own value.
+  // The code column sorts in the ladder order (common.js's byCode); any other column on its own value.
   const val=r=>typeof r[sortKey]==='string'?r[sortKey].toLowerCase():(r[sortKey]==null?-1:r[sortKey]);
   const render=()=>{
     const q=fold($('q').value.trim()), ctry=$('country').value, cv=$('cov').value, wi=$('issues').checked, ws=$('stale').checked;
@@ -170,7 +170,7 @@ get(STATUS).then(s=>{
     const again=[...$('list').querySelectorAll('tr.c')].find(x=>x.dataset.c===k);if(again)again.focus();};
   $('list').closest('table').querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=(k==='city'||k==='country'||k==='code');}render();});
   for(const id of ['q','country','cov','issues','stale']) $(id).oninput=render;
-  // Parked: by code (3, 2, then 1; its header flips it), then the main-city order.
+  // Parked: by code (1.1 up to 3.x; its header flips it), then the main-city order.
   let pasc=true;
   const drawParked=()=>{park.sort(byCode(pasc));const th=$('plist').closest('table').querySelector('th[data-k]');th.classList.add('on');th.classList.toggle('asc',pasc);
   $('plist').innerHTML=park.map(r=>'<tr><td class="code">'+esc(r.code)+'</td><td>'+esc(r.city)+'</td><td class="hide">'+esc(r.country)+'</td><td class="n">'+fmt(r.population)+'</td><td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut))+'</td><td><small>'+esc(r.step)+(r.parked?' · parked':'')+'</small></td></tr>').join('');};

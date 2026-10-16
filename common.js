@@ -74,7 +74,12 @@ const ladderStep=(code,r)=>code==='done'?'done':code+' · '+LADDER[LADDER_RANK[c
 // Consolidation (owner, 2026-10-15: no new cities): a row's stage ('1'..'7', 'done'), whether it is parked (stages 1 and 2,
 // and the #441 batch the status feed marks `parked`), and the main-city order within a code: French cities first, then
 // the most inhabitants (the owner's order is the capitals and big tourist cities, French first; no list holds it yet).
-const stageOf=code=>code==='done'?'done':code[0];
+const stageOf=code=>code==='done'?'done':code.split('.')[0];
 const parked=r=>!!r.parked||+stageOf(r.code)<=2;
 const mainOrder=(a,b)=>(b.country==='France')-(a.country==='France')||(b.population||0)-(a.population||0)||a.city.localeCompare(b.city);
-if(typeof module!=='undefined'&&module.exports)module.exports={esc,fmt,pct,fold,near,holds,countsRows,STAGES,LADDER,LADDER_RANK,ladderCode,ladderStep,stageOf,parked,mainOrder};
+// Codes in the consolidation order: stages 4 → 7, done, then 3, 2, 1; sub-steps compared as numbers (3.2 before 3.10).
+const CODE_ORDER=['4','5','6','7','done','3','2','1'];
+const codeOrder=(a,b)=>CODE_ORDER.indexOf(stageOf(a))-CODE_ORDER.indexOf(stageOf(b))||(+a.split('.')[1]||0)-(+b.split('.')[1]||0);
+// Rows by code (descending reverses the codes only), then the main-city order.
+const byCode=asc=>(x,y)=>codeOrder(x.code,y.code)*(asc?1:-1)||mainOrder(x,y);
+if(typeof module!=='undefined'&&module.exports)module.exports={esc,fmt,pct,fold,near,holds,countsRows,STAGES,LADDER,LADDER_RANK,ladderCode,ladderStep,stageOf,parked,mainOrder,CODE_ORDER,codeOrder,byCode};

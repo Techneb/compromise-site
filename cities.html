@@ -72,7 +72,7 @@ details.legend dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12p
 </tr></thead><tbody id="list"></tbody></table></div>
 <details id="parked"><summary id="parkedSum">Parked and survey only</summary>
 <p>Stages 1 and 2 (found and surveyed, no tiles yet) and the cities set aside until the app work has moved on (the #441 batch). Nothing is planned for them now.</p>
-<div class="scroll"><table><thead><tr><th>Code</th><th>City</th><th class="hide">Country</th><th class="n">Inhabitants</th><th class="n">Going-out</th><th>Waiting for</th></tr></thead><tbody id="plist"></tbody></table></div>
+<div class="scroll"><table><thead><tr><th data-k="code">Code</th><th>City</th><th class="hide">Country</th><th class="n">Inhabitants</th><th class="n">Going-out</th><th>Waiting for</th></tr></thead><tbody id="plist"></tbody></table></div>
 </details>
 </main>
 <script src="/common.js"></script>
@@ -82,7 +82,7 @@ const km=n=>n==null?'':Number(n).toLocaleString(undefined,{maximumFractionDigits
 const day=d=>d?String(d).slice(0,10):'';
 const yes=(v,t)=>v?esc(t):'<span class="dim">no '+esc(t)+'</span>';
 // The stages bar's order: consolidation first (4 → 7, done), then the sun data still missing (3); stages 1–2 sit in Parked.
-const ORDER=['4','5','6','7','done','3'];
+const ORDER=CODE_ORDER.slice(0,6);
 get(STATUS).then(s=>{
   $('ladder').innerHTML=LADDER.map(([c,n,m])=>(c.endsWith('.1')?'<tr><th colspan="3">'+c[0]+' · '+STAGES[c[0]]+'</th></tr>':'')
     +'<tr><td>'+c+'</td><td>'+esc(n)+'</td><td>'+esc(m)+'</td></tr>').join('');
@@ -147,15 +147,14 @@ get(STATUS).then(s=>{
       +'<td><small>'+esc(day(r.built))+'</small>'+(r.isStale?' <span class="tag part" title="'+esc(fr.stale.join(', '))+'">stale</span>':'')+'</td>'
       +'<td>'+(r.nIssues?'<span class="tag'+(r.offered?'':' bad')+'" title="'+esc((d.issues||[]).join('\n'))+'">'+r.nIssues+'</span>':'')+'</td>';};
   let sortKey='code', asc=true; const open=new Set();
-  // The code column sorts in the consolidation order (ORDER: 4 → 7, done, then 3), the ladder's within a stage.
-  const codeRank=r=>ORDER.indexOf(stageOf(r.code))*100+LADDER_RANK[r.code];
-  const val=r=>sortKey==='code'?codeRank(r):typeof r[sortKey]==='string'?r[sortKey].toLowerCase():(r[sortKey]==null?-1:r[sortKey]);
+  // The code column sorts in the consolidation order (common.js's byCode); any other column on its own value.
+  const val=r=>typeof r[sortKey]==='string'?r[sortKey].toLowerCase():(r[sortKey]==null?-1:r[sortKey]);
   const render=()=>{
     const q=fold($('q').value.trim()), ctry=$('country').value, cv=$('cov').value, wi=$('issues').checked, ws=$('stale').checked;
     const shown=main.filter(r=>(!stage||stageOf(r.code)===stage)&&(!q||fold(r.city).includes(q))&&(!ctry||r.country===ctry)&&(!cv||r.coverage===cv)&&(!wi||r.nIssues)&&(!ws||r.isStale));
     // Default: by code, then the main-city order (common.js); any other column sorts on its own, the code breaking ties.
-    shown.sort((x,y)=>{const p=val(x),q2=val(y);return (p<q2?-1:p>q2?1:0)*(asc?1:-1)||codeRank(x)-codeRank(y)||mainOrder(x,y);});
-    document.querySelectorAll('th[data-k]').forEach(th=>{const on=th.dataset.k===sortKey;th.classList.toggle('on',on);th.classList.toggle('asc',on&&asc);});
+    shown.sort(sortKey==='code'?byCode(asc):(x,y)=>{const p=val(x),q2=val(y);return (p<q2?-1:p>q2?1:0)*(asc?1:-1)||byCode(true)(x,y);});
+    $('list').closest('table').querySelectorAll('th[data-k]').forEach(th=>{const on=th.dataset.k===sortKey;th.classList.toggle('on',on);th.classList.toggle('asc',on&&asc);});
     $('list').innerHTML=shown.map(r=>{const o=open.has(r.city);return '<tr class="c'+(o?' open':'')+'" data-c="'+esc(r.city)+'" tabindex="0" aria-expanded="'+o+'">'+cell(r)+'</tr>'+(o?'<tr class="d"><td colspan="11">'+detail(r)+'</td></tr>':'');}).join('')
       ||'<tr><td colspan="11" class="dim">No city matches.</td></tr>';
     $('status').textContent=shown.length+' of '+main.length+' cities in consolidation shown · '+park.length+' parked or survey only · updated '+day(s.updated)+'.';
@@ -164,12 +163,15 @@ get(STATUS).then(s=>{
   $('list').onclick=e=>{if(e.target.closest('a'))return;const tr=e.target.closest('tr.c');if(tr)toggle(tr);};
   $('list').onkeydown=e=>{if(e.key!=='Enter'&&e.key!==' ')return;const tr=e.target.closest('tr.c');if(!tr)return;e.preventDefault();const k=tr.dataset.c;toggle(tr);
     const again=[...$('list').querySelectorAll('tr.c')].find(x=>x.dataset.c===k);if(again)again.focus();};
-  document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=(k==='city'||k==='country'||k==='code');}render();});
+  $('list').closest('table').querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)asc=!asc;else{sortKey=k;asc=(k==='city'||k==='country'||k==='code');}render();});
   for(const id of ['q','country','cov','issues','stale']) $(id).oninput=render;
-  // Parked: by code, then the main-city order.
-  park.sort((x,y)=>LADDER_RANK[x.code]-LADDER_RANK[y.code]||mainOrder(x,y));
+  // Parked: by code (3, 2, then 1; its header flips it), then the main-city order.
+  let pasc=true;
+  const drawParked=()=>{park.sort(byCode(pasc));const th=$('plist').closest('table').querySelector('th[data-k]');th.classList.add('on');th.classList.toggle('asc',pasc);
+  $('plist').innerHTML=park.map(r=>'<tr><td class="code">'+esc(r.code)+'</td><td>'+esc(r.city)+'</td><td class="hide">'+esc(r.country)+'</td><td class="n">'+fmt(r.population)+'</td><td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut))+'</td><td><small>'+esc(r.step)+(r.parked?' · parked':'')+'</small></td></tr>').join('');};
+  $('plist').closest('table').querySelector('th[data-k]').onclick=()=>{pasc=!pasc;drawParked();};
   $('parkedSum').textContent='Parked and survey only ('+fmt(park.length)+')';
-  $('plist').innerHTML=park.map(r=>'<tr><td class="code">'+esc(r.code)+'</td><td>'+esc(r.city)+'</td><td class="hide">'+esc(r.country)+'</td><td class="n">'+fmt(r.population)+'</td><td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut))+'</td><td><small>'+esc(r.step)+(r.parked?' · parked':'')+'</small></td></tr>').join('');
+  drawParked();
   // coverage.html#City (the map's links): that city, its row open.
   const h=decodeURIComponent(location.hash.slice(1));
   if(h&&main.some(r=>r.city===h)){$('q').value=h;open.add(h);}

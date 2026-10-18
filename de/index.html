@@ -12,6 +12,15 @@ const BETA_URL = "{{ site.beta_url }}";
 </script>
 <title>Compromise: Wo treffen wir uns?</title>
 <meta name="description" content="Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, zu Fuß, mit den Öffis, mit dem Auto oder mit dem Rad. Lade Freunde per Link ein. Als Beta auf dem iPhone.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Compromise: die Mitte in Minuten, nicht in Metern">
+<meta property="og:description" content="Die Mitte in Minuten, nicht in Metern. Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, zu Fuß, mit den Öffis, mit dem Auto oder mit dem Rad. Lade Freunde per Link ein. Als Beta auf dem iPhone.">
+<meta property="og:url" content="https://compromise.alephb.uk/de/">
+<meta property="og:image" content="https://compromise.alephb.uk/img/og-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Das Compromise-Icon und sein Name.">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://compromise.alephb.uk/de/">
 {% include hreflang.html %}
@@ -37,7 +46,7 @@ const BETA_URL = "{{ site.beta_url }}";
   <header class="hero">
     <div>
       <p class="kicker">Wo treffen wir uns?</p>
-      <h1>Die Mitte in Minuten, nicht in Kilometern.</h1>
+      <h1>Die Mitte in Minuten, nicht in Metern.</h1>
       <p class="lede">Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, egal wie ihr unterwegs seid.</p>
       <div class="modes" aria-label="Wie ihr unterwegs seid"><span class="mode">Zu Fuß</span><span class="mode">Öffis</span><span class="mode">Auto</span><span class="mode">Rad</span></div>
       <div class="cta">
@@ -51,7 +60,7 @@ const BETA_URL = "{{ site.beta_url }}";
       <div class="phone">
         <div class="screen" role="img" aria-label="Illustration der App: eine Karte mit drei Freunden und einem Treffpunkt, dazu eine Liste mit Orten, zu denen Nino, Léa und du jeweils etwa 18 Minuten braucht.">
           <!-- Screenshot slot: img/de/meet.png, 1206 × 2622 -->
-          <img class="shot" src="/img/de/meet.png" alt="Compromise: die Karte, die Startpunkte aller und die Orte, sortiert danach, wie nah die Fahrtzeiten beieinanderliegen" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
+          <img class="shot" src="/img/de/meet.png" alt="Compromise: die Karte, die Startpunkte aller und die Orte, sortiert danach, wie nah die Fahrzeiten beieinanderliegen" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
           <div class="island"></div>
           <svg class="map" viewBox="0 0 300 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <rect width="300" height="640" fill="var(--map)"/>
@@ -86,17 +95,17 @@ const BETA_URL = "{{ site.beta_url }}";
               <div class="spot-head"><span class="rank">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 Min. Unterschied</span></div>
               <div class="sun-cap">In der Sonne bis 18:40</div>
               <div class="bars">
-                <div class="bar"><span>Du</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 min</b></div>
-                <div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div>
-                <div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 min</b></div>
+                <div class="bar"><span>Du</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 Min.</b></div>
+                <div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 Min.</b></div>
+                <div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 Min.</b></div>
               </div>
             </div>
             <div class="spot">
               <div class="spot-head"><span class="rank">2</span><span class="spot-name">Bar Mercure</span><span class="gap">≃ 4 Min. Unterschied</span></div>
               <div class="bars">
-                <div class="bar"><span>Du</span><span class="track"><span class="fill" style="width: 50%; background: var(--p1)"></span></span><b>15 min</b></div>
-                <div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div>
-                <div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 57%; background: var(--p3)"></span></span><b>17 min</b></div>
+                <div class="bar"><span>Du</span><span class="track"><span class="fill" style="width: 50%; background: var(--p1)"></span></span><b>15 Min.</b></div>
+                <div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 Min.</b></div>
+                <div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 57%; background: var(--p3)"></span></span><b>17 Min.</b></div>
               </div>
             </div>
           </div>
@@ -116,7 +125,7 @@ const BETA_URL = "{{ site.beta_url }}";
     <ol class="steps">
       <li><h3>Alle hinzufügen</h3><p>Starte da, wo du bist, und füge Freunde hinzu oder lade sie per Link ein. Zu zweit oder als ganze Gruppe, alle mit ihrem eigenen Startpunkt.</p></li>
       <li><h3>Sag, wie alle hinkommen</h3><p>Eine läuft, einer nimmt die U-Bahn, eine fährt Rad. Jeder Weg wird so berechnet, wie die Person wirklich unterwegs ist.</p></li>
-      <li><h3>Wähl aus den fairsten Orten</h3><p>Bars, Cafés und Restaurants, bei denen die Fahrtzeiten aller am nächsten beieinanderliegen, stehen oben. Öffne die Route oder teile den Ort mit einem Tipp.</p></li>
+      <li><h3>Wähl aus den fairsten Orten</h3><p>Bars, Cafés und Restaurants, bei denen die Fahrzeiten aller am nächsten beieinanderliegen, stehen oben. Öffne die Route oder teile den Ort mit einem Tipp.</p></li>
     </ol>
   </section>
 
@@ -125,26 +134,26 @@ const BETA_URL = "{{ site.beta_url }}";
       <div class="copy">
         <p class="kicker">Fair heißt: gleiche Zeit</p>
         <h2 id="fair-title">Die Mitte der Karte ist selten der faire Ort.</h2>
-        <p>Ein Punkt auf halbem Weg zwischen zwei Adressen kann für den einen ein kurzer Spaziergang sein und für die andere eine lange Fahrt. Compromise vergleicht echte Fahrtzeiten, damit niemand den Abend unterwegs verbringt.</p>
+        <p>Ein Punkt auf halbem Weg zwischen zwei Adressen kann für den einen ein kurzer Spaziergang sein und für die andere eine lange Fahrt. Compromise vergleicht echte Fahrzeiten, damit niemand den Abend unterwegs verbringt.</p>
         <ul>
           <li>Zu Fuß, mit den Öffis, mit dem Auto oder mit dem Rad: alle auf ihre Art.</li>
           <li>Mit den Öffis siehst du, welche Linien du nehmen musst.</li>
           <li>Halte die Zeiten aller nah beieinander oder lass etwas Unterschied zu, damit die Wege insgesamt kürzer werden.</li>
-          <li>Leg eine maximale Fahrtzeit fest, damit niemand zu weit fahren muss.</li>
+          <li>Leg eine maximale Fahrzeit fest, damit niemand zu weit fahren muss.</li>
         </ul>
       </div>
       <div>
         <div class="panel compare" role="img" aria-label="Beispiel: Der Punkt auf halbem Weg auf der Karte bedeutet 35 Minuten für den einen und 12 für die andere; der Ort, den Compromise wählt, 18 und 22 Minuten.">
           <div class="compare-row">
             <div class="compare-title">Die Mitte auf der Karte <span>Beispiel</span></div>
-            <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 88%; background: var(--p2)"></span></span><b>35 min</b></div>
-            <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 30%; background: var(--p3)"></span></span><b>12 min</b></div>
+            <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 88%; background: var(--p2)"></span></span><b>35 Min.</b></div>
+            <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 30%; background: var(--p3)"></span></span><b>12 Min.</b></div>
             <p class="verdict bad">23 Minuten Unterschied</p>
           </div>
           <div class="compare-row">
             <div class="compare-title">Der Ort, den Compromise wählt</div>
-            <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 45%; background: var(--p2)"></span></span><b>18 min</b></div>
-            <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 55%; background: var(--p3)"></span></span><b>22 min</b></div>
+            <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 45%; background: var(--p2)"></span></span><b>18 Min.</b></div>
+            <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 55%; background: var(--p3)"></span></span><b>22 Min.</b></div>
             <p class="verdict good">4 Minuten Unterschied</p>
           </div>
         </div>
@@ -201,7 +210,7 @@ const BETA_URL = "{{ site.beta_url }}";
 <path d="M226 72c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--shade)" stroke="#fff" stroke-width="2"/><circle cx="226" cy="83" r="4" fill="#fff"/><path d="M104 68c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--sun)" stroke="#fff" stroke-width="2"/><circle cx="104" cy="79" r="4" fill="#fff"/><path d="M140 40c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--sun)" stroke="#fff" stroke-width="2"/><circle cx="140" cy="51" r="4" fill="#fff"/>
 <rect x="156" y="40" width="110" height="22" rx="11" fill="var(--surface)"/><circle cx="168" cy="51" r="4.5" fill="var(--sun)"/><text x="177" y="55" font-size="10.5" font-weight="650" fill="var(--fg)" font-family="-apple-system, Segoe UI, sans-serif">Sonne bis 18:40</text>
 </svg>
-<div class="spot"><div class="spot-head"><span class="rank r1">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 Min. Unterschied</span></div><div class="sun-cap">In der Sonne bis 18:40</div><div class="bars"><div class="bar"><span>Du</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 min</b></div><div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div><div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 min</b></div></div></div>
+<div class="spot"><div class="spot-head"><span class="rank r1">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 Min. Unterschied</span></div><div class="sun-cap">In der Sonne bis 18:40</div><div class="bars"><div class="bar"><span>Du</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 Min.</b></div><div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 Min.</b></div><div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 Min.</b></div></div></div>
 <div class="switch-row"><span>Sonnige Terrasse</span><span class="ios-switch" aria-hidden="true"></span></div>
 </div>
       </div>
@@ -216,11 +225,11 @@ const BETA_URL = "{{ site.beta_url }}";
     <div class="grid4">
       <div class="tile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
-        <h3>35 Arten von Orten</h3><p>Bars, Cafés und Restaurants, aber auch Kinos, Museen, Klettern, Parks oder Strände, dazu ein Stichwort für alles andere.</p>
+        <h3>35 Arten von Orten</h3><p>Bars, Cafés und Restaurants, aber auch Kinos, Museen, Kletterhallen, Parks oder Strände, dazu ein Stichwort für alles andere.</p>
       </div>
       <div class="tile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
-        <h3>Eine Farbe pro Person</h3><p>Die Fahrtzeit aller auf einer Skala, jede in ihrer eigenen Farbe, in der Liste und auf der Karte.</p>
+        <h3>Eine Farbe pro Person</h3><p>Die Fahrzeit aller auf einer Skala, jede in ihrer eigenen Farbe, in der Liste und auf der Karte.</p>
       </div>
       <div class="tile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
@@ -228,7 +237,7 @@ const BETA_URL = "{{ site.beta_url }}";
       </div>
       <div class="tile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
-        <h3>Für später planen</h3><p>Wähl, wann ihr losgeht: Fahrtzeiten und Sonne richten sich nach dieser Uhrzeit, nicht nur nach jetzt.</p>
+        <h3>Für später planen</h3><p>Wähl, wann ihr losgeht: Fahrzeiten und Sonne richten sich nach dieser Uhrzeit, nicht nur nach jetzt.</p>
       </div>
     </div>
   </section>

@@ -20,8 +20,14 @@ const BETA_URL = "{{ site.beta_url }}";
 })();
 {%- endif %}
 </script>
-<title>Compromise: where should we meet?</title>
-<meta name="description" content="Compromise finds the bar, café or restaurant everyone reaches in about the same time, on foot, by transit, by car or by bike. Invite friends with a link. In beta on iPhone.">
+<title>Compromise: meet in the middle, in minutes rather than miles</title>
+<meta name="description" content="Meet in the middle, in minutes rather than miles. Compromise finds the bar, café or restaurant everyone reaches in about the same time. On iPhone.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Compromise: meet in the middle, in minutes rather than miles">
+<meta property="og:description" content="Meet in the middle, in minutes rather than miles. Compromise finds the bar, café or restaurant everyone reaches in about the same time. On iPhone.">
+<meta property="og:url" content="https://compromise.alephb.uk/en/">
+<meta property="og:image" content="https://compromise.alephb.uk/apple-touch-icon.png">
+<meta name="twitter:card" content="summary">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://compromise.alephb.uk/en/">
 {% include hreflang.html %}
@@ -47,7 +53,7 @@ const BETA_URL = "{{ site.beta_url }}";
   <header class="hero">
     <div>
       <p class="kicker">For iPhone</p>
-      <h1>Meet halfway in minutes, not <span id="unit">miles</span>.</h1>
+      <h1>Meet in the middle, in minutes rather than <span id="unit">miles</span>.</h1>
       <script>
       // "miles" stays for the US, the UK, Liberia, Myanmar and a browser without a region; everyone else reads "kilometres".
       (function () {

@@ -53,15 +53,7 @@ const BETA_URL = "{{ site.beta_url }}";
   <header class="hero">
     <div>
       <p class="kicker">For iPhone</p>
-      <h1>Meet in the middle, in minutes rather than <span id="unit">miles</span>.</h1>
-      <script>
-      // "miles" stays for the US, the UK, Liberia, Myanmar and a browser without a region; everyone else reads "kilometres".
-      (function () {
-        var tag = (navigator.languages && navigator.languages[0]) || navigator.language || "";
-        var region = tag.split("-").slice(1).filter(function (p) { return /^[a-z]{2}$/i.test(p); }).pop();
-        if (region && ["US", "GB", "LR", "MM"].indexOf(region.toUpperCase()) < 0) document.getElementById("unit").textContent = "kilometres";
-      })();
-      </script>
+      <h1>Meet in the middle, in minutes rather than miles.</h1>
       <p class="lede">Compromise finds the bar, café or restaurant everyone reaches in about the same time, however each of you travels.</p>
       <div class="modes" aria-label="Ways to travel"><span class="mode">On foot</span><span class="mode">Transit</span><span class="mode">Car</span><span class="mode">Bike</span></div>
       <div class="cta">

@@ -125,7 +125,7 @@ get(STATUS).then(s=>{
         ['Blocks with terraces',fmt(su.terraceCells)],
         ['Buildings',bu.tiled==null?'':fmt(bu.passing)+' of '+fmt(bu.tiled)+' blocks have enough ('+pct(bu.share)+')'],
         ['Footprints with a height',pct(bu.withHeight)],['Heights',esc(bu.heights==='city'?'city feed':bu.heights||'')]]))
-      +sec('4 · Coverage',dl([['Extent',r.coverage?'<span class="tag '+(r.coverage==='whole'?'ok':'part')+'">'+r.coverage+'</span>':'none'],
+      +sec('4 · Coverage',dl([['Extent',r.coverage?'<span class="tag '+(r.coverage==='whole'?'ok':'part')+'">'+esc(r.coverage)+'</span>':'none'],
         ['Covered',cv.km2==null?'':km(cv.km2)+' km²'+(cv.cityKm2?' of '+km(cv.cityKm2)+' km² ('+pct(cv.share)+')':'')],
         ['Blocks tiled',fmt(cv.tiledCells)],['Inhabitants',fmt(r.population)],['Areas',(cv.areas||[]).map(esc).join(', ')]]))
       +sec('5 · Home',dl([['Streets',ho.streets?'built':'not yet'],['Outline',ho.outline?'municipal boundary':'none'],
@@ -143,12 +143,12 @@ get(STATUS).then(s=>{
   const cell=r=>{const d=r.d, cv=d.coverage||{}, go=d.goingOut||{}, ch=d.checks||{}, fr=d.freshness||{}, ho=d.home||{};
     const dist=(ch.districts||[]).length;
     return '<td class="code" title="'+esc(r.step)+'">'+esc(r.code)+'</td><td>'+(r.coverage?'<a href="coverage.html#'+encodeURIComponent(r.city)+'">'+esc(r.city)+'</a>':esc(r.city))+'</td><td class="hide">'+esc(r.country)+'</td>'
-      +'<td>'+(isCovered(r)?'<span class="tag '+(r.coverage==='whole'?'ok':'part')+'">'+r.coverage+'</span> <small>'+(cv.km2!=null?km(cv.km2)+' km²':'')+(cv.share!=null?' · '+pct(cv.share):'')+'</small>':'<span class="tag bad">not covered</span>')+'</td>'
+      +'<td>'+(isCovered(r)?'<span class="tag '+(r.coverage==='whole'?'ok':'part')+'">'+esc(r.coverage)+'</span> <small>'+(cv.km2!=null?km(cv.km2)+' km²':'')+(cv.share!=null?' · '+pct(cv.share):'')+'</small>':'<span class="tag bad">not covered</span>')+'</td>'
       +'<td class="n">'+(r.goingOut==null?'<small>not counted</small>':fmt(r.goingOut))+(go.share!=null?'<br><small>'+pct(go.share)+' sunny</small>':'')+'</td>'
       +'<td>'+(r.offered?'<span class="tag ok">offered</span>':'<span class="tag">not offered</span>')+'<br><small>'+esc(r.terraces==='permits'?'permits':r.terraces==='osm'?'OSM':r.terraces==='none'?'no terraces':'')+(r.heights?' · '+esc(r.heights==='city'?'city heights':r.heights+' heights'):'')+'</small></td>'
       +'<td><small>'+yes(r.streets,'streets')+'<br>'+yes(r.outline,'outline')+' · '+(r.listings?fmt((ho.sites||[]).length||'')+' sites':'<span class="dim">no sites</span>')+'</small></td>'
       +'<td class="n">'+(r.transit==='none'?'<small>N/A</small>':r.transit==null?'<small>–</small>':fmt(r.transit))+'</td>'
-      +'<td>'+(r.check?'<span class="tag '+(r.check==='pass'?'ok':r.check==='failed'?'bad':'part')+'">'+esc(r.check)+'</span><br><small>'+esc(day(r.checkDate))+(ch.mode?' · '+esc(ch.mode):'')+(dist?' · '+(r.districtsOffered||0)+'/'+dist+' dist.':'')+'</small>':'<small>not run</small>')+'</td>'
+      +'<td>'+(r.check?'<span class="tag '+(r.check==='pass'?'ok':r.check==='failed'?'bad':'part')+'">'+esc(r.check)+'</span><br><small>'+esc(day(r.checkDate))+(ch.mode?' · '+esc(ch.mode):'')+(dist?' · '+fmt(r.districtsOffered||0)+'/'+dist+' dist.':'')+'</small>':'<small>not run</small>')+'</td>'
       +'<td><small>'+esc(day(r.built))+'</small>'+(r.isStale?' <span class="tag part" title="'+esc(fr.stale.join(', '))+'">stale</span>':'')+'</td>'
       +'<td>'+(r.nIssues?'<span class="tag'+(r.offered?'':' bad')+'" title="'+esc((d.issues||[]).join('\n'))+'">'+r.nIssues+'</span>':'')+'</td>';};
   let sortKey='code', asc=true; const open=new Set();

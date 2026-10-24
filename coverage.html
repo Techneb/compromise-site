@@ -5,8 +5,8 @@ layout: null
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
 <title>Compromise coverage</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
 :root{--bg:#fbfcfc;--fg:#1d2a2d;--muted:#5b6b6f;--line:#dde3e4;--accent:#368B9C;--panel:#fff}
 @media (prefers-color-scheme:dark){:root{--bg:#15191a;--fg:#e6ecec;--muted:#9aa8ab;--line:#2b3336;--accent:#16B9DB;--panel:#1c2224;color-scheme:dark}}
@@ -109,13 +109,13 @@ get(TILES+'areas.json').then(d=>Object.assign(d,{slim:true,cells:[],venueCells:[
   const nameOf=async(lat,lon)=>{const k=lat.toFixed(3)+','+lon.toFixed(3);if(named.has(k))return named.get(k);
     try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat='+lat+'&lon='+lon,{headers:{'Accept-Language':'en'}});const j=await r.json();const a=j.address||{};
       const n=[a.neighbourhood||a.quarter||a.suburb||a.road||a.hamlet,a.city||a.town||a.village||a.municipality].filter(Boolean).join(', ')||j.name||'';named.set(k,n);return n;}catch(e){return '';}};
-  const dl=rows=>'<dl>'+rows.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('')+'</dl>';
+  const dl=rows=>'<dl>'+rows.map(([k,v])=>'<dt>'+k+'</dt><dd>'+esc(v)+'</dd>').join('')+'</dl>';
   const blockPopup=c=>{const n=near(c[0],c[1]);const pct=c[3]?Math.round(100*c[4]/c[3])+' %':'–';
-    return '<h3 class="nm">Block '+c[0]+','+c[1]+'</h3><small class="sub">200 m square</small>'
+    return '<h3 class="nm">Block '+esc(c[0]+','+c[1])+'</h3><small class="sub">200 m square</small>'
       +'<h4>Places</h4>'+dl((c.length>9&&counted(c)?[['in this block',c[8]],['with outdoor seating',c[8]?c[9]+' ('+Math.round(100*c[9]/c[8])+' %)':'0']]:[]).concat([['within ~600 m (estimate)',n===null?'no venue tile':Math.round(n)]]))
       +'<h4>Sunny filter</h4>'+dl([['works here',works(c)?'yes':'no, too few buildings'],['judges',works(c)?(known(c)?'the terrace itself':'the sunny side of the street'):'–'],['terrace records',c[2]],['buildings',c[3]],['heights measured',pct]])
-      +'<h4>Data</h4>'+dl([['terraces built',day(c[5])||'–'],['buildings built',day(c[6])||'–']].concat(c[7]?[['commune',esc(c[7].split(' ').map(k=>(d.communes||{})[k]||k).join(', '))]]:[]));};
-  const tilePopup=w=>'<h3 class="nm">Venue tile '+w[0]+','+w[1]+'</h3><small class="sub">2 km square</small><h4>Places on record (OpenStreetMap)</h4>'+dl([['bars, cafés, restaurants',w[2]],['with outdoor seating',w[3]]])+'<h4>Data</h4>'+dl([['built',day(w[4])||'–']]);
+      +'<h4>Data</h4>'+dl([['terraces built',day(c[5])||'–'],['buildings built',day(c[6])||'–']].concat(c[7]?[['commune',c[7].split(' ').map(k=>(d.communes||{})[k]||k).join(', ')]]:[]));};
+  const tilePopup=w=>'<h3 class="nm">Venue tile '+esc(w[0]+','+w[1])+'</h3><small class="sub">2 km square</small><h4>Places on record (OpenStreetMap)</h4>'+dl([['bars, cafés, restaurants',w[2]],['with outdoor seating',w[3]]])+'<h4>Data</h4>'+dl([['built',day(w[4])||'–']]);
   const withName=(layer,lat,lon)=>layer.on('popupopen',async e=>{const el=e.popup.getElement();const n=await nameOf(lat,lon);if(n&&el){const h=el.querySelector('.nm'),s=el.querySelector('.sub');if(h){s.textContent=h.textContent+' · '+s.textContent;h.textContent=n;}}});
 
   const groups={}, drawn={}, chunks=d.slim?[]:[d.cells];

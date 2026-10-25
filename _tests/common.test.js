@@ -109,6 +109,8 @@ for (const f of walk(".")) {
   const texts = [...page.matchAll(/>([^<]+)</g)].map((m) => m[1])
     .concat([...page.matchAll(/\s(?:alt|content|title|aria-label|placeholder)="([^"]*)"/g)].map((m) => m[1]));
   for (const t of texts) assert.ok(!straight.test(t), f + ": " + t.trim().slice(0, 80));
+  // French (owner, 2026-10-25): a non-breaking space before ; : ! ? and » and after «, never a plain one or none.
+  if (f.startsWith("fr" + path.sep)) for (const t of texts) assert.ok(!/ [;:!?»]|« |[\p{L}\d][;!?»]|«[^\s]/u.test(t), f + ": " + t.trim().slice(0, 80));
 }
 // Fonts are self-hosted: no landing page or its stylesheet calls Google, and every font the CSS names is in /fonts/.
 for (const f of ["_includes/landing-en.html", "fr/index.html", "es/index.html", "de/index.html", "landing.css"]) {

@@ -45,17 +45,17 @@ details.legend dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12p
 </style><link rel="icon" type="image/png" href="logo.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"></head><body><main>
 <nav><a href="coverage.html">Map</a><a class="on" aria-current="page" href="cities.html">Cities</a><a href="overview.html">Overview</a></nav>
 <h1>City coverage</h1>
-<p>No new cities for now: the covered ones are being completed, in this order: <b>4</b> the whole city, not only its core → <b>5</b> Home's streets and listing links → <b>6</b> transit lines → <b>7</b> the checks on screen. Each city's code is the first step it has not done. Tap a stage to show only its cities, a row for everything on record about it.</p>
+<p>No new cities for now: the covered ones are being completed, in this order: <b>4</b> the whole city, not only its core → <b>5</b> Home’s streets and listing links → <b>6</b> transit lines → <b>7</b> the checks on screen. Each city’s code is the first step it has not done. Tap a stage to show only its cities, a row for everything on record about it.</p>
 <p id="status">Loading…</p>
 <div class="stages" id="stages"></div>
 <details class="legend"><summary>How to read it</summary><dl>
 <dt>Code</dt><dd>The first step of the ladder (below) the city has not done; <em>done</em> when every step that applies is.</dd>
-<dt>Coverage</dt><dd><span class="tag ok">whole</span> the whole municipality; <span class="tag part">core</span> the part where people go out; <span class="tag bad">not covered</span> at stage 3 with no tiles offered yet. The km² where the sunny filter works, and their share of the city's surface.</dd>
+<dt>Coverage</dt><dd><span class="tag ok">whole</span> the whole municipality; <span class="tag part">core</span> the part where people go out; <span class="tag bad">not covered</span> at stage 3 with no tiles offered yet. The km² where the sunny filter works, and their share of the city’s surface.</dd>
 <dt>Going-out</dt><dd>Blocks of about 200 m with at least 10 bars, cafés and restaurants within 400 m; the share is the part where the sunny filter works.</dd>
 <dt>Sun data</dt><dd>Where outdoor seating comes from (a city permit feed or OpenStreetMap), and whether the sunny filter is offered.</dd>
 <dt>Home</dt><dd>Streets built, the municipal outline, and the listing sites linked for its country.</dd>
 <dt>Transit</dt><dd>Transit lines built where it lies; N/A for a city with no network.</dd>
-<dt>Check</dt><dd>The last check on screen at the city's seed, its date and mode, and how many districts were checked.</dd>
+<dt>Check</dt><dd>The last check on screen at the city’s seed, its date and mode, and how many districts were checked.</dd>
 <dt>Data</dt><dd>The newest build date of its tiles; <span class="tag part">stale</span> when a layer is older than its rebuild cycle (weekly for venues and terraces, yearly for buildings and streets).</dd>
 <dt>⚑</dt><dd>Open issues; the detail row lists them.</dd>
 </dl>
@@ -137,7 +137,7 @@ get(STATUS).then(s=>{
         ['',(ch.districts||[]).map(x=>esc(x.name)+(x.offered?'':' <small>(not offered)</small>')).join(', ')],
         ['Data',ch.cacheNote?esc(ch.cacheNote):'']]))
       +sec('Data freshness',layers.length?'<table><thead><tr><th>Layer</th><th class="n">Tiles</th><th>Built</th><th></th></tr></thead><tbody>'
-        +layers.map(([l,v])=>'<tr><td>'+esc(l)+(v.by?' <small>('+esc(v.by)+'\'s)</small>':'')+'</td><td class="n">'+fmt(v.tiles)+'</td><td>'+(v.newest?(v.oldest&&v.oldest!==v.newest?esc(v.oldest)+' – ':'')+esc(v.newest):'<small>not recorded</small>')+'</td><td>'+(v.stale?'<span class="tag part">stale</span>':'')+'</td></tr>').join('')
+        +layers.map(([l,v])=>'<tr><td>'+esc(l)+(v.by?' <small>('+esc(v.by)+'’s)</small>':'')+'</td><td class="n">'+fmt(v.tiles)+'</td><td>'+(v.newest?(v.oldest&&v.oldest!==v.newest?esc(v.oldest)+' – ':'')+esc(v.newest):'<small>not recorded</small>')+'</td><td>'+(v.stale?'<span class="tag part">stale</span>':'')+'</td></tr>').join('')
         +'</tbody></table>':'<span class="dim">No tiles.</span>',true)
       +'</div>';};
   const cell=r=>{const d=r.d, cv=d.coverage||{}, go=d.goingOut||{}, ch=d.checks||{}, fr=d.freshness||{}, ho=d.home||{};

@@ -10,16 +10,16 @@ layout: null
 <meta name="color-scheme" content="light dark">
 <meta name="robots" content="noindex">
 <meta name="referrer" content="no-referrer">
-<meta name="description" content="Add your start in 10 seconds. Compromise finds the spot that's fair for everyone.">
+<meta name="description" content="Add your start in 10 seconds. Compromise finds the spot that’s fair for everyone.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Compromise">
 <meta property="og:title" content="Where are you starting from?">
-<meta property="og:description" content="Add your start in 10 seconds. Compromise finds the spot that's fair for everyone.">
+<meta property="og:description" content="Add your start in 10 seconds. Compromise finds the spot that’s fair for everyone.">
 <meta property="og:url" content="https://compromise.alephb.uk/join/">
 <meta property="og:image" content="https://compromise.alephb.uk/img/og-card-join.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Two friends' starts on a map and a third being added, on Compromise.">
+<meta property="og:image:alt" content="Two friends’ starts on a map and a third being added, on Compromise.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="apple-itunes-app" content="app-id=6821360989, app-clip-bundle-id=uk.alephb.compromise.Clip, app-clip-display=card">
 <style>
@@ -112,7 +112,7 @@ footer a { color: var(--muted); }
       <header>
         <p class="kicker">Invitation</p>
         <h1 id="title"></h1>
-        <p class="lede">Say where you're starting from and how you'll get there, then send the link back.</p>
+        <p class="lede">Say where you’re starting from and how you’ll get there, then send the link back.</p>
       </header>
 
       <fieldset>
@@ -154,11 +154,11 @@ footer a { color: var(--muted); }
     </form>
 
     <div id="reply" class="note" hidden>
-      <h1>This link is meant for the organiser's Compromise app.</h1>
+      <h1>This link is meant for the organiser’s Compromise app.</h1>
     </div>
 
     <div id="refused" class="note" hidden>
-      <h1>This link can't be read.</h1>
+      <h1>This link can’t be read.</h1>
     </div>
 
     <noscript><div class="note"><h1>This page needs JavaScript to read the link.</h1></div></noscript>
@@ -220,7 +220,7 @@ footer a { color: var(--muted); }
   function locate() {
     addressField.hidden = true;
     point = null;
-    if (!navigator.geolocation) { useAddress("Your location isn't available here. Type an address instead."); return; }
+    if (!navigator.geolocation) { useAddress("Your location isn’t available here. Type an address instead."); return; }
     var attempt = ++locating;
     status.textContent = "Finding your location…";
     navigator.geolocation.getCurrentPosition(function (position) {
@@ -236,7 +236,7 @@ footer a { color: var(--muted); }
         : "Location found, approximate (" + within(accuracy) + ").";
     }, function () {
       if (attempt !== locating || form.elements.start.value !== "here") return;
-      useAddress("Your location isn't available. Type an address instead.");
+      useAddress("Your location isn’t available. Type an address instead.");
       address.focus();
     }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
   }
@@ -295,12 +295,12 @@ footer a { color: var(--muted); }
       error.textContent = "Choose a starting point.";
       return;
     }
-    if (!mode) { error.textContent = "Choose how you'll get there."; return; }
+    if (!mode) { error.textContent = "Choose how you’ll get there."; return; }
     var url;
     try {
       url = GroupLink.writeReply({ name: document.getElementById("name").value, mode: mode, start: start });
     } catch (e) {
-      error.textContent = "This can't be sent. Try writing the address differently.";
+      error.textContent = "This can’t be sent. Try writing the address differently.";
       return;
     }
     if (navigator.share) {

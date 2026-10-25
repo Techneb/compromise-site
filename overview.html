@@ -46,7 +46,7 @@ a{color:var(--accent)}small{color:var(--muted)}
 </details>
 
 <details id="sec-countries" open><summary><h2>Countries</h2></summary>
-<p><small>* counted in a 24 km square around the city's centre.</small></p>
+<p><small>* counted in a 24 km square around the city’s centre.</small></p>
 <div class="scroll"><table><thead><tr>
 <th data-k="country"><button type="button" class="btn">Country</button></th><th data-k="covered" class="n"><button type="button" class="btn"><span class="long">Cities covered</span><span class="short">Covered</span></button></th><th data-k="all" class="n"><button type="button" class="btn"><span class="long">Cities in the database</span><span class="short">Listed</span></button></th><th class="hide">Top 3 by going-out blocks</th><th data-k="population" class="n"><button type="button" class="btn"><span class="long">Population covered</span><span class="short">Population</span></button></th><th data-k="streets" class="n"><button type="button" class="btn"><span class="long">Cities with streets</span><span class="short">Streets</span></button></th><th data-k="transit" class="n"><button type="button" class="btn"><span class="long">Cities with transit lines</span><span class="short">Transit</span></button></th>
 </tr></thead><tbody id="countries"></tbody></table></div>
@@ -109,12 +109,12 @@ Promise.all([status,coverage,counts]).then(([s,feed,cnts])=>{
   // Each row opens on its denominator, the base of the row's percentages (the two block KPIs excepted: their tooltips name their own base).
   const base=(n,label,tip)=>kpi(fmt(n),label,null,tip);
   const groups=[
-    ['Depth',[base(covered.length,'covered cities',more3+' · base of this row\'s percentages (the two block figures excepted)'),part(whole,'whole city',ofCov(whole)),part(covered.length-whole,'core only',ofCov(covered.length-whole)),
+    ['Depth',[base(covered.length,'covered cities',more3+' · base of this row’s percentages (the two block figures excepted)'),part(whole,'whole city',ofCov(whole)),part(covered.length-whole,'core only',ofCov(covered.length-whole)),
       part(streets,'cities with streets',ofCov(streets)),part(transit,'cities with transit lines',ofCov(transit)),
       part(passing,'blocks where the sunny filter works',of(passing,sum('tiled'),'blocks with data (not covered cities)')),
       part(known,'blocks with terrace records',of(known,passing,'blocks where the filter works (not covered cities)'))]],
     // Health (2026-10-15): the status feed's detail (cities_status.py), over the covered cities.
-    ['Health',[base(covered.length,'covered cities',more3+' · base of this row\'s percentages (the going-out blocks excepted)'),part(offered,'sunny filter offered',ofCov(offered)),
+    ['Health',[base(covered.length,'covered cities',more3+' · base of this row’s percentages (the going-out blocks excepted)'),part(offered,'sunny filter offered',ofCov(offered)),
       part(passed,'seed check passed',ofCov(passed)),part(districts,'with a district checked',ofCov(districts)),
       part(withIssues,'with open issues',ofCov(withIssues)),part(stale,'with stale data',ofCov(stale)),
       part(goCovered,'going-out blocks where the sunny filter works',of(goCovered,goTiled,'going-out blocks in the tiles'))]],

@@ -92,6 +92,24 @@ const odd = C.whyGroups(sample.concat({ status: "brand new" }).map(withCode));
 assert.strictEqual(odd.unmapped.length, 1); assert.strictEqual(odd.sum, odd.total - 1);
 assert.deepStrictEqual(C.whyGroups(sample.map(withCode)).groups.map((g) => g.code + " " + g.status + (g.parked ? " P" : "")),
   ["1.1 candidate", "1.3 not surveyed", "2.4 to measure", "3.1 found, to wire", "3.1 found, to wire P", "3.6 measured, not offered"]);
+// Apostrophes (owner, 2026-10-25): visible text, and the copy scripts write into a page, use the typographic ’, never '.
+const walk = (d) => fs.readdirSync(path.join(root, d), { withFileTypes: true }).flatMap((e) => e.name.startsWith(".") || ["_site", "_tests", "node_modules"].includes(e.name) ? []
+  : e.isDirectory() ? walk(path.join(d, e.name)) : /\.(html|js)$/.test(e.name) ? [path.join(d, e.name)] : []);
+const noComments = (js) => js.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "");
+const straight = /\p{L}'\p{L}/u;
+for (const f of walk(".")) {
+  const src = fs.readFileSync(path.join(root, f), "utf8");
+  const scripts = f.endsWith(".js") ? [src] : [...src.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+  for (const js of scripts.map(noComments)) {
+    assert.ok(!/\\'/.test(js), f + ": an escaped ' in a script string");
+    for (const [str] of js.matchAll(/"[^"\n]*"|`[^`]*`/g)) assert.ok(!straight.test(str), f + ": " + str);
+  }
+  if (f.endsWith(".js")) continue;
+  const page = src.replace(/\{%-?\s*comment\s*-?%\}[\s\S]*?\{%-?\s*endcomment\s*-?%\}|<!--[\s\S]*?-->|<(script|style)[^>]*>[\s\S]*?<\/\1>/g, "");
+  const texts = [...page.matchAll(/>([^<]+)</g)].map((m) => m[1])
+    .concat([...page.matchAll(/\s(?:alt|content|title|aria-label|placeholder)="([^"]*)"/g)].map((m) => m[1]));
+  for (const t of texts) assert.ok(!straight.test(t), f + ": " + t.trim().slice(0, 80));
+}
 // Fonts are self-hosted: no landing page or its stylesheet calls Google, and every font the CSS names is in /fonts/.
 for (const f of ["_includes/landing-en.html", "fr/index.html", "es/index.html", "de/index.html", "landing.css"]) {
   const src = fs.readFileSync(path.join(root, f), "utf8");

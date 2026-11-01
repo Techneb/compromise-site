@@ -11,4 +11,4 @@ jobs:
         with:
           node-version: 22
       - run: node _tests/grouplink.test.js
-      - run: node _tests/common.test.js
+      - run: node _tests/site.test.js

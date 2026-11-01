@@ -1,4 +1,4 @@
-// node _tests/site.test.js — the site's pages: cache-busted local files, self-hosted fonts, SRI on outside scripts.
+// node _tests/site.test.js — the site’s pages: cache-busted local files, self-hosted fonts, SRI on outside scripts, typography.
 const assert = require("assert"), fs = require("fs"), path = require("path");
 const root = path.join(__dirname, "..");
 
@@ -24,5 +24,25 @@ for (const f of pages("")) for (const [tag] of fs.readFileSync(path.join(root, f
   const u = (/\b(?:src|href)="((?:https?:)?\/\/[^"]+)"/.exec(tag) || [])[1];
   if (!u || /fonts\.googleapis\.com/.test(u) || (tag.startsWith("<link") && !/rel="stylesheet"/.test(tag))) continue;
   assert.ok(/\bintegrity="sha(256|384|512)-[\w+/=]+"/.test(tag) && /\bcrossorigin=/.test(tag), f + ": no integrity on " + u);
+}
+// Apostrophes (owner, 2026-10-25): visible text, and the copy scripts write into a page, use the typographic ’, never '.
+const walk = (d) => fs.readdirSync(path.join(root, d), { withFileTypes: true }).flatMap((e) => e.name.startsWith(".") || ["_site", "_tests", "node_modules"].includes(e.name) ? []
+  : e.isDirectory() ? walk(path.join(d, e.name)) : /\.(html|js)$/.test(e.name) ? [path.join(d, e.name)] : []);
+const noComments = (js) => js.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "");
+const straight = /\p{L}'\p{L}/u;
+for (const f of walk(".")) {
+  const src = fs.readFileSync(path.join(root, f), "utf8");
+  const scripts = f.endsWith(".js") ? [src] : [...src.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+  for (const js of scripts.map(noComments)) {
+    assert.ok(!/\\'/.test(js), f + ": an escaped ' in a script string");
+    for (const [str] of js.matchAll(/"[^"\n]*"|`[^`]*`/g)) assert.ok(!straight.test(str), f + ": " + str);
+  }
+  if (f.endsWith(".js")) continue;
+  const page = src.replace(/\{%-?\s*comment\s*-?%\}[\s\S]*?\{%-?\s*endcomment\s*-?%\}|<!--[\s\S]*?-->|<(script|style)[^>]*>[\s\S]*?<\/\1>/g, "");
+  const texts = [...page.matchAll(/>([^<]+)</g)].map((m) => m[1])
+    .concat([...page.matchAll(/\s(?:alt|content|title|aria-label|placeholder)="([^"]*)"/g)].map((m) => m[1]));
+  for (const t of texts) assert.ok(!straight.test(t), f + ": " + t.trim().slice(0, 80));
+  // French (owner, 2026-10-25): a non-breaking space before ; : ! ? and » and after «, never a plain one or none.
+  if (f.startsWith("fr" + path.sep)) for (const t of texts) assert.ok(!/ [;:!?»]|« |[\p{L}\d][;!?»]|«[^\s]/u.test(t), f + ": " + t.trim().slice(0, 80));
 }
 console.log("ok");

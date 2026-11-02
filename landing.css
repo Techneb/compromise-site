@@ -143,6 +143,8 @@ section + section { border-top: 1px solid var(--hair); }
 .feature ul { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
 .feature li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 16px; }
 .feature li::before { content: ""; width: 10px; height: 10px; margin-top: 8px; border-radius: 50%; background: var(--p1); }
+/* Sunny terraces: a sun instead of the dot, in the dot’s slot. */
+section[aria-labelledby="sun-title"] .feature li::before { content: "\2600\FE0F"; width: auto; height: auto; margin-top: 0; border-radius: 0; background: none; font-size: 14px; line-height: inherit; }
 .panel { background: var(--surface); border-radius: 24px; padding: 28px; }
 .panel svg { display: block; width: 100%; height: auto; }
 
@@ -213,6 +215,9 @@ footer .links { display: flex; flex-wrap: wrap; gap: 20px; }
 footer a { color: var(--muted); }
 /* AlephB’s monogram after its name, in the link’s colour (a mask, so it follows light and dark). */
 .alephb { display: inline-flex; align-items: center; gap: 5px; }
+/* AlephB and the email in the brand blue, underlined on hover. */
+footer a.alephb, footer a[href^="mailto:"] { color: var(--tint); text-decoration: none; }
+footer a.alephb:hover, footer a[href^="mailto:"]:hover { text-decoration: underline; }
 .alephb-logo { width: 27px; height: 15px; background: currentColor; -webkit-mask: url(/img/alephb.svg) center / contain no-repeat; mask: url(/img/alephb.svg) center / contain no-repeat; }
 .email { user-select: all; color: var(--fg); }
 

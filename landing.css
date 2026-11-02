@@ -224,12 +224,12 @@ section[aria-labelledby="sun-title"] .feature li::before { content: "\2600\FE0F"
 footer { padding-block: 40px 56px; border-top: 1px solid var(--hair); display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; font-size: 15px; color: var(--muted); }
 footer .links { display: flex; flex-wrap: wrap; gap: 20px; }
 footer a { color: var(--muted); }
-/* AlephB’s monogram after its name, in the brand blue (a mask), sitting on the text’s baseline at cap height. */
+/* AlephB’s monogram after its name, in the footer’s grey (a mask), sitting on the text’s baseline at cap height. */
 .alephb { white-space: nowrap; }
 /* AlephB and the email in the brand blue, underlined on hover. */
 footer a.alephb, footer a[href^="mailto:"] { color: var(--tint); text-decoration: none; }
 footer a.alephb:hover, footer a[href^="mailto:"]:hover { text-decoration: underline; }
-.alephb-logo { display: inline-block; height: 0.7em; width: 1.27em; margin-left: 0.3em; vertical-align: baseline; background-color: var(--tint); -webkit-mask-image: url(/img/alephb.svg); mask-image: url(/img/alephb.svg); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: left bottom; mask-position: left bottom; }
+.alephb-logo { display: inline-block; height: 0.7em; width: 1.27em; margin-left: 0.3em; vertical-align: baseline; background-color: var(--muted); -webkit-mask-image: url(/img/alephb.svg); mask-image: url(/img/alephb.svg); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: left bottom; mask-position: left bottom; }
 .email { user-select: all; color: var(--fg); }
 
 @media (max-width: 860px) {

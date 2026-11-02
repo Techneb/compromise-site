@@ -179,8 +179,11 @@ layout: null
         </ul>
       </div>
       <div class="visual" id="shot-group">
-        <!-- Screenshot slot: img/de/group.jpg, 620 × 1348 (the App Clip form) -->
-        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/group.jpg" width="620" height="1348" alt="Das Formular, das Freunde über den Einladungslink sehen, ohne die App" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
+        <!-- Screenshot slots: img/de/group-live.jpg, 620 × 1182 (the app, cropped), and img/de/group.jpg, 620 × 1348 (the App Clip form, shown to the same height) -->
+        <div class="phones">
+          <figure><figcaption>Mit der App</figcaption><div class="phone"><div class="screen short"><div class="island"></div><img class="shot" src="/img/de/group-live.jpg" width="620" height="1182" alt="Die App mit einer über iCloud synchronisierten Gruppe, vier Personen und dem ersten Treffpunkt" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div></figure>
+          <figure><figcaption>Ohne die App</figcaption><div class="phone"><div class="screen short"><div class="island"></div><img class="shot" src="/img/de/group.jpg" width="620" height="1348" alt="Das Formular, das Freunde über den Einladungslink sehen, ohne die App" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div></figure>
+        </div>
         <div class="panel group" role="img" aria-label="Illustration: ein Einladungslink an eine Gruppe; Nino ist mit der App beigetreten, Léa hat über den Link geantwortet.">
           <div class="invite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Freitagsbier · Einladungslink</span></div>
           <div class="member"><i style="background: var(--p1)"></i><span><b>Du</b> · <svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>zu Fuß</span><small>Organisiert</small></div>

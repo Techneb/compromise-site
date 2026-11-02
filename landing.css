@@ -78,7 +78,7 @@ nav .links .globe a:hover { background: var(--bg); }
 .island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 92px; height: 26px; border-radius: 20px; background: #0E1A1D; z-index: 3; }
 /* An app screenshot covers the illustration once img/<lang>/<name>.png exists; until then the img removes itself. */
 .screen img.shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; }
-.visual:not(.has-shot) > .phone, .visual.has-shot > .panel { display: none; }
+.visual:not(.has-shot) > .phone, .visual:not(.has-shot) > .phones, .visual.has-shot > .panel { display: none; }
 /* The selected sun button in the sunny-terrace screenshot, ringed as in the principle video; placed in % of the screen so it stays on the button. */
 .sun-ring { position: absolute; z-index: 3; left: 80.7%; top: 10.25%; width: 13%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; border: 3px solid var(--sun); background: color-mix(in srgb, var(--sun) 16%, transparent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--sun) 22%, transparent), 0 0 18px 4px color-mix(in srgb, var(--sun) 45%, transparent); pointer-events: none; }
 /* Hero: the iPhone by default, the iPad behind the iPhone | iPad switch (shown by its script). Both sit in one grid cell, so the column keeps the taller one's height and nothing jumps. */
@@ -175,6 +175,14 @@ section[aria-labelledby="sun-title"] .feature li::before { content: "\2600\FE0F"
 .member small { font-size: 13px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
 .member small.live { color: var(--tint); font-weight: 600; }
 .beta-tag { display: inline-block; margin-left: 8px; padding: 3px 8px; border-radius: 999px; font: 700 11px/1.2 var(--font); letter-spacing: 0.06em; vertical-align: middle; background: color-mix(in srgb, var(--p2) 16%, transparent); color: var(--p2); }
+/* Groups: the app and the App Clip form side by side, same height (both screens cut at the bottom), stacked when either would be under 140 px. */
+.phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 24px 20px; max-width: 560px; margin-inline: auto; }
+.phones figure { margin: 0; display: grid; gap: 10px; }
+.phones figcaption { font-size: 15px; font-weight: 650; color: var(--muted); text-align: center; }
+.phones .phone { border-radius: 34px; padding: 8px; }
+.phones .screen.short { aspect-ratio: 620 / 1182; border-radius: 27px; }
+.phones .screen img.shot { object-position: top; }
+.phones .island { top: 6px; width: 30%; height: auto; aspect-ratio: 92 / 26; }
 
 .join { background: var(--surface); border-radius: 28px; padding: clamp(28px, 5vw, 56px); display: grid; gap: 14px; justify-items: start; }
 .join .cta { margin-top: 8px; }

@@ -190,8 +190,11 @@
         </ul>
       </div>
       <div class="visual" id="shot-group">
-        <!-- Screenshot slot: img/en/group.jpg, 620 × 1348 (the App Clip form) -->
-        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/group.jpg" width="620" height="1348" alt="The form a friend sees from the invite link, without the app" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
+        <!-- Screenshot slots: img/en/group-live.jpg, 620 × 1182 (the app, cropped), and img/en/group.jpg, 620 × 1348 (the App Clip form, shown to the same height) -->
+        <div class="phones">
+          <figure><figcaption>With the app</figcaption><div class="phone"><div class="screen short"><div class="island"></div><img class="shot" src="/img/en/group-live.jpg" width="620" height="1182" alt="The app with a group synced through iCloud, four people and the first spot" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div></figure>
+          <figure><figcaption>Without the app</figcaption><div class="phone"><div class="screen short"><div class="island"></div><img class="shot" src="/img/en/group.jpg" width="620" height="1348" alt="The form a friend sees from the invite link, without the app" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div></figure>
+        </div>
         <div class="panel group" role="img" aria-label="Illustration: an invite link sent to a group; Nino joined with the app, Léa answered from the link.">
           <div class="invite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Friday drinks · invite link</span></div>
           <div class="member"><i style="background: var(--p1)"></i><span><b>You</b> · <svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>walk</span><small>Organiser</small></div>

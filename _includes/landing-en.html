@@ -37,6 +37,13 @@
 <link rel="icon" type="image/png" href="/logo.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- Travel-mode icons, drawn to match the app's SF Symbols (figure.walk, tram.fill, car.fill, bicycle). -->
+  <symbol id="m-walk" viewBox="0 0 24 24"><circle cx="13.5" cy="4" r="2.2" fill="currentColor"/><path d="M13 8.5 10.5 14l3 3v5M10.5 14 8.5 22M12.8 9l3 3.5 3 1M12.2 8.8 8.5 10.5 7.5 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="m-transit" viewBox="0 0 24 24"><path d="M8 2.5h8M12 2.5V5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path fill="currentColor" fill-rule="evenodd" d="M8 5h8a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm-.5 3.5v4h9v-4Zm1.5 6.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm6 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z"/><path d="m8.5 19.5-1.5 2.5M15.5 19.5l1.5 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="m-car" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M7.6 4h8.8a2 2 0 0 1 1.9 1.4L19.7 10H20a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-1v1.5a1.5 1.5 0 0 1-3 0V18H7v1.5a1.5 1.5 0 0 1-3 0V18H3a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h.3l1.4-4.6A2 2 0 0 1 7.6 4Zm.2 2-1.2 4h10.8l-1.2-4ZM6 12.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm12 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></symbol>
+  <symbol id="m-bike" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="16" r="3.8"/><circle cx="18.5" cy="16" r="3.8"/><path d="M5.5 16 9 9h7l2.5 7M9 9l3.5 7h-7M12.5 16 16 9M8 6.5h3M15 6.5h2l-1 2.5"/></g></symbol>
+</svg>
 <div class="wrap">
   <nav aria-label="Main">
     <a class="brand" href="{{ page.url }}">
@@ -55,7 +62,7 @@
     <div>
       <h1>Meet halfway in minutes, not miles.</h1>
       <p class="lede">Compromise finds the bar, café or restaurant everyone reaches in about the same time, however each of you travels.</p>
-      <div class="modes" aria-label="Ways to travel"><span class="mode">On foot</span><span class="mode">Transit</span><span class="mode">Car</span><span class="mode">Bike</span></div>
+      <div class="modes" aria-label="Ways to travel"><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>On foot</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-transit"/></svg>Transit</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-car"/></svg>Car</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>Bike</span></div>
       <div class="cta">
         <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
         <a class="store" href="{{ site.beta_url }}"><img src="/img/app-store-badge-en.svg" alt="Download on the App Store" width="150" height="50"></a>
@@ -94,9 +101,9 @@
           <div class="sheet" aria-hidden="true">
             <div class="grabber"></div>
             <div class="chips">
-              <span class="chip"><i style="background: var(--p1)"></i>You · walk</span>
-              <span class="chip"><i style="background: var(--p2)"></i>Nino · transit</span>
-              <span class="chip"><i style="background: var(--p3)"></i>Léa · bike</span>
+              <span class="chip"><i style="background: var(--p1)"></i>You · <svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>walk</span>
+              <span class="chip"><i style="background: var(--p2)"></i>Nino · <svg class="ico" aria-hidden="true"><use href="#m-transit"/></svg>transit</span>
+              <span class="chip"><i style="background: var(--p3)"></i>Léa · <svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>bike</span>
             </div>
             <div class="spot">
               <div class="spot-head"><span class="rank">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 min apart</span></div>
@@ -184,9 +191,9 @@
         <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/group.png" alt="A group in Compromise: everyone who joined, with their way of travelling" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
         <div class="panel group" role="img" aria-label="Illustration: an invite link sent to a group; Nino joined with the app, Léa answered from the link.">
           <div class="invite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Friday drinks · invite link</span></div>
-          <div class="member"><i style="background: var(--p1)"></i><span><b>You</b> · walk</span><small>Organiser</small></div>
-          <div class="member"><i style="background: var(--p2)"></i><span><b>Nino</b> · transit</span><small class="live">Joined · live</small></div>
-          <div class="member"><i style="background: var(--p3)"></i><span><b>Léa</b> · bike</span><small>Answered from the link</small></div>
+          <div class="member"><i style="background: var(--p1)"></i><span><b>You</b> · <svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>walk</span><small>Organiser</small></div>
+          <div class="member"><i style="background: var(--p2)"></i><span><b>Nino</b> · <svg class="ico" aria-hidden="true"><use href="#m-transit"/></svg>transit</span><small class="live">Joined · live</small></div>
+          <div class="member"><i style="background: var(--p3)"></i><span><b>Léa</b> · <svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>bike</span><small>Answered from the link</small></div>
         </div>
       </div>
     </div>

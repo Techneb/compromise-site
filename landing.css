@@ -63,7 +63,7 @@ nav .links .globe a:hover { background: var(--bg); }
 .button[hidden], .soon[hidden] { display: none; }
 .soon { font-size: 15px; font-weight: 600; color: var(--p2); }
 .modes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
-.mode { font-size: 14px; padding: 5px 12px; border-radius: 999px; background: color-mix(in srgb, var(--p1) 12%, transparent); color: var(--fg); }
+.mode { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; padding: 5px 12px; border-radius: 999px; background: color-mix(in srgb, var(--p1) 12%, transparent); color: var(--fg); }
 
 /* Phone */
 .phone { width: min(310px, 100%); margin-inline: auto; border-radius: 46px; background: #0E1A1D; padding: 11px; box-shadow: 0 30px 60px -20px rgba(15, 35, 40, 0.35), 0 0 0 1px rgba(255,255,255,0.06) inset; }
@@ -78,6 +78,7 @@ nav .links .globe a:hover { background: var(--bg); }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 .chip { display: inline-flex; align-items: center; gap: 5px; font: 600 11.5px/1 var(--font); padding: 6px 9px; border-radius: 999px; background: var(--bg); }
 .chip i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.ico { width: 1.15em; height: 1.15em; flex: none; vertical-align: -0.2em; }
 .spot { padding: 9px 0; border-top: 1px solid var(--hair); }
 .spot-head { display: flex; align-items: center; gap: 8px; }
 .rank { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 700 11px/1 var(--round); color: #fff; background: var(--shade); flex: none; }

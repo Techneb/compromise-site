@@ -4,8 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>
-// The public TestFlight link lives in _config.yml (beta_url), shared with the other languages. Empty, the "Join the beta" buttons stay hidden and "Beta opening soon" shows.
-const BETA_URL = "{{ site.beta_url }}";
 {%- if include.redirect %}
 // / only (never /en/): a browser in another of the site's languages lands on its page unless the visitor picked one (the globe menu, or ?lang=en); a choice is remembered.
 (function () {
@@ -55,15 +53,14 @@ const BETA_URL = "{{ site.beta_url }}";
 
   <header class="hero">
     <div>
-      <p class="kicker">For iPhone</p>
       <h1>Meet halfway in minutes, not miles.</h1>
       <p class="lede">Compromise finds the bar, café or restaurant everyone reaches in about the same time, however each of you travels.</p>
       <div class="modes" aria-label="Ways to travel"><span class="mode">On foot</span><span class="mode">Transit</span><span class="mode">Car</span><span class="mode">Bike</span></div>
       <div class="cta">
-        <a class="button beta" href="#" hidden>Join the beta</a>
-        <p class="status"><span class="dot" aria-hidden="true"></span>In beta on iPhone (iOS 18 or later)</p>
-        <p class="soon">Beta opening soon</p>
+        <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
+        <a class="store" href="{{ site.beta_url }}"><img src="/img/app-store-badge-en.svg" alt="Download on the App Store" width="150" height="50"></a>
       </div>
+      <p class="muted" style="margin-top: 12px; font-size: 15px">Works on iPad too.</p>
     </div>
 
     <div>
@@ -148,8 +145,6 @@ const BETA_URL = "{{ site.beta_url }}";
         <ul>
           <li>On foot, by transit, by car or by bike, each person their own way.</li>
           <li>On transit, see which lines to take.</li>
-          <li>Keep everyone’s times close, or allow a gap for a shorter trip overall.</li>
-          <li>Set a longest trip so nobody travels too far.</li>
         </ul>
       </div>
       <div>
@@ -206,7 +201,7 @@ const BETA_URL = "{{ site.beta_url }}";
         <ul>
           <li>"In the sun until 18:40" on each spot.</li>
           <li>Rooftops count too.</li>
-          <li>Available in a growing list of cities.</li>
+          <li>Available in more than 350 cities.</li>
         </ul>
       </div>
       <div class="visual" id="shot-sun">
@@ -236,7 +231,7 @@ const BETA_URL = "{{ site.beta_url }}";
     <div class="grid4">
       <div class="tile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
-        <h3>35 kinds of place</h3><p>Bars, cafés and restaurants, and cinemas, museums, climbing, parks or beaches, plus a keyword for the rest.</p>
+        <h3>35 kinds of place</h3><p>Bars, cafés, restaurants, cinemas, museums, parks and more, and you can see which ones are open when you arrive.</p>
       </div>
       <div class="tile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
@@ -258,7 +253,7 @@ const BETA_URL = "{{ site.beta_url }}";
       <div>
         <p class="kicker">Privacy</p>
         <h2 id="privacy-title" style="margin-top: 14px">Your plans stay yours.</h2>
-        <p class="muted" style="margin-top: 16px">No account, no advertising, no tracking. Nothing you type is sent to us. In a group, what you share goes through your iCloud, encrypted so only the group can read it. If you suggest an edit to a place, your answer is stored in iCloud under an identifier, without your name, and answers about OpenStreetMap places are published under the ODbL. Anonymous usage counts (what you use, the city you search in) go to the developer through Cloudflare, without your addresses or names, and you can turn them off in Settings › Privacy.</p>
+        <p class="muted" style="margin-top: 16px">No account, no advertising, no tracking. Nothing you type is sent to us. Usage counts are anonymous, and you can turn them off in Settings.</p>
       </div>
       <ul>
         <li>No sign-up, for you or your friends.</li>
@@ -270,12 +265,12 @@ const BETA_URL = "{{ site.beta_url }}";
 
   <section id="beta" aria-labelledby="beta-title">
     <div class="join">
-      <p class="kicker">Beta</p>
-      <h2 id="beta-title">Try it before everyone else.</h2>
-      <p class="muted">Compromise is in beta on iPhone, iOS 18 or later. In English, French, Spanish and German.</p>
+      <p class="kicker">App Store</p>
+      <h2 id="beta-title">Try the app.</h2>
+      <p class="muted">On iPhone, iOS 18 or later. In English, French, Spanish and German.</p>
       <div class="cta">
-        <a class="button beta" href="#" hidden>Join the beta</a>
-        <p class="soon">Beta opening soon</p>
+        <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
+        <a class="store" href="{{ site.beta_url }}"><img src="/img/app-store-badge-en.svg" alt="Download on the App Store" width="150" height="50"></a>
       </div>
     </div>
   </section>
@@ -285,9 +280,5 @@ const BETA_URL = "{{ site.beta_url }}";
     <div class="links"><a href="/privacy">Privacy policy</a>{% include lang-links.html current="en" %}<span>Contact: <span class="email">contact@alephb.uk</span></span></div>
   </footer>
 </div>
-<script>
-if (BETA_URL) document.querySelectorAll(".beta").forEach(function (a) { a.href = BETA_URL; a.hidden = false; });
-if (BETA_URL) document.querySelectorAll(".soon").forEach(function (p) { p.hidden = true; });
-</script>
 </body>
 </html>

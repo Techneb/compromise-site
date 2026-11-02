@@ -3,3 +3,5 @@ description: A fair place to meet
 include: [".well-known"]
 # The public TestFlight link, used by /, /en/, /fr/, /es/ and /de/: paste it between the quotes.
 beta_url: "https://testflight.apple.com/join/5J8fMFDM"
+# The README is for GitHub, not a page of the site.
+exclude: [README.md]

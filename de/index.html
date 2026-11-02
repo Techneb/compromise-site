@@ -56,14 +56,15 @@ layout: null
         <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
         <a class="button" href="{{ site.beta_url }}">Laden im App Store</a>
       </div>
-      <p class="muted" style="margin-top: 12px; font-size: 15px">Läuft auch auf dem iPad.</p>
     </div>
 
     <div>
+      <div class="devices">
+      <div class="ipad"><div class="ipad-screen"><img class="shot" src="/img/de/meet-ipad.jpg" alt="Compromise auf dem iPad: links die Orte, auf der Karte die Wege aller" width="800" height="1066"></div></div>
       <div class="phone">
         <div class="screen" role="img" aria-label="Illustration der App: eine Karte mit drei Freunden und einem Treffpunkt, dazu eine Liste mit Orten, zu denen Nino, Léa und du jeweils etwa 18 Minuten braucht.">
-          <!-- Screenshot slot: img/de/meet.jpg, 1206 × 2622 -->
-          <img class="shot" src="/img/de/meet.jpg" alt="Compromise: die Karte, die Startpunkte aller und die Orte, sortiert danach, wie nah die Fahrzeiten beieinanderliegen" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
+          <!-- Screenshot slot: img/de/meet.jpg, 400 × 869 -->
+          <img class="shot" src="/img/de/meet.jpg" width="400" height="869" alt="Compromise: die Karte, die Startpunkte aller und die Orte, sortiert danach, wie nah die Fahrzeiten beieinanderliegen" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
           <div class="island"></div>
           <svg class="map" viewBox="0 0 300 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <rect width="300" height="640" fill="var(--map)"/>
@@ -114,6 +115,7 @@ layout: null
           </div>
         </div>
       </div>
+      </div>
       <p class="illustration">Namen und Orte sind Beispiele.</p>
     </div>
   </header>
@@ -126,9 +128,9 @@ layout: null
       <h2 id="how-title">In drei Schritten zu einem Ort, der für alle passt.</h2>
     </div>
     <ol class="steps">
-      <li><h3>Alle hinzufügen</h3><p>Starte da, wo du bist, und füge Freunde hinzu oder lade sie per Link ein. Zu zweit oder als ganze Gruppe, alle mit ihrem eigenen Startpunkt.</p></li>
-      <li><h3>Sag, wie alle hinkommen</h3><p>Eine läuft, einer nimmt die U-Bahn, eine fährt Rad. Jeder Weg wird so berechnet, wie die Person wirklich unterwegs ist.</p></li>
-      <li><h3>Wähl aus den fairsten Orten</h3><p>Bars, Cafés und Restaurants, bei denen die Fahrzeiten aller am nächsten beieinanderliegen, stehen oben. Öffne die Route oder teile den Ort mit einem Tipp.</p></li>
+      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/how-1.jpg" alt="Ein Einladungslink zur Gruppe wird geteilt" width="400" height="869" loading="lazy"></div></div><h3>Alle hinzufügen</h3><p>Starte da, wo du bist, und füge Freunde hinzu oder lade sie per Link ein. Zu zweit oder als ganze Gruppe, alle mit ihrem eigenen Startpunkt.</p></li>
+      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/how-2.jpg" alt="Vier Freunde, alle mit ihrem Verkehrsmittel, und die Orte danach sortiert, wie nah ihre Fahrzeiten beieinanderliegen" width="400" height="869" loading="lazy"></div></div><h3>Sag, wie alle hinkommen</h3><p>Eine läuft, einer nimmt die U-Bahn, eine fährt Rad. Jeder Weg wird so berechnet, wie die Person wirklich unterwegs ist.</p></li>
+      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/how-3.jpg" alt="Die Wege aller zum Ort auf der Karte" width="400" height="869" loading="lazy"></div></div><h3>Wähl aus den fairsten Orten</h3><p>Bars, Cafés und Restaurants, bei denen die Fahrzeiten aller am nächsten beieinanderliegen, stehen oben. Öffne die Route oder teile den Ort mit einem Tipp.</p></li>
     </ol>
   </section>
 

@@ -56,14 +56,15 @@ layout: null
         <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
         <a class="button" href="{{ site.beta_url }}">Télécharger dans l’App Store</a>
       </div>
-      <p class="muted" style="margin-top: 12px; font-size: 15px">Marche aussi sur iPad.</p>
     </div>
 
     <div>
+      <div class="devices">
+      <div class="ipad"><div class="ipad-screen"><img class="shot" src="/img/fr/meet-ipad.jpg" alt="Compromise sur iPad : les adresses à gauche, le trajet de chacun sur la carte" width="800" height="1066"></div></div>
       <div class="phone">
         <div class="screen" role="img" aria-label="Illustration de l’app : une carte avec trois amis et un point de rendez-vous, et une liste d’adresses où Nino, Léa et toi mettez chacun environ 18 minutes.">
-          <!-- Screenshot slot: img/fr/meet.png, 1206 × 2622 -->
-          <img class="shot" src="/img/fr/meet.png" alt="Compromise : la carte, le départ de chacun, et les adresses classées selon l’écart entre les temps de trajet" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
+          <!-- Screenshot slot: img/fr/meet.jpg, 400 × 869 -->
+          <img class="shot" src="/img/fr/meet.jpg" width="400" height="869" alt="Compromise : la carte, le départ de chacun, et les adresses classées selon l’écart entre les temps de trajet" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
           <div class="island"></div>
           <svg class="map" viewBox="0 0 300 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <rect width="300" height="640" fill="var(--map)"/>
@@ -114,6 +115,7 @@ layout: null
           </div>
         </div>
       </div>
+      </div>
       <p class="illustration">Noms et adresses à titre d’exemple.</p>
     </div>
   </header>
@@ -126,9 +128,9 @@ layout: null
       <h2 id="how-title">Trois étapes, et une adresse qui met tout le monde d’accord.</h2>
     </div>
     <ol class="steps">
-      <li><h3>Ajoute tout le monde</h3><p>Pars d’où tu es, ajoute tes amis ou invite-les avec un lien. À deux ou à dix, chacun avec son point de départ.</p></li>
-      <li><h3>Dis comment chacun vient</h3><p>L’une vient à pied, l’autre en métro, le troisième à vélo. Le temps de chacun est calculé avec son vrai moyen de transport.</p></li>
-      <li><h3>Choisis parmi les adresses les plus justes</h3><p>Les bars, cafés et restaurants où les temps de trajet sont les plus proches arrivent en tête. Ouvre l’itinéraire ou partage l’adresse en un geste.</p></li>
+      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/fr/how-1.jpg" alt="Le partage d’un lien d’invitation au groupe" width="400" height="869" loading="lazy"></div></div><h3>Ajoute tout le monde</h3><p>Pars d’où tu es, ajoute tes amis ou invite-les avec un lien. À deux ou à dix, chacun avec son point de départ.</p></li>
+      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/fr/how-2.jpg" alt="Quatre amis, chacun avec son moyen de transport, et les adresses classées selon l’écart entre leurs temps de trajet" width="400" height="869" loading="lazy"></div></div><h3>Dis comment chacun vient</h3><p>L’une vient à pied, l’autre en métro, le troisième à vélo. Le temps de chacun est calculé avec son vrai moyen de transport.</p></li>
+      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/fr/how-3.jpg" alt="Le trajet de chacun jusqu’à l’adresse, sur la carte" width="400" height="869" loading="lazy"></div></div><h3>Choisis parmi les adresses les plus justes</h3><p>Les bars, cafés et restaurants où les temps de trajet sont les plus proches arrivent en tête. Ouvre l’itinéraire ou partage l’adresse en un geste.</p></li>
     </ol>
   </section>
 

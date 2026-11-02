@@ -67,14 +67,15 @@
         <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
         <a class="store" href="{{ site.beta_url }}"><img src="/img/app-store-badge-en.svg" alt="Download on the App Store" width="150" height="50"></a>
       </div>
-      <p class="muted" style="margin-top: 12px; font-size: 15px">Works on iPad too.</p>
     </div>
 
     <div>
+      <div class="devices">
+      <div class="ipad"><div class="ipad-screen"><img class="shot" src="/img/en/meet-ipad.jpg" alt="Compromise on iPad: the spots on the left, everyone’s route on the map" width="800" height="1066"></div></div>
       <div class="phone">
         <div class="screen" role="img" aria-label="Illustration of the app: a map with three friends and a meeting spot, and a list of spots where Nino, Léa and you each travel about 18 minutes.">
-          <!-- Screenshot slot: img/en/meet.png, 1206 × 2622 -->
-          <img class="shot" src="/img/en/meet.png" alt="Compromise: the map, everyone’s start, and the spots ranked by how close everyone’s travel times are" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
+          <!-- Screenshot slot: img/en/meet.jpg, 400 × 869 -->
+          <img class="shot" src="/img/en/meet.jpg" width="400" height="869" alt="Compromise: the map, everyone’s start, and the spots ranked by how close everyone’s travel times are" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
           <div class="island"></div>
           <svg class="map" viewBox="0 0 300 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <rect width="300" height="640" fill="var(--map)"/>
@@ -125,6 +126,7 @@
           </div>
         </div>
       </div>
+      </div>
       <p class="illustration">Names and places are examples.</p>
     </div>
   </header>
@@ -137,9 +139,9 @@
       <h2 id="how-title">Three taps to a place everyone can live with.</h2>
     </div>
     <ol class="steps">
-      <li><h3>Add everyone</h3><p>Start from where you are, then add friends or invite them with a link. Two people or a whole group, each with their own starting point.</p></li>
-      <li><h3>Say how each one travels</h3><p>One walks, one takes the metro, one cycles. Every journey is timed the way that person actually travels.</p></li>
-      <li><h3>Pick from the fairest spots</h3><p>Bars, cafés and restaurants come first where everyone’s travel times are closest. Open the route or share the spot in one tap.</p></li>
+      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/how-1.jpg" alt="Sharing an invite link to the group" width="400" height="869" loading="lazy"></div></div><h3>Add everyone</h3><p>Start from where you are, then add friends or invite them with a link. Two people or a whole group, each with their own starting point.</p></li>
+      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/how-2.jpg" alt="Four friends, each with their way of travelling, and the spots ranked by how close their travel times are" width="400" height="869" loading="lazy"></div></div><h3>Say how each one travels</h3><p>One walks, one takes the metro, one cycles. Every journey is timed the way that person actually travels.</p></li>
+      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/how-3.jpg" alt="Everyone’s route to the spot on the map" width="400" height="869" loading="lazy"></div></div><h3>Pick from the fairest spots</h3><p>Bars, cafés and restaurants come first where everyone’s travel times are closest. Open the route or share the spot in one tap.</p></li>
     </ol>
   </section>
 

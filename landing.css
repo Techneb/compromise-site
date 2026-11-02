@@ -73,6 +73,14 @@ nav .links .globe a:hover { background: var(--bg); }
 /* An app screenshot covers the illustration once img/<lang>/<name>.png exists; until then the img removes itself. */
 .screen img.shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; }
 .visual:not(.has-shot) > .phone, .visual.has-shot > .panel { display: none; }
+/* Hero: the iPad behind, the iPhone in front of its lower right corner, both on the same example. */
+.devices { position: relative; padding: 0 22% 28px 0; }
+.ipad { border-radius: 28px; background: #0E1A1D; padding: 10px; box-shadow: 0 30px 60px -20px rgba(15, 35, 40, 0.35), 0 0 0 1px rgba(255,255,255,0.06) inset; }
+.ipad-screen { position: relative; aspect-ratio: 2064 / 2752; border-radius: 18px; overflow: hidden; background: var(--map); }
+.devices .phone { position: absolute; right: 0; bottom: 0; width: 38%; border-radius: 30px; padding: 7px; }
+.devices .screen { border-radius: 24px; }
+.devices .island { top: 5px; width: 46px; height: 13px; }
+.ipad-screen img.shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-radius: 22px 22px 0 0; padding: 8px 14px 16px; box-shadow: 0 -6px 20px rgba(0,0,0,0.08); }
 .grabber { width: 36px; height: 5px; border-radius: 3px; background: var(--hair); margin: 0 auto 10px; }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
@@ -106,6 +114,10 @@ section + section { border-top: 1px solid var(--hair); }
 .steps li:nth-child(2)::before { background: var(--p2); }
 .steps li:nth-child(3)::before { background: var(--p3); }
 .steps p { color: var(--muted); font-size: 16px; }
+/* Each step shows its app screen in a smaller phone, above the number. */
+.steps .phone { order: -1; width: min(200px, 100%); border-radius: 30px; padding: 7px; margin-bottom: 8px; }
+.steps .screen { border-radius: 24px; }
+.steps .island { top: 6px; width: 60px; height: 17px; }
 
 .feature { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
 .feature > div { min-width: 0; }

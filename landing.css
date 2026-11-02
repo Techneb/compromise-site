@@ -60,7 +60,7 @@ nav .links .globe a:hover { background: var(--bg); }
 /* The text keeps the height it had before the device switch grew the right column (title 94 px below the phone’s top at desktop width). */
 @media (min-width: 861px) { .hero > div:first-child { align-self: start; margin-top: 94px; } .hero > div:first-child:has(> .kicker) { margin-top: 76px; } }
 .hero .lede { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 34ch; margin-top: 20px; }
-.hero .lede strong { font-weight: 650; color: var(--fg); }
+.hero .lede strong, section strong { font-weight: 650; color: var(--fg); }
 .status { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; padding: 9px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); font-size: 15px; font-weight: 550; }
 .status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--p2); }
 .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 26px; }

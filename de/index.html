@@ -6,15 +6,11 @@ layout: null
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script>
-// Der öffentliche TestFlight-Link steht in _config.yml (beta_url), gemeinsam mit den anderen Seiten. Ist er leer, bleiben die Buttons „Bei der Beta mitmachen“ versteckt und „Die Beta startet bald“ wird angezeigt.
-const BETA_URL = "{{ site.beta_url }}";
-</script>
-<title>Compromise: Wo treffen wir uns?</title>
-<meta name="description" content="Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, zu Fuß, mit den Öffis, mit dem Auto oder mit dem Rad. Lade Freunde per Link ein. Als Beta auf dem iPhone.">
+<title>Compromise: Die Mitte in Minuten, nicht in Metern</title>
+<meta name="description" content="Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, ob zu Fuß, mit dem Rad, mit dem Auto oder mit den Öffis. Für iPhone.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Compromise: die Mitte in Minuten, nicht in Metern">
-<meta property="og:description" content="Die Mitte in Minuten, nicht in Metern. Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, zu Fuß, mit den Öffis, mit dem Auto oder mit dem Rad. Lade Freunde per Link ein. Als Beta auf dem iPhone.">
+<meta property="og:title" content="Compromise: Die Mitte in Minuten, nicht in Metern">
+<meta property="og:description" content="Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, ob zu Fuß, mit dem Rad, mit dem Auto oder mit den Öffis. Für iPhone.">
 <meta property="og:url" content="https://compromise.alephb.uk/de/">
 <meta property="og:image" content="https://compromise.alephb.uk/img/og-preview.png">
 <meta property="og:image:width" content="1200">
@@ -38,21 +34,20 @@ const BETA_URL = "{{ site.beta_url }}";
       Compromise
     </a>
     <div class="links">
-      <a class="hide-sm" href="#how">So geht’s</a><a class="hide-xs" href="/privacy" hreflang="en">Datenschutz</a>
+      <a class="hide-xs" href="/privacy" hreflang="en">Datenschutz</a>
       {% include lang-menu.html current="de" label="Sprache" %}
     </div>
   </nav>
 
   <header class="hero">
     <div>
-      <p class="kicker">Wo treffen wir uns?</p>
-      <h1>Die Mitte in Minuten, nicht in Metern.</h1>
-      <p class="lede">Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, egal wie ihr unterwegs seid.</p>
-      <div class="modes" aria-label="Wie ihr unterwegs seid"><span class="mode">Zu Fuß</span><span class="mode">Öffis</span><span class="mode">Auto</span><span class="mode">Rad</span></div>
+      <h1>Wo treffen wir uns?</h1>
+      <p class="lede">Compromise findet den Ort, den alle in etwa gleich schnell erreichen, egal ob ihr lauft, radelt, fahrt oder die Öffis nehmt.</p>
       <div class="cta">
-        <a class="button beta" href="#" hidden>Bei der Beta mitmachen</a>
-        <p class="status"><span class="dot" aria-hidden="true"></span>Als Beta auf dem iPhone (ab iOS 18)</p>
-        <p class="soon">Die Beta startet bald</p>
+        <!-- Once 1.0 is approved, swap this TestFlight link (beta_url in _config.yml) for the App Store link. -->
+        <a class="button" href="{{ site.beta_url }}">Probier die App aus</a>
+        <p class="req">Für iPhone, ab iOS 18.</p>
+        <p class="ipad">Läuft auch auf dem iPad.</p>
       </div>
     </div>
 
@@ -117,157 +112,14 @@ const BETA_URL = "{{ site.beta_url }}";
 </div>
 
 <div class="wrap">
-  <section id="how" aria-labelledby="how-title">
-    <div class="section-head">
-      <p class="kicker">So geht’s</p>
-      <h2 id="how-title">In drei Schritten zu einem Ort, der für alle passt.</h2>
-    </div>
-    <ol class="steps">
-      <li><h3>Alle hinzufügen</h3><p>Starte da, wo du bist, und füge Freunde hinzu oder lade sie per Link ein. Zu zweit oder als ganze Gruppe, alle mit ihrem eigenen Startpunkt.</p></li>
-      <li><h3>Sag, wie alle hinkommen</h3><p>Eine läuft, einer nimmt die U-Bahn, eine fährt Rad. Jeder Weg wird so berechnet, wie die Person wirklich unterwegs ist.</p></li>
-      <li><h3>Wähl aus den fairsten Orten</h3><p>Bars, Cafés und Restaurants, bei denen die Fahrzeiten aller am nächsten beieinanderliegen, stehen oben. Öffne die Route oder teile den Ort mit einem Tipp.</p></li>
-    </ol>
-  </section>
-
-  <section aria-labelledby="fair-title">
-    <div class="feature">
-      <div class="copy">
-        <p class="kicker">Fair heißt: gleiche Zeit</p>
-        <h2 id="fair-title">Die Mitte der Karte ist selten der faire Ort.</h2>
-        <p>Ein Punkt auf halbem Weg zwischen zwei Adressen kann für den einen ein kurzer Spaziergang sein und für die andere eine lange Fahrt. Compromise vergleicht echte Fahrzeiten, damit niemand den Abend unterwegs verbringt.</p>
-        <ul>
-          <li>Zu Fuß, mit den Öffis, mit dem Auto oder mit dem Rad: alle auf ihre Art.</li>
-          <li>Mit den Öffis siehst du, welche Linien du nehmen musst.</li>
-          <li>Halte die Zeiten aller nah beieinander oder lass etwas Unterschied zu, damit die Wege insgesamt kürzer werden.</li>
-          <li>Leg eine maximale Fahrzeit fest, damit niemand zu weit fahren muss.</li>
-        </ul>
-      </div>
-      <div>
-        <div class="panel compare" role="img" aria-label="Beispiel: Der Punkt auf halbem Weg auf der Karte bedeutet 35 Minuten für den einen und 12 für die andere; der Ort, den Compromise wählt, 18 und 22 Minuten.">
-          <div class="compare-row">
-            <div class="compare-title">Die Mitte auf der Karte <span>Beispiel</span></div>
-            <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 88%; background: var(--p2)"></span></span><b>35 Min.</b></div>
-            <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 30%; background: var(--p3)"></span></span><b>12 Min.</b></div>
-            <p class="verdict bad">23 Minuten Unterschied</p>
-          </div>
-          <div class="compare-row">
-            <div class="compare-title">Der Ort, den Compromise wählt</div>
-            <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 45%; background: var(--p2)"></span></span><b>18 Min.</b></div>
-            <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 55%; background: var(--p3)"></span></span><b>22 Min.</b></div>
-            <p class="verdict good">4 Minuten Unterschied</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="groups" aria-labelledby="group-title">
-    <div class="feature flip">
-      <div class="copy">
-        <p class="kicker">Gruppen</p>
-        <h2 id="group-title">Ein Link, und alle sind dabei.</h2>
-        <p>Schick der Gruppe einen einzigen Link. Wer die App und iCloud hat, tritt der Gruppe bei: Startpunkt und Fortbewegung aller erscheinen auf jedem Handy, und Änderungen sind live zu sehen. Wer die App nicht hat, antwortet in ein paar Sekunden über den Link.</p>
-        <ul>
-          <li>Kein Konto nötig, weder für dich noch für deine Freunde.</li>
-          <li>Dein Handy sagt dir Bescheid, wenn jemand beitritt.</li>
-          <li>Pläne ändern sich? Die Orte ändern sich für alle mit.</li>
-          <li>Eine Gruppe endet von selbst nach zwei Tagen ohne Änderung.</li>
-        </ul>
-      </div>
-      <div class="visual" id="shot-group">
-        <!-- Screenshot slot: img/de/group.png, 1206 × 2622 -->
-        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/group.png" alt="Eine Gruppe in Compromise: alle, die beigetreten sind, und wie sie unterwegs sind" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
-        <div class="panel group" role="img" aria-label="Illustration: ein Einladungslink an eine Gruppe; Nino ist mit der App beigetreten, Léa hat über den Link geantwortet.">
-          <div class="invite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Freitagsbier · Einladungslink</span></div>
-          <div class="member"><i style="background: var(--p1)"></i><span><b>Du</b> · zu Fuß</span><small>Organisiert</small></div>
-          <div class="member"><i style="background: var(--p2)"></i><span><b>Nino</b> · Öffis</span><small class="live">Dabei · live</small></div>
-          <div class="member"><i style="background: var(--p3)"></i><span><b>Léa</b> · Rad</span><small>Per Link geantwortet</small></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section aria-labelledby="sun-title">
-    <div class="feature">
-      <div class="copy">
-        <p class="kicker">Sonnige Terrassen</p>
-        <h2 id="sun-title">Noch Sonne auf der Terrasse, wenn alle da sind.</h2>
-        <p>Schalte „Sonnige Terrasse“ ein, und Compromise behält die Orte, deren Terrasse noch in der Sonne liegt, wenn alle angekommen sind, und sagt dir, wie lange noch. An heißen Tagen frag stattdessen nach Schatten.</p>
-        <ul>
-          <li>„In der Sonne bis 18:40“ bei jedem Ort.</li>
-          <li>Dachterrassen zählen auch.</li>
-          <li>In immer mehr Städten verfügbar.</li>
-        </ul>
-      </div>
-      <div class="visual" id="shot-sun">
-        <!-- Screenshot slot: img/de/sun.png, 1206 × 2622 -->
-        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/sun.png" alt="Orte mit sonniger Terrasse, jeweils mit der Angabe, wie lange die Sonne bleibt" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
-        <div class="panel mini" role="img" aria-label="Illustration: eine Karte mit sonnigen Terrassen, der beste Ort in der Sonne bis 18:40 und der Schalter Sonnige Terrasse an.">
-<svg class="snip" viewBox="0 0 300 150" aria-hidden="true"><rect width="300" height="150" fill="var(--map)"/>
-<path d="M-10 104 C 60 84, 120 128, 190 100 S 290 70, 320 86" stroke="var(--water)" stroke-width="16" fill="none"/>
-<rect x="196" y="16" width="64" height="40" rx="8" fill="var(--park)"/>
-<g stroke="var(--street)" stroke-linecap="round" fill="none"><path d="M-10 40 L310 54" stroke-width="7"/><path d="M-10 136 L310 124" stroke-width="8"/><path d="M70 -10 L86 160" stroke-width="7"/><path d="M182 -10 L170 160" stroke-width="6"/><path d="M-10 10 L130 80 L310 150" stroke-width="5"/></g>
-<g stroke="#fff" stroke-width="2.5"><circle cx="30" cy="22" r="6" fill="var(--p1)"/><circle cx="276" cy="30" r="6" fill="var(--p2)"/><circle cx="150" cy="142" r="6" fill="var(--p3)"/></g>
-<path d="M226 72c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--shade)" stroke="#fff" stroke-width="2"/><circle cx="226" cy="83" r="4" fill="#fff"/><path d="M104 68c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--sun)" stroke="#fff" stroke-width="2"/><circle cx="104" cy="79" r="4" fill="#fff"/><path d="M140 40c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--sun)" stroke="#fff" stroke-width="2"/><circle cx="140" cy="51" r="4" fill="#fff"/>
-<rect x="156" y="40" width="110" height="22" rx="11" fill="var(--surface)"/><circle cx="168" cy="51" r="4.5" fill="var(--sun)"/><text x="177" y="55" font-size="10.5" font-weight="650" fill="var(--fg)" font-family="-apple-system, Segoe UI, sans-serif">Sonne bis 18:40</text>
-</svg>
-<div class="spot"><div class="spot-head"><span class="rank r1">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 Min. Unterschied</span></div><div class="sun-cap">In der Sonne bis 18:40</div><div class="bars"><div class="bar"><span>Du</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 Min.</b></div><div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 Min.</b></div><div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 Min.</b></div></div></div>
-<div class="switch-row"><span>Sonnige Terrasse</span><span class="ios-switch" aria-hidden="true"></span></div>
-</div>
-      </div>
-    </div>
-  </section>
-
-  <section aria-labelledby="more-title">
-    <div class="section-head">
-      <p class="kicker">Für echte Pläne gemacht</p>
-      <h2 id="more-title">Alles, um euch auf einen Ort zu einigen.</h2>
-    </div>
-    <div class="grid4">
-      <div class="tile">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
-        <h3>35 Arten von Orten</h3><p>Bars, Cafés und Restaurants, aber auch Kinos, Museen, Kletterhallen, Parks oder Strände, dazu ein Stichwort für alles andere.</p>
-      </div>
-      <div class="tile">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
-        <h3>Eine Farbe pro Person</h3><p>Die Fahrzeit aller auf einer Skala, jede in ihrer eigenen Farbe, in der Liste und auf der Karte.</p>
-      </div>
-      <div class="tile">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
-        <h3>Teilen oder los</h3><p>Schick die Orte an die Gruppe oder öffne die Route in deiner Karten-App.</p>
-      </div>
-      <div class="tile">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
-        <h3>Für später planen</h3><p>Wähl, wann ihr losgeht: Fahrzeiten und Sonne richten sich nach dieser Uhrzeit, nicht nur nach jetzt.</p>
-      </div>
-    </div>
-  </section>
-
-  <section aria-labelledby="privacy-title">
-    <div class="privacy">
-      <div>
-        <p class="kicker">Datenschutz</p>
-        <h2 id="privacy-title" style="margin-top: 14px">Deine Pläne bleiben deine.</h2>
-        <p class="muted" style="margin-top: 16px">Kein Konto, keine Werbung, kein Tracking. Nichts, was du eintippst, wird an uns gesendet. In einer Gruppe läuft, was du teilst, über dein iCloud, verschlüsselt, sodass nur die Gruppe es lesen kann. Wenn du für einen Ort eine Änderung vorschlägst, wird deine Antwort unter einer Kennung, ohne deinen Namen, in iCloud gespeichert. Antworten zu Orten aus OpenStreetMap werden unter der ODbL veröffentlicht. Anonyme Nutzungsdaten (was du nutzt, in welcher Stadt du suchst) gehen über Cloudflare an den Entwickler, ohne deine Adressen oder Namen. Du kannst sie unter Einstellungen › Datenschutz ausschalten.</p>
-      </div>
-      <ul>
-        <li>Keine Anmeldung, weder für dich noch für deine Freunde.</li>
-        <li>Adressen werden nur auf deinem Handy gespeichert, und ein Tipp löscht sie.</li>
-        <li><span>Lies die <a href="/privacy" hreflang="en">Datenschutzerklärung</a> (auf Englisch).</span></li>
-      </ul>
-    </div>
-  </section>
-
-  <section id="beta" aria-labelledby="beta-title">
-    <div class="join">
-      <p class="kicker">Beta</p>
-      <h2 id="beta-title">Probier die App vor allen anderen aus.</h2>
-      <p class="muted">Compromise gibt es als Beta auf dem iPhone, ab iOS 18. Auf Deutsch, Englisch, Französisch und Spanisch.</p>
-      <div class="cta">
-        <a class="button beta" href="#" hidden>Bei der Beta mitmachen</a>
-        <p class="soon">Die Beta startet bald</p>
-      </div>
-    </div>
+  <section aria-label="Funktionen">
+  <ul class="features">
+    <li><h2>In der Mitte… nur nicht für alle.</h2><p>Die Mitte der Karte ist für die eine ein kurzer Spaziergang und für den anderen eine Stunde in der U-Bahn. Compromise zählt stattdessen die Minuten, die jede Person unterwegs ist.</p></li>
+    <li><h2>Jede Person, ihr eigener Weg.</h2><p>Eine läuft, einer radelt, eine nimmt den Bus, und jede Fahrzeit passt dazu, wie diese Person wirklich unterwegs ist.</p></li>
+    <li><h2>Ein Link für die ganze Gruppe.</h2><p>Deine Freunde schicken dir zurück, von wo sie starten, auch ohne die App.</p></li>
+    <li><h2>In der Sonne, wenn ihr ankommt.</h2><p>Tipp auf die Sonne, dann bleiben nur Terrassen, die bei eurer Ankunft noch Sonne haben, mit der Uhrzeit, bis wann. In über 250 Städten.</p></li>
+    <li><h2>35 Arten von Orten.</h2><p>Bars, Cafés, Restaurants, Kinos, Museen, Parks und mehr, und du siehst, welche bei eurer Ankunft geöffnet sind.</p></li>
+  </ul>
   </section>
 
   <footer>
@@ -275,9 +127,5 @@ const BETA_URL = "{{ site.beta_url }}";
     <div class="links"><a href="/privacy" hreflang="en">Datenschutz (auf Englisch)</a>{% include lang-links.html current="de" %}<span>Kontakt: <span class="email">contact@alephb.uk</span></span></div>
   </footer>
 </div>
-<script>
-if (BETA_URL) document.querySelectorAll(".beta").forEach(function (a) { a.href = BETA_URL; a.hidden = false; });
-if (BETA_URL) document.querySelectorAll(".soon").forEach(function (p) { p.hidden = true; });
-</script>
 </body>
 </html>

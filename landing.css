@@ -28,6 +28,8 @@ a:focus-visible { outline: 2px solid var(--tint); outline-offset: 3px; border-ra
 h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
 h1 { font-size: clamp(40px, 7vw, 68px); line-height: 1.02; font-weight: 800; }
 h1 .accent { color: var(--tint); }
+/* The app’s name in Fair means time, in the brand blue like the title’s accents. */
+.brand-word { color: var(--tint); font-weight: 700; }
 h2 { font-size: clamp(28px, 4.2vw, 42px); line-height: 1.08; font-weight: 800; }
 h3 { font-size: 20px; line-height: 1.25; font-weight: 650; letter-spacing: -0.01em; }
 p { margin: 0; }
@@ -153,6 +155,7 @@ section[aria-labelledby="sun-title"] .feature li::before { content: "\2600\FE0F"
 .compare-row { display: grid; gap: 10px; }
 .compare-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-weight: 650; }
 .compare-title span { font-size: 14px; font-weight: 500; color: var(--muted); }
+.compare-title b { font-weight: inherit; }
 .cbar { display: grid; grid-template-columns: 52px 1fr 58px; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); }
 .cbar .track { height: 12px; border-radius: 6px; background: var(--hair); position: relative; }
 .cbar .fill { position: absolute; inset: 0 auto 0 0; border-radius: 6px; }

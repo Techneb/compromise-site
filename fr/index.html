@@ -6,10 +6,6 @@ layout: null
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script>
-// Le lien TestFlight public est dans _config.yml (beta_url), partagé avec la page anglaise. Vide, les boutons « Rejoindre la bêta » restent cachés et « La bêta ouvre bientôt » s’affiche.
-const BETA_URL = "{{ site.beta_url }}";
-</script>
 <title>Compromise : à mi-chemin en minutes, pas en kilomètres</title>
 <meta name="description" content="À mi-chemin en minutes, pas en kilomètres. Compromise trouve le bar, le café ou le restaurant où tout le monde arrive à peu près en même temps. Sur iPhone.">
 <meta property="og:type" content="website">
@@ -50,10 +46,10 @@ const BETA_URL = "{{ site.beta_url }}";
       <p class="lede">Compromise trouve le bar, le café ou le restaurant où tout le monde arrive à peu près en même temps, peu importe comment chacun vient.</p>
       <div class="modes" aria-label="Façons de se déplacer"><span class="mode">À pied</span><span class="mode">Transports</span><span class="mode">Voiture</span><span class="mode">Vélo</span></div>
       <div class="cta">
-        <a class="button beta" href="#" hidden>Rejoindre la bêta</a>
-        <p class="status"><span class="dot" aria-hidden="true"></span>En bêta sur iPhone (iOS 18 ou plus récent)</p>
-        <p class="soon">La bêta ouvre bientôt</p>
+        <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
+        <a class="button" href="{{ site.beta_url }}">Télécharger dans l’App Store</a>
       </div>
+      <p class="muted" style="margin-top: 12px; font-size: 15px">Marche aussi sur iPad.</p>
     </div>
 
     <div>
@@ -138,8 +134,6 @@ const BETA_URL = "{{ site.beta_url }}";
         <ul>
           <li>À pied, en transports, en voiture ou à vélo : chacun à sa façon.</li>
           <li>En transports, tu vois quelles lignes prendre.</li>
-          <li>Garde les temps de chacun proches, ou accepte un écart pour moins de trajet au total.</li>
-          <li>Fixe un temps de trajet maximum, pour que personne n’aille trop loin.</li>
         </ul>
       </div>
       <div>
@@ -196,7 +190,7 @@ const BETA_URL = "{{ site.beta_url }}";
         <ul>
           <li>« Au soleil jusqu’à 18:40 » sur chaque adresse.</li>
           <li>Les rooftops comptent aussi.</li>
-          <li>Disponible dans de plus en plus de villes.</li>
+          <li>Disponible dans plus de 350 villes.</li>
         </ul>
       </div>
       <div class="visual" id="shot-sun">
@@ -226,7 +220,7 @@ const BETA_URL = "{{ site.beta_url }}";
     <div class="grid4">
       <div class="tile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
-        <h3>35 types d’adresses</h3><p>Bars, cafés et restaurants, mais aussi cinémas, musées, escalade, parcs ou plages, et un mot-clé pour tout le reste.</p>
+        <h3>35 types d’adresses</h3><p>Bars, cafés, restos, cinémas, musées, parcs et le reste, et tu vois celles qui seront ouvertes à votre arrivée.</p>
       </div>
       <div class="tile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
@@ -248,7 +242,7 @@ const BETA_URL = "{{ site.beta_url }}";
       <div>
         <p class="kicker">Confidentialité</p>
         <h2 id="privacy-title" style="margin-top: 14px">Tes plans ne regardent que toi.</h2>
-        <p class="muted" style="margin-top: 16px">Pas de compte, pas de pub, pas de traçage. Rien de ce que tu tapes ne nous est envoyé. Dans un groupe, ce que tu partages passe par ton iCloud, chiffré pour que seul le groupe puisse le lire. Si tu proposes une modification d’un lieu, ta réponse est enregistrée dans iCloud sous un identifiant, sans ton nom, et les réponses sur des lieux d’OpenStreetMap sont publiées sous licence ODbL. Des statistiques d’usage anonymes (ce que tu utilises, la ville où tu cherches) sont envoyées au développeur via Cloudflare, sans tes adresses ni tes noms, et tu peux les couper dans Réglages › Confidentialité.</p>
+        <p class="muted" style="margin-top: 16px">Pas de compte, pas de pub, pas de traçage. Rien de ce que tu tapes ne nous est envoyé. Les statistiques d’usage sont anonymes, et tu peux les couper dans Réglages.</p>
       </div>
       <ul>
         <li>Aucune inscription, ni pour toi ni pour tes amis.</li>
@@ -260,12 +254,12 @@ const BETA_URL = "{{ site.beta_url }}";
 
   <section id="beta" aria-labelledby="beta-title">
     <div class="join">
-      <p class="kicker">Bêta</p>
-      <h2 id="beta-title">Essaie l’app avant tout le monde.</h2>
-      <p class="muted">Compromise est en bêta sur iPhone, iOS 18 ou plus récent. En français, anglais, espagnol et allemand.</p>
+      <p class="kicker">App Store</p>
+      <h2 id="beta-title">Teste l’appli.</h2>
+      <p class="muted">Sur iPhone, iOS 18 ou plus récent. En français, anglais, espagnol et allemand.</p>
       <div class="cta">
-        <a class="button beta" href="#" hidden>Rejoindre la bêta</a>
-        <p class="soon">La bêta ouvre bientôt</p>
+        <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
+        <a class="button" href="{{ site.beta_url }}">Télécharger dans l’App Store</a>
       </div>
     </div>
   </section>
@@ -275,9 +269,5 @@ const BETA_URL = "{{ site.beta_url }}";
     <div class="links"><a href="/privacy" hreflang="en">Confidentialité</a>{% include lang-links.html current="fr" %}<span>Contact : <span class="email">contact@alephb.uk</span></span></div>
   </footer>
 </div>
-<script>
-if (BETA_URL) document.querySelectorAll(".beta").forEach(function (a) { a.href = BETA_URL; a.hidden = false; });
-if (BETA_URL) document.querySelectorAll(".soon").forEach(function (p) { p.hidden = true; });
-</script>
 </body>
 </html>

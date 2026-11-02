@@ -6,10 +6,6 @@ layout: null
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script>
-// El enlace público de TestFlight está en _config.yml (beta_url), compartido con las demás páginas. Vacío, los botones «Unirme a la beta» siguen ocultos y se muestra «La beta abre pronto».
-const BETA_URL = "{{ site.beta_url }}";
-</script>
 <title>Compromise: ¿dónde quedamos?</title>
 <meta name="description" content="Compromise encuentra el bar, la cafetería o el restaurante al que todos llegáis más o menos a la vez, a pie, en transporte público, en coche o en bici. Invita a tus amigos con un enlace. En beta en iPhone.">
 <meta property="og:type" content="website">
@@ -50,17 +46,17 @@ const BETA_URL = "{{ site.beta_url }}";
       <p class="lede">Compromise encuentra el bar, la cafetería o el restaurante al que todos llegáis más o menos a la vez, se mueva como se mueva cada uno.</p>
       <div class="modes" aria-label="Formas de moverse"><span class="mode">A pie</span><span class="mode">Transporte público</span><span class="mode">Coche</span><span class="mode">Bici</span></div>
       <div class="cta">
-        <a class="button beta" href="#" hidden>Unirme a la beta</a>
-        <p class="status"><span class="dot" aria-hidden="true"></span>En beta en iPhone (iOS 18 o posterior)</p>
-        <p class="soon">La beta abre pronto</p>
+        <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
+        <a class="button" href="{{ site.beta_url }}">Descárgalo en el App Store</a>
       </div>
+      <p class="muted" style="margin-top: 12px; font-size: 15px">También funciona en iPad.</p>
     </div>
 
     <div>
       <div class="phone">
         <div class="screen" role="img" aria-label="Ilustración de la app: un mapa con tres amigos y un punto de encuentro, y una lista de lugares a los que Nino, Léa y tú tardáis unos 18 minutos cada uno.">
-          <!-- Screenshot slot: img/es/meet.png, 1206 × 2622 -->
-          <img class="shot" src="/img/es/meet.png" alt="Compromise: el mapa, el punto de partida de cada uno y los lugares ordenados según lo parecidos que son los tiempos de trayecto" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
+          <!-- Screenshot slot: img/es/meet.jpg, 1206 × 2622 -->
+          <img class="shot" src="/img/es/meet.jpg" alt="Compromise: el mapa, el punto de partida de cada uno y los lugares ordenados según lo parecidos que son los tiempos de trayecto" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
           <div class="island"></div>
           <svg class="map" viewBox="0 0 300 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <rect width="300" height="640" fill="var(--map)"/>
@@ -138,8 +134,6 @@ const BETA_URL = "{{ site.beta_url }}";
         <ul>
           <li>A pie, en transporte público, en coche o en bici: cada uno a su manera.</li>
           <li>En transporte público, ves qué líneas coger.</li>
-          <li>Mantén parecidos los tiempos de todos, o acepta algo de diferencia para un trayecto total más corto.</li>
-          <li>Fija un trayecto máximo para que nadie vaya demasiado lejos.</li>
         </ul>
       </div>
       <div>
@@ -196,7 +190,7 @@ const BETA_URL = "{{ site.beta_url }}";
         <ul>
           <li>«Al sol hasta las 18:40» en cada lugar.</li>
           <li>Las azoteas también cuentan.</li>
-          <li>Disponible en cada vez más ciudades.</li>
+          <li>Disponible en más de 350 ciudades.</li>
         </ul>
       </div>
       <div class="visual" id="shot-sun">
@@ -226,7 +220,7 @@ const BETA_URL = "{{ site.beta_url }}";
     <div class="grid4">
       <div class="tile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
-        <h3>35 tipos de lugares</h3><p>Bares, cafeterías y restaurantes, y también cines, museos, rocódromos, parques o playas, además de una palabra clave para lo demás.</p>
+        <h3>35 tipos de lugares</h3><p>Bares, cafeterías, restaurantes, cines, museos, parques y más, y ves cuáles estarán abiertos cuando lleguéis.</p>
       </div>
       <div class="tile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
@@ -248,7 +242,7 @@ const BETA_URL = "{{ site.beta_url }}";
       <div>
         <p class="kicker">Privacidad</p>
         <h2 id="privacy-title" style="margin-top: 14px">Tus planes son solo tuyos.</h2>
-        <p class="muted" style="margin-top: 16px">Sin cuenta, sin publicidad, sin rastreo. Nada de lo que escribes nos llega. En un grupo, lo que compartes pasa por tu iCloud, cifrado para que solo el grupo pueda leerlo. Si sugieres un cambio en un lugar, tu respuesta se guarda en iCloud con un identificador, sin tu nombre, y las respuestas sobre lugares de OpenStreetMap se publican con la licencia ODbL. Se envían al desarrollador, a través de Cloudflare, estadísticas de uso anónimas (lo que usas, la ciudad en la que buscas), sin tus direcciones ni tus nombres, y puedes desactivarlas en Ajustes › Privacidad.</p>
+        <p class="muted" style="margin-top: 16px">Sin cuenta, sin publicidad, sin rastreo. Nada de lo que escribes nos llega. Las estadísticas de uso son anónimas y puedes desactivarlas en Ajustes.</p>
       </div>
       <ul>
         <li>Sin registro, ni para ti ni para tus amigos.</li>
@@ -260,12 +254,12 @@ const BETA_URL = "{{ site.beta_url }}";
 
   <section id="beta" aria-labelledby="beta-title">
     <div class="join">
-      <p class="kicker">Beta</p>
-      <h2 id="beta-title">Pruébala antes que nadie.</h2>
-      <p class="muted">Compromise está en beta en iPhone, iOS 18 o posterior. En español, inglés, francés y alemán.</p>
+      <p class="kicker">App Store</p>
+      <h2 id="beta-title">Prueba la app.</h2>
+      <p class="muted">Para iPhone, con iOS 18 o posterior. En español, inglés, francés y alemán.</p>
       <div class="cta">
-        <a class="button beta" href="#" hidden>Unirme a la beta</a>
-        <p class="soon">La beta abre pronto</p>
+        <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
+        <a class="button" href="{{ site.beta_url }}">Descárgalo en el App Store</a>
       </div>
     </div>
   </section>
@@ -275,9 +269,5 @@ const BETA_URL = "{{ site.beta_url }}";
     <div class="links"><a href="/privacy" hreflang="en">Privacidad (en inglés)</a>{% include lang-links.html current="es" %}<span>Contacto: <span class="email">contact@alephb.uk</span></span></div>
   </footer>
 </div>
-<script>
-if (BETA_URL) document.querySelectorAll(".beta").forEach(function (a) { a.href = BETA_URL; a.hidden = false; });
-if (BETA_URL) document.querySelectorAll(".soon").forEach(function (p) { p.hidden = true; });
-</script>
 </body>
 </html>

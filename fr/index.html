@@ -49,7 +49,7 @@ layout: null
   <header class="hero">
     <div>
       <p class="kicker">Où on se capte ?</p>
-      <h1>À mi-chemin en minutes, pas en kilomètres.</h1>
+      <h1>À mi-chemin en <span class="accent">minutes</span>, pas en <span class="accent">kilomètres</span>.</h1>
       <p class="lede">Compromise trouve <strong>le bar, le café ou le restaurant</strong> où tout le monde arrive <strong>à peu près en même temps</strong>, peu importe comment chacun vient.</p>
       <div class="modes" aria-label="Façons de se déplacer"><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>À pied</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-transit"/></svg>Transports</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-car"/></svg>Voiture</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>Vélo</span></div>
       <div class="cta">
@@ -116,7 +116,7 @@ layout: null
       </div>
       <div class="ipad"><div class="ipad-screen"><img class="shot" loading="lazy" src="/img/fr/meet-ipad.jpg" alt="Compromise sur iPad : les adresses à gauche, le trajet de chacun sur la carte" width="800" height="1066"></div></div>
       </div>
-      <div class="device-switch" role="group" aria-label="Appareil" hidden><button type="button" data-device="iphone" aria-pressed="true">iPhone</button><button type="button" data-device="ipad" aria-pressed="false">iPad</button></div>
+      <div class="device-switch" role="group" aria-label="Appareil" hidden><button type="button" data-device="iphone" aria-pressed="true" aria-label="iPhone" title="iPhone"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.5 18.2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><button type="button" data-device="ipad" aria-pressed="false" aria-label="iPad" title="iPad"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3" width="17" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.5 17.7h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
       <script>{const s=document.querySelector(".device-switch"),d=document.querySelector(".devices");s.hidden=false;s.addEventListener("click",(e)=>{const b=e.target.closest("button");if(!b)return;d.dataset.device=b.dataset.device;for(const x of s.querySelectorAll("button"))x.setAttribute("aria-pressed",x===b);});}</script>
       <p class="illustration">Noms et adresses à titre d’exemple.</p>
     </div>
@@ -130,9 +130,9 @@ layout: null
       <h2 id="how-title">Trois étapes, et une adresse qui met tout le monde d’accord.</h2>
     </div>
     <ol class="steps">
-      <li><img class="step-shot" src="/img/fr/how-1.jpg" alt="Le point de départ de chacun, avec de quoi ajouter une personne ou inviter des amis" width="600" height="682" loading="lazy"><h3>Ajoute tout le monde</h3><p>Pars d’où tu es, ajoute tes amis ou invite-les avec un lien. À deux ou à dix, chacun avec son point de départ.</p></li>
-      <li><img class="step-shot" src="/img/fr/how-2.jpg" alt="Quatre amis, chacun avec son moyen de transport, et leurs temps de trajet jusqu’à la première adresse" width="600" height="682" loading="lazy"><h3>Dis comment chacun vient</h3><p>L’une vient à pied, l’autre en métro, le troisième à vélo. Le temps de chacun est calculé avec son vrai moyen de transport.</p></li>
-      <li><img class="step-shot" src="/img/fr/how-3.jpg" alt="Le trajet de chacun jusqu’à l’adresse la plus juste, sur la carte" width="600" height="682" loading="lazy"><h3>Choisis parmi les adresses les plus justes</h3><p>Les bars, cafés et restaurants où les temps de trajet sont les plus proches arrivent en tête. Ouvre l’itinéraire ou partage l’adresse en un geste.</p></li>
+      <li><img class="step-shot" src="/img/fr/how-1.jpg" alt="Quatre personnes, chacune avec son point de départ, et de quoi ajouter quelqu’un ou inviter des amis" width="600" height="532" loading="lazy"><h3>Ajoute tout le monde</h3><p>Pars d’où tu es, ajoute tes amis ou invite-les avec un lien. À deux ou à dix, chacun avec son point de départ.</p></li>
+      <li><img class="step-shot" src="/img/fr/how-2.jpg" alt="Le moyen de transport et le temps de trajet de chacun jusqu’à une adresse" width="600" height="532" loading="lazy"><h3>Dis comment chacun vient</h3><p>L’une vient à pied, l’autre en métro, le troisième à vélo. Le temps de chacun est calculé avec son vrai moyen de transport.</p></li>
+      <li><img class="step-shot" src="/img/fr/how-3.jpg" alt="Les adresses classées, chacune avec l’écart en minutes entre les temps de trajet" width="600" height="532" loading="lazy"><h3>Choisis parmi les adresses les plus justes</h3><p>Les bars, cafés et restaurants où les temps de trajet sont les plus proches arrivent en tête. Ouvre l’itinéraire ou partage l’adresse en un geste.</p></li>
     </ol>
   </section>
 
@@ -205,7 +205,7 @@ layout: null
         </ul>
       </div>
       <div class="visual" id="shot-sun">
-        <!-- Screenshot slot: img/fr/sun.jpg, 620 × 1347; the ring marks the sun button -->
+        <!-- Screenshot slot: img/fr/sun.jpg, 620 × 1347; the ring marks the sun button; the gold captions are baked in -->
         <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/fr/sun.jpg" width="620" height="1347" alt="Le filtre soleil activé : chaque adresse dit jusqu’à quand sa terrasse est au soleil" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"><span class="sun-ring" aria-hidden="true"></span></div></div>
         <div class="panel mini" role="img" aria-label="Illustration : une carte avec des terrasses au soleil, la meilleure adresse au soleil jusqu’à 18:40, et l’interrupteur Terrasse au soleil activé.">
 <svg class="snip" viewBox="0 0 300 150" aria-hidden="true"><rect width="300" height="150" fill="var(--map)"/>
@@ -235,14 +235,13 @@ layout: null
         <h3>35 types d’adresses</h3><p>Bars, cafés, restos, cinémas, musées, parcs et le reste, et tu vois celles qui seront ouvertes à votre arrivée.</p>
       </div>
       <div class="tile">
-        <img class="tile-shot" src="/img/fr/tile-2.jpg" alt="Quatre temps de trajet jusqu’à une adresse, chacun dans sa couleur" width="560" height="350" loading="lazy">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
-        <h3>Une couleur par personne</h3><p>Le temps de trajet de chacun sur la même échelle, dans sa couleur, dans la liste comme sur la carte.</p>
+        <img class="tile-shot" src="/img/fr/tile-lines.jpg" alt="Les temps de trajet vers deux adresses, avec le numéro de la ligne à prendre pour chaque trajet" width="560" height="350" loading="lazy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="5" width="12" height="12" rx="3"/><path d="M6 11h12M9 2.5h6M12 2.5V5M9.5 14h.01M14.5 14h.01M9 17l-2 4M15 17l2 4"/></svg>
+        <h3>Quelle ligne prendre</h3><p>En transports en commun, chaque trajet t’indique les lignes à prendre, du métro au bus.</p>
       </div>
       <div class="tile">
-        <img class="tile-shot" src="/img/fr/tile-3.jpg" alt="La feuille de partage, pour envoyer ou copier les adresses" width="560" height="350" loading="lazy">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
-        <h3>Partage ou fonce</h3><p>Envoie les adresses au groupe, ou ouvre l’itinéraire dans ton app de transports.</p>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>
+        <h3>Les infos de tous</h3><p>Horaires faux ou terrasse oubliée ? Propose une correction, tout le monde en profite.</p>
       </div>
       <div class="tile">
         <img class="tile-shot" src="/img/fr/tile-4.jpg" alt="La date et l’heure de départ dans les réglages" width="560" height="350" loading="lazy">
@@ -280,8 +279,8 @@ layout: null
   </section>
 
   <footer>
-    <span>Compromise, par <a href="https://alephb.uk">AlephB</a>.</span>
-    <div class="links"><a href="/privacy" hreflang="en">Confidentialité</a>{% include lang-links.html current="fr" %}<span>Contact : <span class="email">contact@alephb.uk</span></span></div>
+    <span>Compromise, par <a class="alephb" href="https://alephb.uk">AlephB<span class="alephb-logo" aria-hidden="true"></span></a>.</span>
+    <div class="links"><a href="/privacy" hreflang="en">Confidentialité</a><span>Contact : <a href="mailto:contact@alephb.uk">contact@alephb.uk</a></span></div>
   </footer>
 </div>
 </body>

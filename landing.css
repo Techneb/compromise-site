@@ -27,6 +27,7 @@ a:focus-visible { outline: 2px solid var(--tint); outline-offset: 3px; border-ra
 .wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; }
 h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
 h1 { font-size: clamp(40px, 7vw, 68px); line-height: 1.02; font-weight: 800; }
+h1 .accent { color: var(--tint); }
 h2 { font-size: clamp(28px, 4.2vw, 42px); line-height: 1.08; font-weight: 800; }
 h3 { font-size: 20px; line-height: 1.25; font-weight: 650; letter-spacing: -0.01em; }
 p { margin: 0; }
@@ -54,6 +55,8 @@ nav .links .globe a:hover { background: var(--bg); }
 /* Hero */
 .hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; padding-block: 36px 0; }
 .hero > div { min-width: 0; }
+/* The text keeps the height it had before the device switch grew the right column (title 94 px below the phone’s top at desktop width). */
+@media (min-width: 861px) { .hero > div:first-child { align-self: start; margin-top: 94px; } .hero > div:first-child:has(> .kicker) { margin-top: 76px; } }
 .hero .lede { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 34ch; margin-top: 20px; }
 .hero .lede strong { font-weight: 650; color: var(--fg); }
 .status { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; padding: 9px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); font-size: 15px; font-weight: 550; }
@@ -84,8 +87,9 @@ nav .links .globe a:hover { background: var(--bg); }
 @media (prefers-reduced-motion: reduce) { .devices > * { transition: none; } }
 .device-switch { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
 .device-switch[hidden] { display: none; }
-.device-switch button { font: 600 14px/1 var(--font); padding: 8px 16px; border-radius: 999px; border: 0; cursor: pointer; background: color-mix(in srgb, var(--p1) 12%, transparent); color: var(--fg); }
+.device-switch button { display: inline-grid; place-items: center; font: 600 14px/1 var(--font); padding: 7px 16px; border-radius: 999px; border: 0; cursor: pointer; background: color-mix(in srgb, var(--p1) 12%, transparent); color: var(--fg); }
 .device-switch button[aria-pressed="true"] { background: var(--tint); color: var(--on-tint); }
+.device-switch .ico { width: 20px; height: 20px; }
 .device-switch button:focus-visible { outline: 2px solid var(--tint); outline-offset: 3px; }
 .ipad { border-radius: 22px; background: #0E1A1D; padding: 8px; box-shadow: 0 30px 60px -20px rgba(15, 35, 40, 0.35), 0 0 0 1px rgba(255,255,255,0.06) inset; }
 .ipad-screen { position: relative; aspect-ratio: 2064 / 2752; border-radius: 15px; overflow: hidden; background: var(--map); }
@@ -207,6 +211,9 @@ section + section { border-top: 1px solid var(--hair); }
 footer { padding-block: 40px 56px; border-top: 1px solid var(--hair); display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; font-size: 15px; color: var(--muted); }
 footer .links { display: flex; flex-wrap: wrap; gap: 20px; }
 footer a { color: var(--muted); }
+/* AlephB’s monogram after its name, in the link’s colour (a mask, so it follows light and dark). */
+.alephb { display: inline-flex; align-items: center; gap: 5px; }
+.alephb-logo { width: 27px; height: 15px; background: currentColor; -webkit-mask: url(/img/alephb.svg) center / contain no-repeat; mask: url(/img/alephb.svg) center / contain no-repeat; }
 .email { user-select: all; color: var(--fg); }
 
 @media (max-width: 860px) {

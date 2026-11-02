@@ -50,7 +50,7 @@ layout: null
     <div>
       <p class="kicker">¿Dónde quedamos?</p>
       <h1>El punto medio en minutos, no en metros.</h1>
-      <p class="lede">Compromise encuentra el bar, la cafetería o el restaurante al que todos llegáis más o menos a la vez, se mueva como se mueva cada uno.</p>
+      <p class="lede">Compromise encuentra <strong>el bar, la cafetería o el restaurante</strong> al que todos llegáis <strong>más o menos a la vez</strong>, se mueva como se mueva cada uno.</p>
       <div class="modes" aria-label="Formas de moverse"><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>A pie</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-transit"/></svg>Transporte público</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-car"/></svg>Coche</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>Bici</span></div>
       <div class="cta">
         <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
@@ -59,8 +59,7 @@ layout: null
     </div>
 
     <div>
-      <div class="devices">
-      <div class="ipad"><div class="ipad-screen"><img class="shot" src="/img/es/meet-ipad.jpg" alt="Compromise en iPad: los lugares a la izquierda y la ruta de cada uno en el mapa" width="800" height="1066"></div></div>
+      <div class="devices" data-device="iphone">
       <div class="phone">
         <div class="screen" role="img" aria-label="Ilustración de la app: un mapa con tres amigos y un punto de encuentro, y una lista de lugares a los que Nino, Léa y tú tardáis unos 18 minutos cada uno.">
           <!-- Screenshot slot: img/es/meet.jpg, 400 × 869 -->
@@ -115,7 +114,10 @@ layout: null
           </div>
         </div>
       </div>
+      <div class="ipad"><div class="ipad-screen"><img class="shot" loading="lazy" src="/img/es/meet-ipad.jpg" alt="Compromise en iPad: los lugares a la izquierda y la ruta de cada uno en el mapa" width="800" height="1066"></div></div>
       </div>
+      <div class="device-switch" role="group" aria-label="Dispositivo" hidden><button type="button" data-device="iphone" aria-pressed="true">iPhone</button><button type="button" data-device="ipad" aria-pressed="false">iPad</button></div>
+      <script>{const s=document.querySelector(".device-switch"),d=document.querySelector(".devices");s.hidden=false;s.addEventListener("click",(e)=>{const b=e.target.closest("button");if(!b)return;d.dataset.device=b.dataset.device;for(const x of s.querySelectorAll("button"))x.setAttribute("aria-pressed",x===b);});}</script>
       <p class="illustration">Nombres y lugares de ejemplo.</p>
     </div>
   </header>
@@ -128,9 +130,9 @@ layout: null
       <h2 id="how-title">Tres toques y un lugar que os va bien a todos.</h2>
     </div>
     <ol class="steps">
-      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/es/how-1.jpg" alt="Compartir un enlace de invitación al grupo" width="400" height="869" loading="lazy"></div></div><h3>Añade a todos</h3><p>Empieza desde donde estás y añade a tus amigos o invítalos con un enlace. Dos personas o un grupo entero, cada uno con su punto de partida.</p></li>
-      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/es/how-2.jpg" alt="Cuatro amigos, cada uno con su forma de moverse, y los lugares ordenados según lo parecidos que son sus tiempos de trayecto" width="400" height="869" loading="lazy"></div></div><h3>Di cómo va cada uno</h3><p>Una va andando, otro en metro, otra en bici. Cada trayecto se calcula según cómo se mueve de verdad esa persona.</p></li>
-      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/es/how-3.jpg" alt="La ruta de cada uno hasta el lugar, en el mapa" width="400" height="869" loading="lazy"></div></div><h3>Elige entre los lugares más justos</h3><p>Primero salen los bares, cafeterías y restaurantes donde los tiempos de trayecto de todos se parecen más. Abre la ruta o comparte el lugar con un toque.</p></li>
+      <li><img class="step-shot" src="/img/es/how-1.jpg" alt="El punto de partida de cada uno, con botones para añadir a alguien o invitar a amigos" width="600" height="682" loading="lazy"><h3>Añade a todos</h3><p>Empieza desde donde estás y añade a tus amigos o invítalos con un enlace. Dos personas o un grupo entero, cada uno con su punto de partida.</p></li>
+      <li><img class="step-shot" src="/img/es/how-2.jpg" alt="Cuatro amigos, cada uno con su forma de moverse, y sus tiempos de trayecto hasta el primer lugar" width="600" height="682" loading="lazy"><h3>Di cómo va cada uno</h3><p>Una va andando, otro en metro, otra en bici. Cada trayecto se calcula según cómo se mueve de verdad esa persona.</p></li>
+      <li><img class="step-shot" src="/img/es/how-3.jpg" alt="La ruta de cada uno hasta el lugar más justo, en el mapa" width="600" height="682" loading="lazy"><h3>Elige entre los lugares más justos</h3><p>Primero salen los bares, cafeterías y restaurantes donde los tiempos de trayecto de todos se parecen más. Abre la ruta o comparte el lugar con un toque.</p></li>
     </ol>
   </section>
 
@@ -203,8 +205,8 @@ layout: null
         </ul>
       </div>
       <div class="visual" id="shot-sun">
-        <!-- Screenshot slot: img/es/sun.png, 1206 × 2622 -->
-        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/es/sun.png" alt="Sitios con terraza al sol, cada uno con cuánto dura el sol" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
+        <!-- Screenshot slot: img/es/sun.jpg, 620 × 1347; the ring marks the sun button -->
+        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/es/sun.jpg" width="620" height="1347" alt="El filtro de sol activado: cada lugar dice hasta cuándo tiene sol su terraza" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"><span class="sun-ring" aria-hidden="true"></span></div></div>
         <div class="panel mini" role="img" aria-label="Ilustración: un mapa con terrazas al sol, el mejor lugar al sol hasta las 18:40 y el interruptor Terraza al sol activado.">
 <svg class="snip" viewBox="0 0 300 150" aria-hidden="true"><rect width="300" height="150" fill="var(--map)"/>
 <path d="M-10 104 C 60 84, 120 128, 190 100 S 290 70, 320 86" stroke="var(--water)" stroke-width="16" fill="none"/>
@@ -228,18 +230,22 @@ layout: null
     </div>
     <div class="grid4">
       <div class="tile">
+        <img class="tile-shot" src="/img/es/tile-1.jpg" alt="El menú de tipos de lugar, de comer y beber al aire libre" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
         <h3>35 tipos de lugares</h3><p>Bares, cafeterías, restaurantes, cines, museos, parques y más, y ves cuáles estarán abiertos cuando lleguéis.</p>
       </div>
       <div class="tile">
+        <img class="tile-shot" src="/img/es/tile-2.jpg" alt="Cuatro tiempos de trayecto hasta un lugar, cada persona en su color" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
         <h3>Un color para cada uno</h3><p>El tiempo de trayecto de cada uno en la misma escala, con su color, en la lista y en el mapa.</p>
       </div>
       <div class="tile">
+        <img class="tile-shot" src="/img/es/tile-3.jpg" alt="El menú de compartir, para enviar o copiar los lugares" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
         <h3>Comparte o sal ya</h3><p>Manda los lugares al grupo o abre la ruta en tu app de mapas.</p>
       </div>
       <div class="tile">
+        <img class="tile-shot" src="/img/es/tile-4.jpg" alt="La fecha y la hora de salida en los ajustes" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
         <h3>Planea para luego</h3><p>Elige cuándo salís: los tiempos de trayecto y el sol siguen esa hora, no solo la de ahora.</p>
       </div>
@@ -274,7 +280,7 @@ layout: null
   </section>
 
   <footer>
-    <span>Compromise, de AlephB.</span>
+    <span>Compromise, de <a href="https://alephb.uk">AlephB</a>.</span>
     <div class="links"><a href="/privacy" hreflang="en">Privacidad (en inglés)</a>{% include lang-links.html current="es" %}<span>Contacto: <span class="email">contact@alephb.uk</span></span></div>
   </footer>
 </div>

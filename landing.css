@@ -7,7 +7,7 @@
 @font-face { font-family: "Nunito Sans"; font-style: normal; font-weight: 400 800; font-display: swap; src: url(/fonts/nunito-sans-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 :root {
   --bg: #F6F9FA; --surface: #FFFFFF; --fg: #0F2328; --muted: #50686E; --hair: #DCE6E8;
-  --tint: #2F7F90; --on-tint: #FFFFFF; --p1: #368B9C; --p2: #DB7116; --p3: #8E5BB5; --sun: #E8A317; --shade: #37565C;
+  --tint: #2F7F90; --on-tint: #FFFFFF; --p1: #368B9C; --p2: #DB7116; --p3: #8E5BB5; --p4: #C03A6B; --sun: #E8A317; --shade: #37565C;
   --map: #E9F0EE; --street: #FFFFFF; --park: #D6E8D5; --water: #CFE6EE;
   /* Brand type (owner, 2026-10-16): Nunito for titles, Nunito Sans for text, self-hosted in /fonts/ (the @font-face rules above). */
   --font: "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
@@ -16,7 +16,7 @@
 }
 @media (prefers-color-scheme: dark) { :root {
   --bg: #0B1416; --surface: #132126; --fg: #E4EFF1; --muted: #98B0B6; --hair: #22363B;
-  --tint: #16B9DB; --on-tint: #06181C; --p1: #16B9DB; --p2: #E8842E; --p3: #C39BE3; --sun: #FFC048; --shade: #8FB5BC;
+  --tint: #16B9DB; --on-tint: #06181C; --p1: #16B9DB; --p2: #E8842E; --p3: #C39BE3; --p4: #F284AC; --sun: #FFC048; --shade: #8FB5BC;
   --map: #16252A; --street: #22363C; --park: #1C3328; --water: #173440; } }
 
 * { box-sizing: border-box; }
@@ -55,6 +55,7 @@ nav .links .globe a:hover { background: var(--bg); }
 .hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; padding-block: 36px 0; }
 .hero > div { min-width: 0; }
 .hero .lede { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 34ch; margin-top: 20px; }
+.hero .lede strong { font-weight: 650; color: var(--fg); }
 .status { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; padding: 9px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); font-size: 15px; font-weight: 550; }
 .status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--p2); }
 .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 26px; }
@@ -73,13 +74,21 @@ nav .links .globe a:hover { background: var(--bg); }
 /* An app screenshot covers the illustration once img/<lang>/<name>.png exists; until then the img removes itself. */
 .screen img.shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; }
 .visual:not(.has-shot) > .phone, .visual.has-shot > .panel { display: none; }
-/* Hero: the iPad behind, the iPhone in front of its lower right corner, both on the same example. */
-.devices { position: relative; padding: 0 22% 28px 0; }
-.ipad { border-radius: 28px; background: #0E1A1D; padding: 10px; box-shadow: 0 30px 60px -20px rgba(15, 35, 40, 0.35), 0 0 0 1px rgba(255,255,255,0.06) inset; }
-.ipad-screen { position: relative; aspect-ratio: 2064 / 2752; border-radius: 18px; overflow: hidden; background: var(--map); }
-.devices .phone { position: absolute; right: 0; bottom: 0; width: 38%; border-radius: 30px; padding: 7px; }
-.devices .screen { border-radius: 24px; }
-.devices .island { top: 5px; width: 46px; height: 13px; }
+/* The selected sun button in the sunny-terrace screenshot, ringed as in the principle video; placed in % of the screen so it stays on the button. */
+.sun-ring { position: absolute; z-index: 3; left: 80.7%; top: 10.25%; width: 13%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; border: 3px solid var(--sun); background: color-mix(in srgb, var(--sun) 16%, transparent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--sun) 22%, transparent), 0 0 18px 4px color-mix(in srgb, var(--sun) 45%, transparent); pointer-events: none; }
+/* Hero: the iPhone by default, the iPad behind the iPhone | iPad switch (shown by its script). Both sit in one grid cell, so the column keeps the taller one's height and nothing jumps. */
+.devices { display: grid; align-items: center; }
+.devices > * { grid-area: 1 / 1; transition: opacity 0.25s, visibility 0.25s; }
+.devices[data-device="iphone"] > .ipad, .devices[data-device="ipad"] > .phone { opacity: 0; visibility: hidden; }
+.devices .ipad { width: min(470px, 100%); margin-inline: auto; }
+@media (prefers-reduced-motion: reduce) { .devices > * { transition: none; } }
+.device-switch { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+.device-switch[hidden] { display: none; }
+.device-switch button { font: 600 14px/1 var(--font); padding: 8px 16px; border-radius: 999px; border: 0; cursor: pointer; background: color-mix(in srgb, var(--p1) 12%, transparent); color: var(--fg); }
+.device-switch button[aria-pressed="true"] { background: var(--tint); color: var(--on-tint); }
+.device-switch button:focus-visible { outline: 2px solid var(--tint); outline-offset: 3px; }
+.ipad { border-radius: 22px; background: #0E1A1D; padding: 8px; box-shadow: 0 30px 60px -20px rgba(15, 35, 40, 0.35), 0 0 0 1px rgba(255,255,255,0.06) inset; }
+.ipad-screen { position: relative; aspect-ratio: 2064 / 2752; border-radius: 15px; overflow: hidden; background: var(--map); }
 .ipad-screen img.shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-radius: 22px 22px 0 0; padding: 8px 14px 16px; box-shadow: 0 -6px 20px rgba(0,0,0,0.08); }
 .grabber { width: 36px; height: 5px; border-radius: 3px; background: var(--hair); margin: 0 auto 10px; }
@@ -87,6 +96,11 @@ nav .links .globe a:hover { background: var(--bg); }
 .chip { display: inline-flex; align-items: center; gap: 5px; font: 600 11.5px/1 var(--font); padding: 6px 9px; border-radius: 999px; background: var(--bg); }
 .chip i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .ico { width: 1.15em; height: 1.15em; flex: none; vertical-align: -0.2em; }
+/* One colour per travel mode on its icon (the app’s first four person colours); the label keeps the text colour. */
+.ico:has(use[href="#m-walk"]) { color: var(--p1); }
+.ico:has(use[href="#m-transit"]) { color: var(--p2); }
+.ico:has(use[href="#m-car"]) { color: var(--p4); }
+.ico:has(use[href="#m-bike"]) { color: var(--p3); }
 .spot { padding: 9px 0; border-top: 1px solid var(--hair); }
 .spot-head { display: flex; align-items: center; gap: 8px; }
 .rank { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 700 11px/1 var(--round); color: #fff; background: var(--shade); flex: none; }
@@ -114,10 +128,8 @@ section + section { border-top: 1px solid var(--hair); }
 .steps li:nth-child(2)::before { background: var(--p2); }
 .steps li:nth-child(3)::before { background: var(--p3); }
 .steps p { color: var(--muted); font-size: 16px; }
-/* Each step shows its app screen in a smaller phone, above the number. */
-.steps .phone { order: -1; width: min(200px, 100%); border-radius: 30px; padding: 7px; margin-bottom: 8px; }
-.steps .screen { border-radius: 24px; }
-.steps .island { top: 6px; width: 60px; height: 17px; }
+/* Each step shows a crop of its app screen above the number. */
+.steps .step-shot { order: -1; width: 100%; height: auto; border-radius: 16px; margin-bottom: 8px; }
 
 .feature { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
 .feature > div { min-width: 0; }
@@ -179,6 +191,7 @@ section + section { border-top: 1px solid var(--hair); }
 .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .tile { background: var(--surface); border-radius: 20px; padding: 24px; display: grid; gap: 8px; align-content: start; min-width: 0; }
 .tile p { font-size: 15.5px; color: var(--muted); }
+.tile-shot { width: 100%; height: auto; border-radius: 14px; margin-bottom: 8px; }
 .tile svg { width: 28px; height: 28px; color: var(--tint); }
 
 .privacy { background: var(--surface); border-radius: 28px; padding: clamp(28px, 5vw, 56px); display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }

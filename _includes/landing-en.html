@@ -61,7 +61,7 @@
   <header class="hero">
     <div>
       <h1>Meet halfway in minutes, not miles.</h1>
-      <p class="lede">Compromise finds the bar, café or restaurant everyone reaches in about the same time, however each of you travels.</p>
+      <p class="lede">Compromise finds <strong>the bar, café or restaurant</strong> everyone reaches <strong>in about the same time</strong>, however each of you travels.</p>
       <div class="modes" aria-label="Ways to travel"><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>On foot</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-transit"/></svg>Transit</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-car"/></svg>Car</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>Bike</span></div>
       <div class="cta">
         <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
@@ -70,8 +70,7 @@
     </div>
 
     <div>
-      <div class="devices">
-      <div class="ipad"><div class="ipad-screen"><img class="shot" src="/img/en/meet-ipad.jpg" alt="Compromise on iPad: the spots on the left, everyone’s route on the map" width="800" height="1066"></div></div>
+      <div class="devices" data-device="iphone">
       <div class="phone">
         <div class="screen" role="img" aria-label="Illustration of the app: a map with three friends and a meeting spot, and a list of spots where Nino, Léa and you each travel about 18 minutes.">
           <!-- Screenshot slot: img/en/meet.jpg, 400 × 869 -->
@@ -126,7 +125,10 @@
           </div>
         </div>
       </div>
+      <div class="ipad"><div class="ipad-screen"><img class="shot" loading="lazy" src="/img/en/meet-ipad.jpg" alt="Compromise on iPad: the spots on the left, everyone’s route on the map" width="800" height="1066"></div></div>
       </div>
+      <div class="device-switch" role="group" aria-label="Device" hidden><button type="button" data-device="iphone" aria-pressed="true">iPhone</button><button type="button" data-device="ipad" aria-pressed="false">iPad</button></div>
+      <script>{const s=document.querySelector(".device-switch"),d=document.querySelector(".devices");s.hidden=false;s.addEventListener("click",(e)=>{const b=e.target.closest("button");if(!b)return;d.dataset.device=b.dataset.device;for(const x of s.querySelectorAll("button"))x.setAttribute("aria-pressed",x===b);});}</script>
       <p class="illustration">Names and places are examples.</p>
     </div>
   </header>
@@ -139,9 +141,9 @@
       <h2 id="how-title">Three taps to a place everyone can live with.</h2>
     </div>
     <ol class="steps">
-      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/how-1.jpg" alt="Sharing an invite link to the group" width="400" height="869" loading="lazy"></div></div><h3>Add everyone</h3><p>Start from where you are, then add friends or invite them with a link. Two people or a whole group, each with their own starting point.</p></li>
-      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/how-2.jpg" alt="Four friends, each with their way of travelling, and the spots ranked by how close their travel times are" width="400" height="869" loading="lazy"></div></div><h3>Say how each one travels</h3><p>One walks, one takes the metro, one cycles. Every journey is timed the way that person actually travels.</p></li>
-      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/how-3.jpg" alt="Everyone’s route to the spot on the map" width="400" height="869" loading="lazy"></div></div><h3>Pick from the fairest spots</h3><p>Bars, cafés and restaurants come first where everyone’s travel times are closest. Open the route or share the spot in one tap.</p></li>
+      <li><img class="step-shot" src="/img/en/how-1.jpg" alt="Everyone’s starting point, with buttons to add a person or invite friends" width="600" height="682" loading="lazy"><h3>Add everyone</h3><p>Start from where you are, then add friends or invite them with a link. Two people or a whole group, each with their own starting point.</p></li>
+      <li><img class="step-shot" src="/img/en/how-2.jpg" alt="Four friends, each with their way of travelling, and their travel times to the first spot" width="600" height="682" loading="lazy"><h3>Say how each one travels</h3><p>One walks, one takes the metro, one cycles. Every journey is timed the way that person actually travels.</p></li>
+      <li><img class="step-shot" src="/img/en/how-3.jpg" alt="Everyone’s route to the fairest spot on the map" width="600" height="682" loading="lazy"><h3>Pick from the fairest spots</h3><p>Bars, cafés and restaurants come first where everyone’s travel times are closest. Open the route or share the spot in one tap.</p></li>
     </ol>
   </section>
 
@@ -214,8 +216,8 @@
         </ul>
       </div>
       <div class="visual" id="shot-sun">
-        <!-- Screenshot slot: img/en/sun.png, 1206 × 2622 -->
-        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/sun.png" alt="Spots with a sunny terrace, each saying how long the sun lasts" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
+        <!-- Screenshot slot: img/en/sun.jpg, 620 × 1347; the ring marks the sun button -->
+        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/sun.jpg" width="620" height="1347" alt="The sun filter on: each spot says until when its terrace is in the sun" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"><span class="sun-ring" aria-hidden="true"></span></div></div>
         <div class="panel mini" role="img" aria-label="Illustration: a map with sunlit terraces, the best spot in the sun until 18:40, and the Sunny terrace switch on.">
 <svg class="snip" viewBox="0 0 300 150" aria-hidden="true"><rect width="300" height="150" fill="var(--map)"/>
 <path d="M-10 104 C 60 84, 120 128, 190 100 S 290 70, 320 86" stroke="var(--water)" stroke-width="16" fill="none"/>
@@ -239,18 +241,22 @@
     </div>
     <div class="grid4">
       <div class="tile">
+        <img class="tile-shot" src="/img/en/tile-1.jpg" alt="The menu of kinds of place, from eating and drinking to the outdoors" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
         <h3>35 kinds of place</h3><p>Bars, cafés, restaurants, cinemas, museums, parks and more, and you can see which ones are open when you arrive.</p>
       </div>
       <div class="tile">
+        <img class="tile-shot" src="/img/en/tile-2.jpg" alt="Four travel times to one spot, each person in their own colour" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
         <h3>One colour each</h3><p>Everyone’s travel time on one scale, in their own colour, in the list and on the map.</p>
       </div>
       <div class="tile">
+        <img class="tile-shot" src="/img/en/tile-3.jpg" alt="The share sheet, to send the spots or copy them" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
         <h3>Share or go</h3><p>Send the spots to the group, or open the route in your maps app.</p>
       </div>
       <div class="tile">
+        <img class="tile-shot" src="/img/en/tile-4.jpg" alt="The departure date and time in Settings" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
         <h3>Plan for later</h3><p>Choose when you leave, and travel times and sunshine follow that time, not just right now.</p>
       </div>
@@ -285,7 +291,7 @@
   </section>
 
   <footer>
-    <span>Compromise, by AlephB.</span>
+    <span>Compromise, by <a href="https://alephb.uk">AlephB</a>.</span>
     <div class="links"><a href="/privacy">Privacy policy</a>{% include lang-links.html current="en" %}<span>Contact: <span class="email">contact@alephb.uk</span></span></div>
   </footer>
 </div>

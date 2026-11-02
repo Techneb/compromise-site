@@ -50,7 +50,7 @@ layout: null
     <div>
       <p class="kicker">Wo treffen wir uns?</p>
       <h1>Die Mitte in Minuten, nicht in Metern.</h1>
-      <p class="lede">Compromise findet die Bar, das Café oder das Restaurant, das alle in etwa gleich schnell erreichen, egal wie ihr unterwegs seid.</p>
+      <p class="lede">Compromise findet <strong>die Bar, das Café oder das Restaurant</strong>, das alle <strong>in etwa gleich schnell</strong> erreichen, egal wie ihr unterwegs seid.</p>
       <div class="modes" aria-label="Wie ihr unterwegs seid"><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>Zu Fuß</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-transit"/></svg>Öffis</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-car"/></svg>Auto</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>Rad</span></div>
       <div class="cta">
         <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
@@ -59,8 +59,7 @@ layout: null
     </div>
 
     <div>
-      <div class="devices">
-      <div class="ipad"><div class="ipad-screen"><img class="shot" src="/img/de/meet-ipad.jpg" alt="Compromise auf dem iPad: links die Orte, auf der Karte die Wege aller" width="800" height="1066"></div></div>
+      <div class="devices" data-device="iphone">
       <div class="phone">
         <div class="screen" role="img" aria-label="Illustration der App: eine Karte mit drei Freunden und einem Treffpunkt, dazu eine Liste mit Orten, zu denen Nino, Léa und du jeweils etwa 18 Minuten braucht.">
           <!-- Screenshot slot: img/de/meet.jpg, 400 × 869 -->
@@ -115,7 +114,10 @@ layout: null
           </div>
         </div>
       </div>
+      <div class="ipad"><div class="ipad-screen"><img class="shot" loading="lazy" src="/img/de/meet-ipad.jpg" alt="Compromise auf dem iPad: links die Orte, auf der Karte die Wege aller" width="800" height="1066"></div></div>
       </div>
+      <div class="device-switch" role="group" aria-label="Gerät" hidden><button type="button" data-device="iphone" aria-pressed="true">iPhone</button><button type="button" data-device="ipad" aria-pressed="false">iPad</button></div>
+      <script>{const s=document.querySelector(".device-switch"),d=document.querySelector(".devices");s.hidden=false;s.addEventListener("click",(e)=>{const b=e.target.closest("button");if(!b)return;d.dataset.device=b.dataset.device;for(const x of s.querySelectorAll("button"))x.setAttribute("aria-pressed",x===b);});}</script>
       <p class="illustration">Namen und Orte sind Beispiele.</p>
     </div>
   </header>
@@ -128,9 +130,9 @@ layout: null
       <h2 id="how-title">In drei Schritten zu einem Ort, der für alle passt.</h2>
     </div>
     <ol class="steps">
-      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/how-1.jpg" alt="Ein Einladungslink zur Gruppe wird geteilt" width="400" height="869" loading="lazy"></div></div><h3>Alle hinzufügen</h3><p>Starte da, wo du bist, und füge Freunde hinzu oder lade sie per Link ein. Zu zweit oder als ganze Gruppe, alle mit ihrem eigenen Startpunkt.</p></li>
-      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/how-2.jpg" alt="Vier Freunde, alle mit ihrem Verkehrsmittel, und die Orte danach sortiert, wie nah ihre Fahrzeiten beieinanderliegen" width="400" height="869" loading="lazy"></div></div><h3>Sag, wie alle hinkommen</h3><p>Eine läuft, einer nimmt die U-Bahn, eine fährt Rad. Jeder Weg wird so berechnet, wie die Person wirklich unterwegs ist.</p></li>
-      <li><div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/how-3.jpg" alt="Die Wege aller zum Ort auf der Karte" width="400" height="869" loading="lazy"></div></div><h3>Wähl aus den fairsten Orten</h3><p>Bars, Cafés und Restaurants, bei denen die Fahrzeiten aller am nächsten beieinanderliegen, stehen oben. Öffne die Route oder teile den Ort mit einem Tipp.</p></li>
+      <li><img class="step-shot" src="/img/de/how-1.jpg" alt="Die Startpunkte aller, mit Knöpfen, um jemanden hinzuzufügen oder Freunde einzuladen" width="600" height="682" loading="lazy"><h3>Alle hinzufügen</h3><p>Starte da, wo du bist, und füge Freunde hinzu oder lade sie per Link ein. Zu zweit oder als ganze Gruppe, alle mit ihrem eigenen Startpunkt.</p></li>
+      <li><img class="step-shot" src="/img/de/how-2.jpg" alt="Vier Freunde, alle mit ihrem Verkehrsmittel, und ihre Fahrzeiten zum ersten Ort" width="600" height="682" loading="lazy"><h3>Sag, wie alle hinkommen</h3><p>Eine läuft, einer nimmt die U-Bahn, eine fährt Rad. Jeder Weg wird so berechnet, wie die Person wirklich unterwegs ist.</p></li>
+      <li><img class="step-shot" src="/img/de/how-3.jpg" alt="Die Wege aller zum fairsten Ort auf der Karte" width="600" height="682" loading="lazy"><h3>Wähl aus den fairsten Orten</h3><p>Bars, Cafés und Restaurants, bei denen die Fahrzeiten aller am nächsten beieinanderliegen, stehen oben. Öffne die Route oder teile den Ort mit einem Tipp.</p></li>
     </ol>
   </section>
 
@@ -203,8 +205,8 @@ layout: null
         </ul>
       </div>
       <div class="visual" id="shot-sun">
-        <!-- Screenshot slot: img/de/sun.png, 1206 × 2622 -->
-        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/sun.png" alt="Orte mit sonniger Terrasse, jeweils mit der Angabe, wie lange die Sonne bleibt" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
+        <!-- Screenshot slot: img/de/sun.jpg, 620 × 1347; the ring marks the sun button -->
+        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/de/sun.jpg" width="620" height="1347" alt="Der Sonnenfilter ist an: Jeder Ort zeigt, bis wann seine Terrasse in der Sonne liegt" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"><span class="sun-ring" aria-hidden="true"></span></div></div>
         <div class="panel mini" role="img" aria-label="Illustration: eine Karte mit sonnigen Terrassen, der beste Ort in der Sonne bis 18:40 und der Schalter Sonnige Terrasse an.">
 <svg class="snip" viewBox="0 0 300 150" aria-hidden="true"><rect width="300" height="150" fill="var(--map)"/>
 <path d="M-10 104 C 60 84, 120 128, 190 100 S 290 70, 320 86" stroke="var(--water)" stroke-width="16" fill="none"/>
@@ -228,18 +230,22 @@ layout: null
     </div>
     <div class="grid4">
       <div class="tile">
+        <img class="tile-shot" src="/img/de/tile-1.jpg" alt="Das Menü der Ortsarten, von Essen und Trinken bis draußen" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
         <h3>35 Arten von Orten</h3><p>Bars, Cafés, Restaurants, Kinos, Museen, Parks und mehr, und du siehst, welche bei eurer Ankunft geöffnet sind.</p>
       </div>
       <div class="tile">
+        <img class="tile-shot" src="/img/de/tile-2.jpg" alt="Vier Fahrzeiten zu einem Ort, jede Person in ihrer Farbe" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
         <h3>Eine Farbe pro Person</h3><p>Die Fahrzeit aller auf einer Skala, jede in ihrer eigenen Farbe, in der Liste und auf der Karte.</p>
       </div>
       <div class="tile">
+        <img class="tile-shot" src="/img/de/tile-3.jpg" alt="Das Teilen-Menü, um die Orte zu senden oder zu kopieren" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
         <h3>Teilen oder los</h3><p>Schick die Orte an die Gruppe oder öffne die Route in deiner Karten-App.</p>
       </div>
       <div class="tile">
+        <img class="tile-shot" src="/img/de/tile-4.jpg" alt="Datum und Uhrzeit der Abfahrt in den Einstellungen" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
         <h3>Für später planen</h3><p>Wähl, wann ihr losgeht: Fahrzeiten und Sonne richten sich nach dieser Uhrzeit, nicht nur nach jetzt.</p>
       </div>
@@ -274,7 +280,7 @@ layout: null
   </section>
 
   <footer>
-    <span>Compromise, von AlephB.</span>
+    <span>Compromise, von <a href="https://alephb.uk">AlephB</a>.</span>
     <div class="links"><a href="/privacy" hreflang="en">Datenschutz (auf Englisch)</a>{% include lang-links.html current="de" %}<span>Kontakt: <span class="email">contact@alephb.uk</span></span></div>
   </footer>
 </div>

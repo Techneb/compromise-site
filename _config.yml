@@ -1,5 +1,5 @@
 title: Compromise
 description: A fair place to meet
 include: [".well-known"]
-# The public TestFlight link, the "Try the app" button of /, /en/, /fr/, /es/ and /de/: paste it between the quotes (the App Store link once 1.0 is approved).
+# The public TestFlight link, used by /, /en/, /fr/, /es/ and /de/: paste it between the quotes.
 beta_url: "https://testflight.apple.com/join/5J8fMFDM"

@@ -52,7 +52,7 @@ nav .links .globe a:hover { background: var(--bg); }
 .globe a[aria-current]::after { content: "\2713"; color: var(--tint); font-weight: 700; }
 
 /* Hero */
-.hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; padding-block: 36px 16px; }
+.hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; padding-block: 36px 0; }
 .hero > div { min-width: 0; }
 .hero .lede { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 34ch; margin-top: 20px; }
 .status { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; padding: 9px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); font-size: 15px; font-weight: 550; }
@@ -97,6 +97,7 @@ nav .links .globe a:hover { background: var(--bg); }
 /* Sections */
 section { padding-block: 72px; }
 section + section { border-top: 1px solid var(--hair); }
+.hero + section { padding-top: 32px; }
 .section-head { display: grid; gap: 14px; max-width: 42rem; margin-bottom: 40px; }
 .section-head p { font-size: 19px; color: var(--muted); }
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: step; list-style: none; padding: 0; margin: 0; }

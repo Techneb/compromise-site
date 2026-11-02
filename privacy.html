@@ -52,8 +52,8 @@ main .email { font-weight: 550; }
 
 footer { padding-block: 40px 56px; border-top: 1px solid var(--hair); display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; font-size: 15px; color: var(--muted); }
 footer .links { display: flex; flex-wrap: wrap; gap: 20px; }
-.alephb { display: inline-flex; align-items: center; gap: 5px; }
-.alephb-logo { width: 27px; height: 15px; background: currentColor; -webkit-mask: url(/img/alephb.svg) center / contain no-repeat; mask: url(/img/alephb.svg) center / contain no-repeat; }
+.alephb { white-space: nowrap; }
+.alephb-logo { display: inline-block; height: 0.7em; width: 1.27em; margin-left: 0.3em; vertical-align: baseline; background-color: var(--tint); -webkit-mask-image: url(/img/alephb.svg); mask-image: url(/img/alephb.svg); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: left bottom; mask-position: left bottom; }
 footer a.alephb, footer a[href^="mailto:"] { color: var(--tint); text-decoration: none; }
 footer a.alephb:hover, footer a[href^="mailto:"]:hover { text-decoration: underline; }
 footer a { color: var(--muted); }

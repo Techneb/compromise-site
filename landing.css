@@ -186,6 +186,8 @@ section[aria-labelledby="sun-title"] .feature li::before { content: "\2600\FE0F"
 .phones .phone { border-radius: 34px; padding: 8px; }
 .phones .screen.short { aspect-ratio: 620 / 1182; border-radius: 27px; }
 .phones .screen img.shot { object-position: top; }
+/* Emma, in her colour, on both Groups phones: her row on the organiser's list and her name on the form; placed in % of the screen. */
+.person-ring { position: absolute; z-index: 3; border-radius: 14px; border: 2.5px solid var(--p4); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p4) 20%, transparent), 0 0 14px 2px color-mix(in srgb, var(--p4) 40%, transparent); pointer-events: none; }
 .phones .island { top: 6px; width: 30%; height: auto; aspect-ratio: 92 / 26; }
 
 .join { background: var(--surface); border-radius: 28px; padding: clamp(28px, 5vw, 56px); display: grid; gap: 14px; justify-items: start; }

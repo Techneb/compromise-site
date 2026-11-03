@@ -182,6 +182,7 @@ section[aria-labelledby="sun-title"] .feature li::before { content: "\2600\FE0F"
 #groups .feature .copy { max-width: 38ch; }
 .phones figure { margin: 0; display: grid; gap: 10px; }
 .phones figcaption { font-size: 15px; font-weight: 650; color: var(--muted); text-align: center; }
+.phones .phone-note { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
 .phones .phone { border-radius: 34px; padding: 8px; }
 .phones .screen.short { aspect-ratio: 620 / 1182; border-radius: 27px; }
 .phones .screen img.shot { object-position: top; }

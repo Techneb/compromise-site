@@ -37,6 +37,13 @@
 <link rel="icon" type="image/png" href="/logo.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- Travel-mode icons, drawn to match the app's SF Symbols (figure.walk, tram.fill, car.fill, bicycle). -->
+  <symbol id="m-walk" viewBox="0 0 24 24"><circle cx="13.5" cy="4" r="2.2" fill="currentColor"/><path d="M13 8.5 10.5 14l3 3v5M10.5 14 8.5 22M12.8 9l3 3.5 3 1M12.2 8.8 8.5 10.5 7.5 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="m-transit" viewBox="0 0 24 24"><path d="M8 2.5h8M12 2.5V5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path fill="currentColor" fill-rule="evenodd" d="M8 5h8a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm-.5 3.5v4h9v-4Zm1.5 6.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm6 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z"/><path d="m8.5 19.5-1.5 2.5M15.5 19.5l1.5 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="m-car" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M7.6 4h8.8a2 2 0 0 1 1.9 1.4L19.7 10H20a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-1v1.5a1.5 1.5 0 0 1-3 0V18H7v1.5a1.5 1.5 0 0 1-3 0V18H3a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h.3l1.4-4.6A2 2 0 0 1 7.6 4Zm.2 2-1.2 4h10.8l-1.2-4ZM6 12.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm12 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></symbol>
+  <symbol id="m-bike" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="16" r="3.8"/><circle cx="18.5" cy="16" r="3.8"/><path d="M5.5 16 9 9h7l2.5 7M9 9l3.5 7h-7M12.5 16 16 9M8 6.5h3M15 6.5h2l-1 2.5"/></g></symbol>
+</svg>
 <div class="wrap">
   <nav aria-label="Main">
     <a class="brand" href="{{ page.url }}">
@@ -46,28 +53,27 @@
       Compromise
     </a>
     <div class="links">
-      <a class="hide-sm" href="#how">How it works</a><a class="hide-xs" href="/privacy">Privacy</a>
       {% include lang-menu.html current="en" label="Language" %}
     </div>
   </nav>
 
   <header class="hero">
     <div>
-      <h1>Meet halfway in minutes, not miles.</h1>
-      <p class="lede">Compromise finds the bar, café or restaurant everyone reaches in about the same time, however each of you travels.</p>
-      <div class="modes" aria-label="Ways to travel"><span class="mode">On foot</span><span class="mode">Transit</span><span class="mode">Car</span><span class="mode">Bike</span></div>
+      <h1>Meet halfway in <span class="accent">minutes</span>, not <span class="accent">miles</span>.</h1>
+      <p class="lede">Compromise finds <strong>the bar, café or restaurant</strong> everyone reaches <strong>in about the same time</strong>, however each of you travels.</p>
+      <div class="modes" aria-label="Ways to travel"><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>On foot</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-transit"/></svg>Transit</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-car"/></svg>Car</span><span class="mode"><svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>Bike</span></div>
       <div class="cta">
         <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
         <a class="store" href="{{ site.beta_url }}"><img src="/img/app-store-badge-en.svg" alt="Download on the App Store" width="150" height="50"></a>
       </div>
-      <p class="muted" style="margin-top: 12px; font-size: 15px">Works on iPad too.</p>
     </div>
 
     <div>
+      <div class="devices" data-device="iphone">
       <div class="phone">
         <div class="screen" role="img" aria-label="Illustration of the app: a map with three friends and a meeting spot, and a list of spots where Nino, Léa and you each travel about 18 minutes.">
-          <!-- Screenshot slot: img/en/meet.png, 1206 × 2622 -->
-          <img class="shot" src="/img/en/meet.png" alt="Compromise: the map, everyone’s start, and the spots ranked by how close everyone’s travel times are" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
+          <!-- Screenshot slot: img/en/meet.jpg, 400 × 869 -->
+          <img class="shot" src="/img/en/meet.jpg" width="400" height="869" alt="Compromise: the map, everyone’s start, and the spots ranked by how close everyone’s travel times are" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
           <div class="island"></div>
           <svg class="map" viewBox="0 0 300 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <rect width="300" height="640" fill="var(--map)"/>
@@ -94,9 +100,9 @@
           <div class="sheet" aria-hidden="true">
             <div class="grabber"></div>
             <div class="chips">
-              <span class="chip"><i style="background: var(--p1)"></i>You · walk</span>
-              <span class="chip"><i style="background: var(--p2)"></i>Nino · transit</span>
-              <span class="chip"><i style="background: var(--p3)"></i>Léa · bike</span>
+              <span class="chip"><i style="background: var(--p1)"></i>You · <svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>walk</span>
+              <span class="chip"><i style="background: var(--p2)"></i>Nino · <svg class="ico" aria-hidden="true"><use href="#m-transit"/></svg>transit</span>
+              <span class="chip"><i style="background: var(--p3)"></i>Léa · <svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>bike</span>
             </div>
             <div class="spot">
               <div class="spot-head"><span class="rank">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 min apart</span></div>
@@ -118,6 +124,10 @@
           </div>
         </div>
       </div>
+      <div class="ipad"><div class="ipad-screen"><img class="shot" loading="lazy" src="/img/en/meet-ipad.jpg" alt="Compromise on iPad: the spots on the left, everyone’s route on the map" width="800" height="1066"></div></div>
+      </div>
+      <div class="device-switch" role="group" aria-label="Device" hidden><button type="button" data-device="iphone" aria-pressed="true" aria-label="iPhone" title="iPhone"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.5 18.2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><button type="button" data-device="ipad" aria-pressed="false" aria-label="iPad" title="iPad"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3" width="17" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.5 17.7h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+      <script>{const s=document.querySelector(".device-switch"),d=document.querySelector(".devices");s.hidden=false;s.addEventListener("click",(e)=>{const b=e.target.closest("button");if(!b)return;d.dataset.device=b.dataset.device;for(const x of s.querySelectorAll("button"))x.setAttribute("aria-pressed",x===b);});}</script>
       <p class="illustration">Names and places are examples.</p>
     </div>
   </header>
@@ -130,9 +140,9 @@
       <h2 id="how-title">Three taps to a place everyone can live with.</h2>
     </div>
     <ol class="steps">
-      <li><h3>Add everyone</h3><p>Start from where you are, then add friends or invite them with a link. Two people or a whole group, each with their own starting point.</p></li>
-      <li><h3>Say how each one travels</h3><p>One walks, one takes the metro, one cycles. Every journey is timed the way that person actually travels.</p></li>
-      <li><h3>Pick from the fairest spots</h3><p>Bars, cafés and restaurants come first where everyone’s travel times are closest. Open the route or share the spot in one tap.</p></li>
+      <li><img class="step-shot" src="/img/en/how-1.jpg" alt="Four people, each with their starting place, and buttons to add another person or invite friends" width="600" height="532" loading="lazy"><h3>Add everyone</h3><p>Start from where you are, then add friends or <strong>invite them with a link</strong>. Two people or a whole group, each with their own starting point.</p></li>
+      <li><img class="step-shot" src="/img/en/how-2.jpg" alt="Each person’s way of travelling and travel time to one spot" width="600" height="532" loading="lazy"><h3>Say how each one travels</h3><p>One walks, one takes the metro, one cycles. Every journey is timed <strong>the way that person actually travels</strong>.</p></li>
+      <li><img class="step-shot" src="/img/en/how-3.jpg" alt="The ranked spots for the same four friends, each with how many minutes apart their travel times are" width="600" height="532" loading="lazy"><h3>Pick from the fairest spots</h3><p>Bars, cafés and restaurants come first where everyone’s <strong>travel times are closest</strong>. Open the route or share the spot in one tap.</p></li>
     </ol>
   </section>
 
@@ -141,10 +151,10 @@
       <div class="copy">
         <p class="kicker">Fair means time</p>
         <h2 id="fair-title">The middle of the map is rarely the fair place.</h2>
-        <p>A point halfway between two addresses can mean a short walk for one of you and a long trip for the other. Compromise compares real travel times, so nobody spends the evening getting there.</p>
+        <p>A point halfway between two addresses can mean a short walk for one of you and a long trip for the other. <span class="brand-word">Compromise</span> compares <strong>real travel times</strong>, so nobody spends the evening getting there.</p>
         <ul>
-          <li>On foot, by transit, by car or by bike, each person their own way.</li>
-          <li>On transit, see which lines to take.</li>
+          <li><span>On foot, by transit, by car or by bike, <strong>each person their own way</strong>.</span></li>
+          <li><span>On transit, see <strong>which lines to take</strong>.</span></li>
         </ul>
       </div>
       <div>
@@ -156,7 +166,7 @@
             <p class="verdict bad">23 minutes apart</p>
           </div>
           <div class="compare-row">
-            <div class="compare-title">The spot Compromise picks</div>
+            <div class="compare-title"><b>The spot <b class="brand-word">Compromise</b> picks</b></div>
             <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 45%; background: var(--p2)"></span></span><b>18 min</b></div>
             <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 55%; background: var(--p3)"></span></span><b>22 min</b></div>
             <p class="verdict good">4 minutes apart</p>
@@ -171,22 +181,25 @@
       <div class="copy">
         <p class="kicker">Groups</p>
         <h2 id="group-title">One link, and everyone is in.</h2>
-        <p>Send the group one link. Friends with the app and iCloud join the group: everyone’s start and way of travelling appear on every phone, and changes show up live. Friends without the app answer from the link in a few seconds.</p>
+        <p>Send the group <strong>one link</strong>. Friends with the app and iCloud join the group: everyone’s start and way of travelling appear on every phone, and changes show up live. Friends without the app <strong>answer from the link in a few seconds</strong>.</p>
         <ul>
-          <li>No account to create, no sign-up for your friends.</li>
-          <li>Your phone tells you when a friend joins.</li>
-          <li>Plans change? Everyone’s spots update with them.</li>
-          <li>A group ends on its own after two days without a change.</li>
+          <li><span><strong>No account to create</strong>, no sign-up for your friends.</span></li>
+          <li><span>Your phone tells you <strong>when a friend joins</strong>.</span></li>
+          <li><span>Plans change? Everyone’s spots <strong>update with them</strong>.</span></li>
+          <li><span>A group ends on its own <strong>after two days without a change</strong>.</span></li>
         </ul>
       </div>
       <div class="visual" id="shot-group">
-        <!-- Screenshot slot: img/en/group.png, 1206 × 2622 -->
-        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/group.png" alt="A group in Compromise: everyone who joined, with their way of travelling" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
+        <!-- Screenshot slots: img/en/group-live.jpg, 620 × 1182 (the app, cropped), and img/en/group.jpg, 620 × 1348 (the App Clip form, shown to the same height) -->
+        <div class="phones">
+          <figure><figcaption>With the app</figcaption><div class="phone"><div class="screen short"><div class="island"></div><img class="shot" src="/img/en/group-live.jpg" width="620" height="1182" alt="The app: a notification says Lisa joined the group, above the four people and the group synced through iCloud" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div><p class="phone-note">Lisa joined; her start is on every phone.</p></figure>
+          <figure><figcaption>Without the app</figcaption><div class="phone"><div class="screen short"><div class="island"></div><img class="shot" src="/img/en/group.jpg" width="620" height="1348" alt="The form a friend sees from the link, filled in by Emma: her start and how she travels" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div><p class="phone-note">Emma answered from the link.</p></figure>
+        </div>
         <div class="panel group" role="img" aria-label="Illustration: an invite link sent to a group; Nino joined with the app, Léa answered from the link.">
           <div class="invite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Friday drinks · invite link</span></div>
-          <div class="member"><i style="background: var(--p1)"></i><span><b>You</b> · walk</span><small>Organiser</small></div>
-          <div class="member"><i style="background: var(--p2)"></i><span><b>Nino</b> · transit</span><small class="live">Joined · live</small></div>
-          <div class="member"><i style="background: var(--p3)"></i><span><b>Léa</b> · bike</span><small>Answered from the link</small></div>
+          <div class="member"><i style="background: var(--p1)"></i><span><b>You</b> · <svg class="ico" aria-hidden="true"><use href="#m-walk"/></svg>walk</span><small>Organiser</small></div>
+          <div class="member"><i style="background: var(--p2)"></i><span><b>Nino</b> · <svg class="ico" aria-hidden="true"><use href="#m-transit"/></svg>transit</span><small class="live">Joined · live</small></div>
+          <div class="member"><i style="background: var(--p3)"></i><span><b>Léa</b> · <svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>bike</span><small>Answered from the link</small></div>
         </div>
       </div>
     </div>
@@ -197,16 +210,16 @@
       <div class="copy">
         <p class="kicker">Sunny terraces</p>
         <h2 id="sun-title">A terrace still in the sun when everyone arrives.</h2>
-        <p>Turn on Sunny terrace and Compromise keeps the spots whose terrace will be in the sun when everyone has arrived, and says how long it lasts. On a hot day, ask for the shade instead.</p>
+        <p>Turn on Sunny terrace and Compromise keeps the spots whose terrace will be <strong>in the sun when everyone has arrived</strong>, and says <strong>how long it lasts</strong>. On a hot day, ask for the shade instead.</p>
         <ul>
           <li>"In the sun until 18:40" on each spot.</li>
-          <li>Rooftops count too.</li>
-          <li>Available in more than 350 cities.</li>
+          <li><span><strong>Rooftops</strong> count too.</span></li>
+          <li><span>Available in <strong>more than 350 cities</strong>.</span></li>
         </ul>
       </div>
       <div class="visual" id="shot-sun">
-        <!-- Screenshot slot: img/en/sun.png, 1206 × 2622 -->
-        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/sun.png" alt="Spots with a sunny terrace, each saying how long the sun lasts" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"></div></div>
+        <!-- Screenshot slot: img/en/sun.jpg, 620 × 1347; the ring marks the sun button; the gold captions are baked in -->
+        <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="/img/en/sun.jpg" width="620" height="1347" alt="The sun filter on: each spot says until when its terrace is in the sun" onload="this.closest('.visual').classList.add('has-shot')" onerror="this.remove()"><span class="sun-ring" aria-hidden="true"></span></div></div>
         <div class="panel mini" role="img" aria-label="Illustration: a map with sunlit terraces, the best spot in the sun until 18:40, and the Sunny terrace switch on.">
 <svg class="snip" viewBox="0 0 300 150" aria-hidden="true"><rect width="300" height="150" fill="var(--map)"/>
 <path d="M-10 104 C 60 84, 120 128, 190 100 S 290 70, 320 86" stroke="var(--water)" stroke-width="16" fill="none"/>
@@ -230,20 +243,24 @@
     </div>
     <div class="grid4">
       <div class="tile">
+        <img class="tile-shot" src="/img/en/tile-1.jpg" alt="The menu of kinds of place, from eating and drinking to the outdoors" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>
-        <h3>35 kinds of place</h3><p>Bars, cafés, restaurants, cinemas, museums, parks and more, and you can see which ones are open when you arrive.</p>
+        <h3>35 kinds of place</h3><p>Bars, cafés, restaurants, cinemas, museums, parks and more, and you can <strong>see which ones are open when you arrive</strong>.</p>
       </div>
       <div class="tile">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>
-        <h3>One colour each</h3><p>Everyone’s travel time on one scale, in their own colour, in the list and on the map.</p>
+        <img class="tile-shot" src="/img/en/tile-lines.jpg" alt="The travel times to two spots, with the number of the line to take beside each trip" width="560" height="350" loading="lazy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="5" width="12" height="12" rx="3"/><path d="M6 11h12M9 2.5h6M12 2.5V5M9.5 14h.01M14.5 14h.01M9 17l-2 4M15 17l2 4"/></svg>
+        <h3>Which line to take</h3><p>On transit, each trip shows <strong>the lines to take</strong>, from metro to bus.</p>
       </div>
       <div class="tile">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
-        <h3>Share or go</h3><p>Send the spots to the group, or open the route in your maps app.</p>
+        <img class="tile-shot" src="/img/en/tile-crowd.jpg" alt="The sheet for suggesting an edit: terrace, opening hours and details" width="560" height="350" loading="lazy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>
+        <h3>Crowd data</h3><p>Hours wrong or the terrace missing? <strong>Suggest an edit</strong> and everyone benefits.</p>
       </div>
       <div class="tile">
+        <img class="tile-shot" src="/img/en/tile-4.jpg" alt="The departure date and time in Settings" width="560" height="350" loading="lazy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
-        <h3>Plan for later</h3><p>Choose when you leave, and travel times and sunshine follow that time, not just right now.</p>
+        <h3>Plan for later</h3><p><strong>Choose when you leave</strong>, and travel times and sunshine follow that time, not just right now.</p>
       </div>
     </div>
   </section>
@@ -253,11 +270,11 @@
       <div>
         <p class="kicker">Privacy</p>
         <h2 id="privacy-title" style="margin-top: 14px">Your plans stay yours.</h2>
-        <p class="muted" style="margin-top: 16px">No account, no advertising, no tracking. Nothing you type is sent to us. Usage counts are anonymous, and you can turn them off in Settings.</p>
+        <p class="muted" style="margin-top: 16px"><strong>No account, no advertising, no tracking</strong>. <strong>Nothing you type is sent to us</strong>. Usage counts are anonymous, and you can turn them off in Settings.</p>
       </div>
       <ul>
-        <li>No sign-up, for you or your friends.</li>
-        <li>Addresses are remembered only on your phone, and one tap clears them.</li>
+        <li><span><strong>No sign-up</strong>, for you or your friends.</span></li>
+        <li><span>Addresses are remembered <strong>only on your phone</strong>, and one tap clears them.</span></li>
         <li><span>Read the <a href="/privacy">privacy policy</a>.</span></li>
       </ul>
     </div>
@@ -267,7 +284,7 @@
     <div class="join">
       <p class="kicker">App Store</p>
       <h2 id="beta-title">Try the app.</h2>
-      <p class="muted">On iPhone, iOS 18 or later. In English, French, Spanish and German.</p>
+      <p class="muted"><strong>On iPhone, iOS 18 or later</strong>. In English, French, Spanish and German.</p>
       <div class="cta">
         <!-- App Store URL: on approval, swap the beta_url (TestFlight) link for https://apps.apple.com/app/id6821360989 here and in the closing section. -->
         <a class="store" href="{{ site.beta_url }}"><img src="/img/app-store-badge-en.svg" alt="Download on the App Store" width="150" height="50"></a>
@@ -276,8 +293,8 @@
   </section>
 
   <footer>
-    <span>Compromise, by AlephB.</span>
-    <div class="links"><a href="/privacy">Privacy policy</a>{% include lang-links.html current="en" %}<span>Contact: <span class="email">contact@alephb.uk</span></span></div>
+    <span>Compromise, by <a class="alephb" href="https://alephb.uk">AlephB<span class="alephb-logo" aria-hidden="true"></span></a></span>
+    <div class="links"><a href="/privacy">Privacy policy</a><span>Contact: <a href="mailto:contact@alephb.uk">contact@alephb.uk</a></span></div>
   </footer>
 </div>
 </body>

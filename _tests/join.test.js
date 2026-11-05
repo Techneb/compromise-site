@@ -29,7 +29,12 @@ assert.ok(!html.includes("__MAPKIT_TOKEN__"), "the token was never put in");
 assert.ok(/point = \{ latitude: c\.latitude, longitude: c\.longitude \}/.test(html));
 assert.ok(/var start = point \? \{ point: point \} : \{ address: address\.value \};/.test(html));
 
+// My location shows its street from Apple's reverse lookup of the rounded point; the link still carries the point.
+assert.ok(/geocoder\.reverseLookup\(new mapkit\.Coordinate\(snap\(/.test(html), "the street comes from the rounded point");
+assert.ok(/if \(street && point === located\) address\.value = street;/.test(html), "a late answer must not overwrite an edit");
+assert.ok(/address\.value = HERE;/.test(html), "My location stays the fallback");
+
 // Privacy: the page and the policy both say typed text goes to Apple.
-assert.ok(/class="fine">[^<]*goes to Apple/.test(html));
+assert.ok(/class="fine">[^<]*goes to Apple[^<]*your location, Apple gets it/.test(html));
 assert.ok(/join page on the web<\/strong>: what you type/.test(fs.readFileSync(path.join(__dirname, "..", "privacy.html"), "utf8")));
 console.log("join: ok");

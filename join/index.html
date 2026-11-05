@@ -160,7 +160,7 @@ footer a { color: var(--muted); }
         <label class="label" for="link">Copy this link and send it back</label>
         <input type="text" id="link" readonly>
       </div>
-      <p class="fine">What you type as an address goes to Apple, which suggests matches. Nothing else leaves this page until you send the link. A location is rounded to about 5 m.</p>
+      <p class="fine">What you type as an address goes to Apple, which suggests matches. If you share your location, Apple gets it too, rounded to about 5 m, and names the street. Nothing else leaves this page until you send the link.</p>
     </form>
 
     <div id="reply" class="note" hidden>
@@ -265,9 +265,23 @@ footer a { color: var(--muted); }
       status.textContent = accuracy <= 10 ? "Location found, rounded to about 5 m."
         : "Location found, approximate (" + within(accuracy) + ").";
       update();
+      showStreet(point);
     }, function () {
       if (attempt === locating) failed("Your location isn’t available. Type an address instead.");
     }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+  }
+
+  // The location’s street, as the App Clip shows it, from Apple’s reverse lookup of the
+  // point the link will carry (~5 m). "My location" stays if it fails or the field changed.
+  function showStreet(located) {
+    if (!geocoder) return;
+    var step = GroupLink.Limit.startStep;
+    var snap = function (v) { return Math.round(v / step) * step; };
+    geocoder.reverseLookup(new mapkit.Coordinate(snap(located.latitude), snap(located.longitude)), function (failure, data) {
+      var place = !failure && data && data.results && data.results[0];
+      var street = place && (place.fullThoroughfare || place.name);
+      if (street && point === located) address.value = street;
+    });
   }
 
   // A fix’s accuracy, in words: "±40 m", "±12 km", or "accuracy unknown".
@@ -337,7 +351,7 @@ footer a { color: var(--muted); }
   var MAPKIT_TOKEN = "eyJraWQiOiJZR0o0UU1LUzU3IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJZVzU0Nzk0OTM1IiwiaWF0IjoxNzkzNTQ0MTc0LCJvcmlnaW4iOiJjb21wcm9taXNlLmFsZXBoYi51ayIsInNjb3BlIjoibWFwa2l0X2pzIn0.u4DsxiNYIH6qId4sHXHPiIHPFFipLsYMVPhEkbKZKZh-biynTz8eOHaO1FBuwSsjYFvpCVwNndF82llzgp8JBw";
   var list = document.getElementById("suggestions");
   var listStatus = document.getElementById("suggestions-status");
-  var search = null, results = [], active = -1, asked = 0, timer = 0;
+  var search = null, geocoder = null, results = [], active = -1, asked = 0, timer = 0;
 
   function closeSuggestions() {
     asked += 1;
@@ -433,6 +447,7 @@ footer a { color: var(--muted); }
 
   function useMapKit(on) {
     search = on ? new mapkit.Search({ language: "en" }) : null;
+    geocoder = on ? new mapkit.Geocoder({ language: "en" }) : null;
     closeSuggestions();
     if (on) {
       address.setAttribute("role", "combobox");

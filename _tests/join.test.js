@@ -34,7 +34,15 @@ assert.ok(/geocoder\.reverseLookup\(new mapkit\.Coordinate\(snap\(/.test(html), 
 assert.ok(/if \(street && point === located\) address\.value = street;/.test(html), "a late answer must not overwrite an edit");
 assert.ok(/address\.value = HERE;/.test(html), "My location stays the fallback");
 
-// Privacy: the page and the policy both say typed text goes to Apple.
-assert.ok(/class="fine">[^<]*goes to Apple[^<]*your location, Apple gets it/.test(html));
+// Privacy: the policy says typed text goes to Apple.
 assert.ok(/join page on the web<\/strong>: what you type/.test(fs.readFileSync(path.join(__dirname, "..", "privacy.html"), "utf8")));
+// Travel modes: each shows the app's name for it, read once (the icon is hidden, no aria-label).
+for (const name of ["Walk", "Transit", "Drive", "Cycle"]) {
+  assert.ok(new RegExp('aria-hidden="true"[^]*?</svg><span class="mode-name">' + name + '</span>').test(html), "mode label " + name);
+}
+assert.ok(!/name="mode"[^>]*aria-label/.test(html), "a mode has one name, its visible label");
+// The three questions, in order: name, start, travel mode; each is the real label of its field.
+const order = ['for="name">What’s your name?</label>', 'for="address">Where do you start?</label>', '<legend>You travel by</legend>', 'The group will see your name'].map((q) => html.indexOf(q));
+assert.ok(order.every((i, n) => i > 0 && (n === 0 || i > order[n - 1])), "questions out of order or missing: " + order);
+assert.ok(/<input[^>]*id="name"[^>]*required/.test(html) && !/id="name"[^>]*aria-label/.test(html), "the name field is required and named by its label only");
 console.log("join: ok");

@@ -15,7 +15,7 @@ The website of the Compromise iPhone app.</p>
 - The privacy policy (`privacy.html`).
 - The pages that group links open: `join/`, where a friend adds their starting point, and `spots/`, which shows the spots a group was sent.
 
-The TestFlight link the landing pages use is `beta_url` in `_config.yml`.
+The App Store link the landing pages use is `app_store_url` in `_config.yml`.
 
 ## Preview locally
 

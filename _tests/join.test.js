@@ -1,6 +1,6 @@
 // node _tests/join.test.js — the join page's address field: labelled, plain text until MapKit JS says yes.
 const assert = require("assert"), fs = require("fs"), path = require("path");
-const html = fs.readFileSync(path.join(__dirname, "..", "join", "index.html"), "utf8");
+const html = fs.readFileSync(path.join(__dirname, "..", "_includes", "join.html"), "utf8");
 const tag = (re) => { const m = re.exec(html); assert.ok(m, "missing " + re); return m[0]; };
 
 // The field is labelled and starts as a plain text field: the fallback when MapKit JS never loads or is refused.
@@ -45,4 +45,11 @@ assert.ok(!/name="mode"[^>]*aria-label/.test(html), "a mode has one name, its vi
 const order = ['for="name">What’s your name?</label>', 'for="address">Where do you start?</label>', '<legend>You travel by</legend>', 'The group will see your name'].map((q) => html.indexOf(q));
 assert.ok(order.every((i, n) => i > 0 && (n === 0 || i > order[n - 1])), "questions out of order or missing: " + order);
 assert.ok(/<input[^>]*id="name"[^>]*required/.test(html) && !/id="name"[^>]*aria-label/.test(html), "the name field is required and named by its label only");
+// One page per language at /join/, /join/fr/, /join/es/, /join/de/: link previews show the head's copy in that language.
+for (const d of ["join", "join/fr", "join/es", "join/de"]) {
+  const page = fs.readFileSync(path.join(__dirname, "..", d, "index.html"), "utf8");
+  assert.ok(page.startsWith("---\n") && page.includes("{% include join.html %}"), d + " is not the join page");
+  for (const key of ["join_title", "join_og_title", "join_description", "join_image_alt"]) assert.ok(new RegExp("^" + key + ": \"[^\"]+\"$", "m").test(page), d + ": no " + key);
+}
+assert.ok(/\.replace\(\/\^\\\/join\\\/\(fr\|es\|de\)\$\/, "\/join"\)/.test(html), "a language page reads the links /join reads");
 console.log("join: ok");

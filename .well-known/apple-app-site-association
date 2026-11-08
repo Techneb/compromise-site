@@ -6,6 +6,7 @@
         "components": [
           { "/": "/join" },
           { "/": "/join/" },
+          { "/": "/join/*" },
           { "/": "/spots" },
           { "/": "/spots/" }
         ]

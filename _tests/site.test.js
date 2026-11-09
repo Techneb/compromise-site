@@ -6,7 +6,7 @@ const root = path.join(__dirname, "..");
 // (a fresh page with a cached script used to come up empty for up to ten minutes after a deploy).
 const V = "?v={{ site.time | date: '%s' }}";
 for (const f of ["index.html", "en/index.html", "fr/index.html", "es/index.html", "de/index.html",
-  "_includes/join.html", "spots/index.html", "privacy.html", "_includes/landing-en.html"]) {
+  "_includes/join.html", "_includes/spots.html", "privacy.html", "_includes/landing-en.html"]) {
   const html = fs.readFileSync(path.join(root, f), "utf8");
   for (const m of html.matchAll(/(?:src|href)="(\/[^"]+\.(?:js|css)[^"]*)"/g)) assert.ok(m[1].endsWith(V), f + ": " + m[1]);
   if (!f.startsWith("_includes") && /(?:src|href)="\/[^"]+\.(?:js|css)/.test(html)) assert.ok(html.startsWith("---\n"), f + " has no front matter");

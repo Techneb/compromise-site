@@ -37,12 +37,12 @@ assert.ok(/address\.value = HERE;/.test(html), "My location stays the fallback")
 // Privacy: the policy says typed text goes to Apple.
 assert.ok(/join page on the web<\/strong>: what you type/.test(fs.readFileSync(path.join(__dirname, "..", "privacy.html"), "utf8")));
 // Travel modes: each shows the app's name for it, read once (the icon is hidden, no aria-label).
-for (const name of ["Walk", "Transit", "Drive", "Cycle"]) {
-  assert.ok(new RegExp('aria-hidden="true"[^]*?</svg><span class="mode-name">' + name + '</span>').test(html), "mode label " + name);
+for (const name of ["walk", "transit", "drive", "cycle"]) {
+  assert.ok(new RegExp('aria-hidden="true"[^]*?</svg><span class="mode-name">\\{\\{ page\\.join_' + name + ' \\}\\}</span>').test(html), "mode label " + name);
 }
 assert.ok(!/name="mode"[^>]*aria-label/.test(html), "a mode has one name, its visible label");
 // The three questions, in order: name, start, travel mode; each is the real label of its field.
-const order = ['for="name">What’s your name?</label>', 'for="address">Where do you start?</label>', '<legend>You travel by</legend>', 'The group will see your name'].map((q) => html.indexOf(q));
+const order = ['for="name">{{ page.join_name_q }}</label>', 'for="address">{{ page.join_start_q }}</label>', '<legend>{{ page.join_travel }}</legend>', '{{ page.join_privacy }}'].map((q) => html.indexOf(q));
 assert.ok(order.every((i, n) => i > 0 && (n === 0 || i > order[n - 1])), "questions out of order or missing: " + order);
 assert.ok(/<input[^>]*id="name"[^>]*required/.test(html) && !/id="name"[^>]*aria-label/.test(html), "the name field is required and named by its label only");
 // One page per language at /join/, /join/fr/, /join/es/, /join/de/: link previews show the head's copy in that language.
@@ -89,4 +89,32 @@ const en = fs.readFileSync(path.join(__dirname, "..", "join", "index.html"), "ut
 assert.ok(en.includes('join_lede: "Say where you’re starting from and how you’ll get there, then send the link back."'));
 assert.ok(en.includes('join_why: "Add your first name and where you start, then send it back."'));
 assert.ok(/lede\.textContent = relay \? LEDE_RELAY : LEDE;/.test(html) && /why\.textContent = relay \? WHY_RELAY : WHY;/.test(html));
+// Every line of copy is in the four pages' front matter, in that page's language (owner, 2026-11-09): the same keys
+// on all four, every key the include reads, no English value on fr, es or de, and no text left in the include itself.
+const fm = (d) => {
+  const src = fs.readFileSync(path.join(__dirname, "..", d, "index.html"), "utf8").split("---\n")[1];
+  return Object.fromEntries([...src.matchAll(/^(join_\w+): "(.*)"$/gm)].map((m) => [m[1], m[2]]));
+};
+const english = fm("join"), used = [...new Set([...html.matchAll(/page\.(join_\w+)/g)].map((m) => m[1]))];
+for (const k of used) assert.ok(k in english, "join: no " + k);
+// Words that are the same in that language (and the language-neutral links' home, never the same).
+const same = { fr: ["join_kicker"], es: [], de: [] };
+for (const lang of ["fr", "es", "de"]) {
+  const t = fm("join/" + lang);
+  assert.deepStrictEqual(Object.keys(t).sort(), Object.keys(english).sort(), lang + ": not the English page's keys");
+  for (const [k, v] of Object.entries(t)) {
+    if (!same[lang].includes(k)) assert.notStrictEqual(v, english[k], lang + ": " + k + " is English");
+    assert.strictEqual((v.match(/%@/g) || []).length, (english[k].match(/%@/g) || []).length, lang + ": " + k + " placeholders");
+  }
+  assert.strictEqual(t.join_lang, lang);
+  if (lang === "fr") for (const [k, v] of Object.entries(t)) assert.ok(!/ [;:!?»]|« |[\p{L}\d%@][;!?»]|«[^\s]/u.test(v), "fr: " + k + " typography");
+  if (lang === "de") for (const [k, v] of Object.entries(t)) assert.ok(!/[«»”"]/.test(v), "de: " + k + " quotes");
+}
+assert.ok(/<html lang="\{\{ page\.join_lang \}\}">/.test(html), "<html lang> is the page's");
+assert.ok(/language: LANG/.test(html) && !/language: "en"/.test(html), "MapKit answers in the page's language");
+const markup = html.replace(/\{%-?\s*comment\s*-?%\}[\s\S]*?\{%-?\s*endcomment\s*-?%\}|<(script|style)[^>]*>[\s\S]*?<\/\1>/g, "");
+for (const [, t] of markup.matchAll(/>([^<]*)</g)) assert.ok(/^\s*(\{\{ page\.\w+ \}\}|Compromise)?\s*$/.test(t), "text in the include: " + t.trim());
+for (const [, t] of markup.matchAll(/\s(?:alt|title|aria-label|placeholder)="([^"]+)"/g)) assert.ok(/^\{\{ page\.\w+ \}\}$/.test(t), "attribute text in the include: " + t);
+const script = html.slice(html.indexOf("(function () {"));
+for (const [str] of script.replace(/(^|\s)\/\/.*$/gm, "").matchAll(/"[^"\n]*"/g)) assert.ok(str === "\"use strict\"" || !/\p{L}{3,} \p{L}{3,}/u.test(str), "English in the script: " + str);
 console.log("join: ok");

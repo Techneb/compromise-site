@@ -49,7 +49,20 @@ assert.ok(/<input[^>]*id="name"[^>]*required/.test(html) && !/id="name"[^>]*aria
 for (const d of ["join", "join/fr", "join/es", "join/de"]) {
   const page = fs.readFileSync(path.join(__dirname, "..", d, "index.html"), "utf8");
   assert.ok(page.startsWith("---\n") && page.includes("{% include join.html %}"), d + " is not the join page");
-  for (const key of ["join_title", "join_og_title", "join_description", "join_image_alt"]) assert.ok(new RegExp("^" + key + ": \"[^\"]+\"$", "m").test(page), d + ": no " + key);
+  for (const key of ["join_title", "join_og_title", "join_description", "join_image_alt", "join_send", "join_sent", "join_again", "join_failed"]) {
+    assert.ok(new RegExp("^" + key + ": \"[^\"]+\"$", "m").test(page), d + ": no " + key);
+  }
+  for (const key of ["join_sent", "join_failed"]) assert.ok(new RegExp("^" + key + ": \"[^\"\n]*%@").test(page.split("\n").find((l) => l.startsWith(key))), d + ": " + key + " names no one");
 }
+assert.ok(/^join_send: "Envoyer"$/m.test(fs.readFileSync(path.join(__dirname, "..", "join/fr/index.html"), "utf8")));
+
+// Send (GROUP_SYNC.md §3.1): one button; with r= the relay first, and any failure goes on to the reply link under one line;
+// without r= the reply link at once. The relay's host is in grouplink.js, never read from the link.
+assert.ok(/<button type="submit" id="send"[^>]*>\{\{ page\.join_send \}\}<\/button>/.test(html), "the button is Send, in the page's language");
+assert.ok(!/>Send back</.test(html), "no second button");
+assert.ok(/if \(!relay\) \{ share\(url\); return; \}/.test(html));
+assert.ok(/error\.textContent = named\(NOT_RELAYED\);\s*share\(url\);/.test(html), "a failed post falls back to the reply link");
+assert.ok(/relayedTo\.textContent = named\(SENT_TO\);/.test(html) && /relayedAgain\.hidden = false;/.test(html));
+assert.ok(!/relay\.alephb\.uk/.test(html) && /"https:\/\/relay\.alephb\.uk\/v1\/box\/"/.test(fs.readFileSync(path.join(__dirname, "..", "grouplink.js"), "utf8")));
 assert.ok(/\.replace\(\/\^\\\/join\\\/\(fr\|es\|de\)\$\/, "\/join"\)/.test(html), "a language page reads the links /join reads");
 console.log("join: ok");

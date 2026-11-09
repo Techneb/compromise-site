@@ -153,9 +153,13 @@ footer a { color: var(--muted); }
       <p class="hint">The group will see your name, how you travel and where you start.</p>
 
       <p id="error" class="error" role="alert"></p>
-      <div>
-        <button type="submit" id="send" disabled aria-describedby="why">Send back</button>
+      <div id="send-box">
+        <button type="submit" id="send" disabled aria-describedby="why">{{ page.join_send }}</button>
         <p id="why" class="hint" style="margin-top: 8px">Add your first name and where you start, then send it back.</p>
+      </div>
+      <div id="relayed" role="status">
+        <p id="relayed-to" class="sent"></p>
+        <p id="relayed-again" class="hint" style="margin-top: 8px; text-align: center" hidden>{{ page.join_again }}</p>
       </div>
       <p id="sent" class="sent" role="status"></p>
       <div id="manual" hidden>
@@ -195,8 +199,14 @@ footer a { color: var(--muted); }
   var sent = document.getElementById("sent");
   var manual = document.getElementById("manual");
   var linkField = document.getElementById("link");
+  var sendBox = document.getElementById("send-box");
+  var relayedTo = document.getElementById("relayed-to");
+  var relayedAgain = document.getElementById("relayed-again");
+  var SENT_TO = {{ page.join_sent | jsonify }}, NOT_RELAYED = {{ page.join_failed | jsonify }};
   var HERE = "My location";
   var organiser = "";
+  var relay = null;
+  var posting = false;
   var point = null;
   var locating = 0;
 
@@ -211,12 +221,17 @@ footer a { color: var(--muted); }
       .replace(/^\/join\/(fr|es|de)$/, "/join"); // /join/fr: the same page, its preview in French
   }
 
-  // Send back needs a first name and a start, as in the app.
+  function named(text) { return text.replace("%@", function () { return organiser; }); }
+
+  // Send needs a first name and a start, as in the app. Any change after a relayed send brings Send back.
   function update() {
     var ready = GroupLink.cleaned(nameField.value, GroupLink.Limit.name) !== "" &&
       (point !== null || GroupLink.cleaned(address.value, GroupLink.Limit.address) !== "");
-    send.disabled = !ready;
+    send.disabled = !ready || posting;
     why.hidden = ready;
+    sendBox.hidden = false;
+    relayedTo.textContent = "";
+    relayedAgain.hidden = true;
   }
 
   function render() {
@@ -224,6 +239,7 @@ footer a { color: var(--muted); }
     if (!link || GroupLink.pathFor(link) !== pagePath()) { show("refused"); return; }
     if (link.kind === "reply") { show("reply"); return; }
     organiser = link.organiser;
+    relay = link.relay || null;
     form.reset();
     point = null;
     stopLocating();
@@ -306,6 +322,7 @@ footer a { color: var(--muted); }
     suggest();
   });
   nameField.addEventListener("input", update);
+  form.addEventListener("change", update);
 
   function copy(url) {
     function fallback() {
@@ -338,6 +355,28 @@ footer a { color: var(--muted); }
       error.textContent = "This can’t be sent. Try writing the address differently.";
       return;
     }
+    if (!relay) { share(url); return; }
+    // The relay first (GROUP_SYNC.md §3.1); any failure goes on to the reply link, under one line.
+    posting = true;
+    send.disabled = true;
+    send.setAttribute("aria-busy", "true");
+    GroupLink.send(relay, url.slice(url.indexOf("#") + 1)).then(function (relayed) {
+      posting = false;
+      send.removeAttribute("aria-busy");
+      update();
+      if (relayed) {
+        sendBox.hidden = true;
+        relayedTo.textContent = named(SENT_TO);
+        relayedAgain.hidden = false;
+      } else {
+        error.textContent = named(NOT_RELAYED);
+        share(url);
+      }
+    });
+  });
+
+  // Send back, as before the relay: the share sheet, else the clipboard, else the link to copy.
+  function share(url) {
     if (navigator.share) {
       navigator.share({ url: url }).catch(function (e) {
         if (!e || e.name !== "AbortError") copy(url);
@@ -345,7 +384,7 @@ footer a { color: var(--muted); }
     } else {
       copy(url);
     }
-  });
+  }
 
   // Address suggestions from Apple. The field only becomes a combobox once MapKit JS
   // has loaded and accepted the token (it works on compromise.alephb.uk only); until

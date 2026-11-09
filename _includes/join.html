@@ -75,7 +75,8 @@ legend, .question { font: 650 19px/1.3 var(--display); letter-spacing: -0.01em; 
 @keyframes pulse { to { opacity: 0.3; } }
 @media (prefers-color-scheme: dark) { button.locate { color: var(--tint); } }
 input[type="text"] { width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--hair); background: var(--surface); color: var(--fg); font: inherit; }
-.suggestions { list-style: none; margin: 8px 0 0; padding: 6px; border-radius: 14px; border: 1px solid var(--hair); background: var(--surface); }
+.start { position: relative; }
+.suggestions { position: absolute; top: 100%; left: 0; right: 0; z-index: 10; box-shadow: 0 8px 24px rgb(0 0 0 / 0.14); overflow-y: auto; list-style: none; margin: 8px 0 0; padding: 6px; border-radius: 14px; border: 1px solid var(--hair); background: var(--surface); }
 .suggestions li { padding: 10px 12px; min-height: 44px; border-radius: 10px; cursor: pointer; }
 .suggestions li span { display: block; font-size: 15px; color: var(--muted); }
 .suggestions li[aria-selected="true"], .suggestions li:hover { background: color-mix(in srgb, var(--p1) 12%, var(--surface)); }
@@ -119,7 +120,7 @@ footer a { color: var(--muted); }
       <header>
         <p class="kicker">Invitation</p>
         <h1 id="title"></h1>
-        <p class="lede">Say where you’re starting from and how you’ll get there, then send the link back.</p>
+        <p id="lede" class="lede">{{ page.join_lede }}</p>
       </header>
 
       <div>
@@ -134,8 +135,8 @@ footer a { color: var(--muted); }
           <button type="button" id="locate" class="locate" aria-label="Use my current location">
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 3.4 3.5 10.6c-.8.3-.7 1.5.1 1.7l7.3 1.8 1.8 7.3c.2.8 1.4.9 1.7.1l7.2-17.1c.3-.7-.4-1.3-1-1z" fill="currentColor"/></svg>
           </button>
+          <ul id="suggestions" class="suggestions" role="listbox" aria-label="Suggested addresses" hidden></ul>
         </div>
-        <ul id="suggestions" class="suggestions" role="listbox" aria-label="Suggested addresses" hidden></ul>
         <p id="suggestions-status" class="sr-only" aria-live="polite"></p>
         <p id="location-status" class="hint" aria-live="polite"></p>
       </div>
@@ -155,7 +156,7 @@ footer a { color: var(--muted); }
       <p id="error" class="error" role="alert"></p>
       <div id="send-box">
         <button type="submit" id="send" disabled aria-describedby="why">{{ page.join_send }}</button>
-        <p id="why" class="hint" style="margin-top: 8px">Add your first name and where you start, then send it back.</p>
+        <p id="why" class="hint" style="margin-top: 8px">{{ page.join_why }}</p>
       </div>
       <div id="relayed" role="status">
         <p id="relayed-to" class="sent"></p>
@@ -203,6 +204,10 @@ footer a { color: var(--muted); }
   var relayedTo = document.getElementById("relayed-to");
   var relayedAgain = document.getElementById("relayed-again");
   var SENT_TO = {{ page.join_sent | jsonify }}, NOT_RELAYED = {{ page.join_failed | jsonify }};
+  // With r= Send sends, so the lede and the hint under it say so; without, the link goes back by hand.
+  var LEDE = {{ page.join_lede | jsonify }}, LEDE_RELAY = {{ page.join_lede_relay | jsonify }};
+  var WHY = {{ page.join_why | jsonify }}, WHY_RELAY = {{ page.join_why_relay | jsonify }};
+  var lede = document.getElementById("lede");
   var HERE = "My location";
   var organiser = "";
   var relay = null;
@@ -240,6 +245,8 @@ footer a { color: var(--muted); }
     if (link.kind === "reply") { show("reply"); return; }
     organiser = link.organiser;
     relay = link.relay || null;
+    lede.textContent = relay ? LEDE_RELAY : LEDE;
+    why.textContent = relay ? WHY_RELAY : WHY;
     form.reset();
     point = null;
     stopLocating();
@@ -342,6 +349,7 @@ footer a { color: var(--muted); }
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
+    closeSuggestions();
     error.textContent = "";
     sent.textContent = "";
     manual.hidden = true;
@@ -434,6 +442,8 @@ footer a { color: var(--muted); }
       list.appendChild(item);
     });
     list.hidden = results.length === 0;
+    // It floats over the travel modes but stops above Send, so a click on Send is never a pick.
+    list.style.maxHeight = Math.max(0, send.getBoundingClientRect().top - list.getBoundingClientRect().top - 8) + "px";
     address.setAttribute("aria-expanded", results.length ? "true" : "false");
     listStatus.textContent = results.length === 0 ? "No address found. You can still send what you typed."
       : results.length === 1 ? "1 address found." : results.length + " addresses found.";
@@ -447,8 +457,9 @@ footer a { color: var(--muted); }
     timer = setTimeout(function () {
       search.autocomplete(query, function (failure, data) {
         if (ask !== asked) return;
+        // Places only: a query suggestion ("Search Nearby") has no coordinate.
         showSuggestions(failure || !data ? [] : (data.results || []).filter(function (r) {
-          return r.displayLines && r.displayLines.length;
+          return r.coordinate && r.displayLines && r.displayLines.length;
         }));
       });
     }, 250);
@@ -458,20 +469,16 @@ footer a { color: var(--muted); }
   function pick(index) {
     var result = results[index];
     closeSuggestions();
-    var ask = asked;
     address.value = result.displayLines.join(", ");
     status.textContent = "";
-    function take(c) {
-      if (ask !== asked || !c) return;
-      point = { latitude: c.latitude, longitude: c.longitude };
-      update();
-    }
-    if (result.coordinate) take(result.coordinate);
-    else search.search(result, function (failure, data) { if (!failure && data && data.places.length) take(data.places[0].coordinate); });
+    var c = result.coordinate;
+    point = { latitude: c.latitude, longitude: c.longitude };
     update();
   }
 
+  // Escape, blur, a press outside and Send close the list, even before an answer comes (it is then dropped).
   address.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") { if (!list.hidden) event.preventDefault(); closeSuggestions(); return; }
     if (list.hidden) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
@@ -479,12 +486,11 @@ footer a { color: var(--muted); }
     } else if (event.key === "Enter" && active >= 0) {
       event.preventDefault();
       pick(active);
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      closeSuggestions();
     }
   });
-  address.addEventListener("blur", function () { if (!list.hidden) closeSuggestions(); });
+  address.addEventListener("blur", closeSuggestions);
+  // A touch outside may leave the field focused, so a press anywhere but the field or the list closes it too.
+  document.addEventListener("pointerdown", function (event) { if (event.target !== address && !list.contains(event.target)) closeSuggestions(); });
 
   function useMapKit(on) {
     search = on ? new mapkit.Search({ language: "en" }) : null;

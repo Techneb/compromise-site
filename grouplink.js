@@ -7,7 +7,8 @@
   var MODES = ["walk", "transit", "car", "bike"];
   var Limit = {
     fragment: 4000, pairs: 32, name: 30, address: 200, spotName: 80, spotAddress: 150,
-    people: 12, spots: 3, startDecimals: 5, startStep: 0.00005, spotDecimals: 5, scalarsPerCharacter: 4
+    people: 12, spots: 3, startDecimals: 5, startStep: 0.00005, spotDecimals: 5, scalarsPerCharacter: 4,
+    relayPlaintext: 4096, relayTimeout: 10000
   };
 
   function Refused(reason) { this.reason = reason; }
@@ -132,6 +133,28 @@
     return { kind: "reply", name: name, mode: mode, start: start };
   }
 
+  // Strict base64url without padding: re-encoding must give the same text back.
+  function base64url(data) {
+    return btoa(String.fromCharCode.apply(null, data)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  function fromBase64url(text) {
+    var data = Uint8Array.from(atob(text.replace(/-/g, "+").replace(/_/g, "/")), function (c) { return c.charCodeAt(0); });
+    return base64url(data) === text ? data : null;
+  }
+
+  // r=<box>.<key>: the reply relay's box id (16 bytes) and reply key (32 bytes), both or neither (GROUP_SYNC.md §3.2).
+  function readInvite(fields) {
+    var invite = { kind: "invite", organiser: fields.text("n", Limit.name) };
+    var raw = fields.get("r");
+    if (raw === null) return invite;
+    var parts = /^([A-Za-z0-9_-]{22})\.([A-Za-z0-9_-]{43})$/.exec(raw);
+    var id = parts && fromBase64url(parts[1]), key = parts && fromBase64url(parts[2]);
+    if (!id || !key) throw new Refused("badField");
+    invite.relay = { box: parts[1], id: id, key: key };
+    return invite;
+  }
+
   function readResults(fields, picked) {
     var people = fields.textList("w", Limit.name, 1, Limit.people);
     var spots = [];
@@ -161,8 +184,10 @@
     if (version === null) throw new Refused("missingVersion");
     if (version !== VERSION) throw new Refused("unsupportedVersion");
     switch (fields.get("k")) {
-      case "invite": return { kind: "invite", organiser: fields.text("n", Limit.name) };
-      case "reply": return readReply(fields);
+      case "invite": return readInvite(fields);
+      case "reply":
+        if (fields.get("r") !== null) throw new Refused("badField");
+        return readReply(fields);
       case "pick": return readResults(fields, true);
       case "top": return readResults(fields, false);
       case null: throw new Refused("missingField");
@@ -241,9 +266,40 @@
     return "https://" + HOST + "/join#" + fragment;
   }
 
+  // The reply relay. AES-256-GCM, the box id as associated data; the body is nonce (12) ‖ ciphertext ‖ tag (16),
+  // as the app's ReplyBox seals it. The host is the code's, never the link's.
+  var RELAY = "https://relay.alephb.uk/v1/box/";
+
+  function seal(relay, fragment, nonce) {
+    var plaintext = new TextEncoder().encode(fragment);
+    if (plaintext.length > Limit.relayPlaintext) return Promise.reject(new Refused("tooLong"));
+    var iv = nonce || crypto.getRandomValues(new Uint8Array(12));
+    return crypto.subtle.importKey("raw", relay.key, "AES-GCM", false, ["encrypt"]).then(function (key) {
+      return crypto.subtle.encrypt({ name: "AES-GCM", iv: iv, additionalData: relay.id }, key, plaintext);
+    }).then(function (sealed) {
+      var body = new Uint8Array(12 + sealed.byteLength);
+      body.set(iv);
+      body.set(new Uint8Array(sealed), 12);
+      return body;
+    });
+  }
+
+  // Posts a reply fragment to its box: true when the relay took it (202), false on anything else, never a throw.
+  function send(relay, fragment, fetcher) {
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, Limit.relayTimeout);
+    return seal(relay, fragment).then(function (body) {
+      return (fetcher || fetch)(RELAY + relay.box, {
+        method: "POST", headers: { "Content-Type": "application/octet-stream" }, body: body, signal: controller.signal
+      });
+    }).then(function (response) { return response.status === 202; }, function () { return false; })
+      .finally(function () { clearTimeout(timer); });
+  }
+
   var api = {
     Limit: Limit, Refused: Refused, read: read, readFragment: readFragment,
-    pathFor: pathFor, cleaned: cleaned, encoded: encoded, formatted: formatted, writeReply: writeReply
+    pathFor: pathFor, cleaned: cleaned, encoded: encoded, formatted: formatted, writeReply: writeReply,
+    seal: seal, send: send
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.GroupLink = api;

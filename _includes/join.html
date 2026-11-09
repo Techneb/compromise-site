@@ -1,6 +1,6 @@
-{%- comment -%} The join page; /join/ and /join/fr/, /join/es/, /join/de/ (their link previews in that language) set the head's copy in front matter. {%- endcomment -%}
+{%- comment -%} The join page; /join/ and /join/fr/, /join/es/, /join/de/ (their link previews in that language) set every line of copy in front matter: the same join_* keys on all four, the strings in that page's language (_tests/join.test.js compares them). {%- endcomment -%}
 <!doctype html>
-<html lang="en">
+<html lang="{{ page.join_lang }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -44,12 +44,12 @@ p { margin: 0; }
 .kicker { font: 600 13px/1 var(--font); text-transform: uppercase; letter-spacing: 0.09em; color: var(--tint); }
 .muted { color: var(--muted); }
 
-nav { display: flex; align-items: center; justify-content: space-between; padding-block: 18px; }
+nav { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; justify-content: space-between; padding-block: 18px; }
 .brand { display: flex; align-items: center; gap: 10px; font: 700 19px/1 var(--display); color: var(--fg); text-decoration: none; letter-spacing: -0.01em; }
 .brand-mark { width: 30px; height: 30px; border-radius: 8px; overflow: hidden; flex: none; }
 .brand-mark img { display: block; }
 nav .links { display: flex; gap: 22px; font-size: 15px; }
-nav .links a { color: var(--muted); text-decoration: none; }
+nav .links a { color: var(--muted); text-decoration: none; white-space: nowrap; } /* a longer language moves the links under the brand, whole */
 nav .links a:hover { color: var(--fg); }
 
 main { max-width: 34rem; margin: 0 auto; padding-block: 24px 64px; }
@@ -105,53 +105,53 @@ footer a { color: var(--muted); }
 <link rel="icon" type="image/png" href="/logo.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"></head>
 <body>
 <div class="wrap">
-  <nav aria-label="Main">
-    <a class="brand" href="/">
+  <nav aria-label="{{ page.join_nav_label }}">
+    <a class="brand" href="{{ page.join_home }}">
       <span class="brand-mark" aria-hidden="true">
         <img src="/img/brand-mark@2x.png" srcset="/img/brand-mark@2x.png 2x, /img/brand-mark@3x.png 3x" width="30" height="30" alt="">
       </span>
       Compromise
     </a>
-    <div class="links"><a href="/#how">How it works</a><a href="/privacy">Privacy</a></div>
+    <div class="links"><a href="{{ page.join_home }}#how">{{ page.join_nav_how }}</a><a href="/privacy" hreflang="en">{{ page.join_nav_privacy }}</a></div>
   </nav>
 
   <main>
     <form id="invite" hidden novalidate>
       <header>
-        <p class="kicker">Invitation</p>
+        <p class="kicker">{{ page.join_kicker }}</p>
         <h1 id="title"></h1>
         <p id="lede" class="lede">{{ page.join_lede }}</p>
       </header>
 
       <div>
-        <label class="label question" for="name">What’s your name?</label>
-        <input type="text" id="name" placeholder="Your first name" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" required>
+        <label class="label question" for="name">{{ page.join_name_q }}</label>
+        <input type="text" id="name" placeholder="{{ page.join_name_placeholder }}" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" required>
       </div>
 
       <div>
-        <label class="label question" for="address">Where do you start?</label>
+        <label class="label question" for="address">{{ page.join_start_q }}</label>
         <div class="start">
-          <input type="text" id="address" placeholder="Address" autocomplete="street-address" enterkeyhint="next">
-          <button type="button" id="locate" class="locate" aria-label="Use my current location">
+          <input type="text" id="address" placeholder="{{ page.join_address_placeholder }}" autocomplete="street-address" enterkeyhint="next">
+          <button type="button" id="locate" class="locate" aria-label="{{ page.join_locate }}">
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 3.4 3.5 10.6c-.8.3-.7 1.5.1 1.7l7.3 1.8 1.8 7.3c.2.8 1.4.9 1.7.1l7.2-17.1c.3-.7-.4-1.3-1-1z" fill="currentColor"/></svg>
           </button>
-          <ul id="suggestions" class="suggestions" role="listbox" aria-label="Suggested addresses" hidden></ul>
+          <ul id="suggestions" class="suggestions" role="listbox" aria-label="{{ page.join_suggestions_label }}" hidden></ul>
         </div>
         <p id="suggestions-status" class="sr-only" aria-live="polite"></p>
         <p id="location-status" class="hint" aria-live="polite"></p>
       </div>
 
       <fieldset>
-        <legend>You travel by</legend>
+        <legend>{{ page.join_travel }}</legend>
         <div class="choices">
-          <label class="choice"><input type="radio" name="mode" value="walk"><span><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="3.8" r="2" fill="currentColor" stroke="none"/><path d="M12.6 8 10.8 14l3 3.2.9 4.6M10.8 14l-2.6 7.6M12.6 8 9 9.8 7.8 13M12.6 8l1.7 3.6 3.2 1.4"/></svg><span class="mode-name">Walk</span></span></label>
-          <label class="choice"><input type="radio" name="mode" value="transit" checked><span><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8 6h8a3.5 3.5 0 0 1 3.5 3.5V16a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3V9.5A3.5 3.5 0 0 1 8 6zm-1.5 3.5v3.7h11V9.5zM8 15a1.2 1.2 0 1 0 0 2.4A1.2 1.2 0 0 0 8 15zm8 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z"/><path d="M9 2.5h6M12 2.5V6M8.5 19l-2 2.5M15.5 19l2 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg><span class="mode-name">Transit</span></span></label>
-          <label class="choice"><input type="radio" name="mode" value="car"><span><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8.6 4.5h6.8a2.2 2.2 0 0 1 2.1 1.5l1.5 4.5h.5A1.5 1.5 0 0 1 21 12v5a1 1 0 0 1-1 1h-.6v1.5a1 1 0 0 1-1 1h-1.3a1 1 0 0 1-1-1V18H7.9v1.5a1 1 0 0 1-1 1H5.6a1 1 0 0 1-1-1V18H4a1 1 0 0 1-1-1v-5a1.5 1.5 0 0 1 1.5-1.5H5L6.5 6a2.2 2.2 0 0 1 2.1-1.5zm-1.4 6h9.6l-1.1-3.4a1 1 0 0 0-.9-.6H9.2a1 1 0 0 0-.9.6zM6.6 12.6a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8zm10.8 0a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8z"/></svg><span class="mode-name">Drive</span></span></label>
-          <label class="choice"><input type="radio" name="mode" value="bike"><span><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="15.5" r="3.8"/><circle cx="18.5" cy="15.5" r="3.8"/><path d="M5.5 15.5 9 8.5h7l2.5 7M9 8.5l3.2 7h-6.7M12.2 15.5 16 8.5M7.8 6h2.6M16 8.5l-.9-3h2.2"/></svg><span class="mode-name">Cycle</span></span></label>
+          <label class="choice"><input type="radio" name="mode" value="walk"><span><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="3.8" r="2" fill="currentColor" stroke="none"/><path d="M12.6 8 10.8 14l3 3.2.9 4.6M10.8 14l-2.6 7.6M12.6 8 9 9.8 7.8 13M12.6 8l1.7 3.6 3.2 1.4"/></svg><span class="mode-name">{{ page.join_walk }}</span></span></label>
+          <label class="choice"><input type="radio" name="mode" value="transit" checked><span><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8 6h8a3.5 3.5 0 0 1 3.5 3.5V16a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3V9.5A3.5 3.5 0 0 1 8 6zm-1.5 3.5v3.7h11V9.5zM8 15a1.2 1.2 0 1 0 0 2.4A1.2 1.2 0 0 0 8 15zm8 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z"/><path d="M9 2.5h6M12 2.5V6M8.5 19l-2 2.5M15.5 19l2 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg><span class="mode-name">{{ page.join_transit }}</span></span></label>
+          <label class="choice"><input type="radio" name="mode" value="car"><span><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8.6 4.5h6.8a2.2 2.2 0 0 1 2.1 1.5l1.5 4.5h.5A1.5 1.5 0 0 1 21 12v5a1 1 0 0 1-1 1h-.6v1.5a1 1 0 0 1-1 1h-1.3a1 1 0 0 1-1-1V18H7.9v1.5a1 1 0 0 1-1 1H5.6a1 1 0 0 1-1-1V18H4a1 1 0 0 1-1-1v-5a1.5 1.5 0 0 1 1.5-1.5H5L6.5 6a2.2 2.2 0 0 1 2.1-1.5zm-1.4 6h9.6l-1.1-3.4a1 1 0 0 0-.9-.6H9.2a1 1 0 0 0-.9.6zM6.6 12.6a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8zm10.8 0a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8z"/></svg><span class="mode-name">{{ page.join_drive }}</span></span></label>
+          <label class="choice"><input type="radio" name="mode" value="bike"><span><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="15.5" r="3.8"/><circle cx="18.5" cy="15.5" r="3.8"/><path d="M5.5 15.5 9 8.5h7l2.5 7M9 8.5l3.2 7h-6.7M12.2 15.5 16 8.5M7.8 6h2.6M16 8.5l-.9-3h2.2"/></svg><span class="mode-name">{{ page.join_cycle }}</span></span></label>
         </div>
       </fieldset>
 
-      <p class="hint">The group will see your name, how you travel and where you start.</p>
+      <p class="hint">{{ page.join_privacy }}</p>
 
       <p id="error" class="error" role="alert"></p>
       <div id="send-box">
@@ -164,25 +164,25 @@ footer a { color: var(--muted); }
       </div>
       <p id="sent" class="sent" role="status"></p>
       <div id="manual" hidden>
-        <label class="label" for="link">Copy this link and send it back</label>
+        <label class="label" for="link">{{ page.join_link_label }}</label>
         <input type="text" id="link" readonly>
       </div>
     </form>
 
     <div id="reply" class="note" hidden>
-      <h1>This link is meant for the organiser’s Compromise app.</h1>
+      <h1>{{ page.join_reply }}</h1>
     </div>
 
     <div id="refused" class="note" hidden>
-      <h1>This link can’t be read.</h1>
+      <h1>{{ page.join_refused }}</h1>
     </div>
 
-    <noscript><div class="note"><h1>This page needs JavaScript to read the link.</h1></div></noscript>
+    <noscript><div class="note"><h1>{{ page.join_noscript }}</h1></div></noscript>
   </main>
 
   <footer>
-    <span>Compromise, by AlephB.</span>
-    <div class="links"><a href="/privacy">Privacy policy</a></div>
+    <span>{{ page.join_footer }}</span>
+    <div class="links"><a href="/privacy" hreflang="en">{{ page.join_footer_privacy }}</a></div>
   </footer>
 </div>
 <script src="/grouplink.js?v={{ site.time | date: '%s' }}"></script>
@@ -208,7 +208,16 @@ footer a { color: var(--muted); }
   var LEDE = {{ page.join_lede | jsonify }}, LEDE_RELAY = {{ page.join_lede_relay | jsonify }};
   var WHY = {{ page.join_why | jsonify }}, WHY_RELAY = {{ page.join_why_relay | jsonify }};
   var lede = document.getElementById("lede");
-  var HERE = "My location";
+  // Every other line the script writes, in the page's language; %@ stands for a name, a number or an accuracy.
+  var T = {
+    title: {{ page.join_heading | jsonify }}, here: {{ page.join_here | jsonify }}, finding: {{ page.join_finding | jsonify }},
+    noGeo: {{ page.join_no_geo | jsonify }}, geoFailed: {{ page.join_geo_failed | jsonify }}, approxFail: {{ page.join_approx_fail | jsonify }},
+    foundExact: {{ page.join_found_exact | jsonify }}, foundApprox: {{ page.join_found_approx | jsonify }}, unknown: {{ page.join_accuracy_unknown | jsonify }},
+    copied: {{ page.join_copied | jsonify }}, cantSend: {{ page.join_cant_send | jsonify }},
+    noneFound: {{ page.join_none_found | jsonify }}, oneFound: {{ page.join_one_found | jsonify }}, nFound: {{ page.join_n_found | jsonify }}
+  };
+  var LANG = {{ page.join_lang | jsonify }};
+  var HERE = T.here;
   var organiser = "";
   var relay = null;
   var posting = false;
@@ -226,7 +235,8 @@ footer a { color: var(--muted); }
       .replace(/^\/join\/(fr|es|de)$/, "/join"); // /join/fr: the same page, its preview in French
   }
 
-  function named(text) { return text.replace("%@", function () { return organiser; }); }
+  function fill(text, value) { return text.replace("%@", function () { return value; }); }
+  function named(text) { return fill(text, organiser); }
 
   // Send needs a first name and a start, as in the app. Any change after a relayed send brings Send back.
   function update() {
@@ -253,8 +263,8 @@ footer a { color: var(--muted); }
     closeSuggestions();
     [status, error, sent].forEach(function (p) { p.textContent = ""; });
     manual.hidden = true;
-    document.getElementById("title").textContent = organiser + " wants to meet";
-    document.title = organiser + " wants to meet — Compromise";
+    document.getElementById("title").textContent = named(T.title);
+    document.title = named(T.title) + " — Compromise";
     update();
     show("invite");
   }
@@ -272,27 +282,26 @@ footer a { color: var(--muted); }
 
   function locate() {
     error.textContent = "";
-    if (!navigator.geolocation) { failed("Your location isn’t available here. Type an address instead."); return; }
+    if (!navigator.geolocation) { failed(T.noGeo); return; }
     var attempt = ++locating;
     locateButton.setAttribute("aria-busy", "true");
-    status.textContent = "Finding your location…";
+    status.textContent = T.finding;
     navigator.geolocation.getCurrentPosition(function (position) {
       if (attempt !== locating) return;
       var accuracy = position.coords.accuracy;
       if (!(accuracy <= 150)) {
-        failed("Your location is only approximate (" + within(accuracy) + "). Type an address instead.");
+        failed(fill(T.approxFail, within(accuracy)));
         return;
       }
       stopLocating();
       closeSuggestions();
       point = { latitude: position.coords.latitude, longitude: position.coords.longitude };
       address.value = HERE;
-      status.textContent = accuracy <= 10 ? "Location found, rounded to about 5 m."
-        : "Location found, approximate (" + within(accuracy) + ").";
+      status.textContent = accuracy <= 10 ? T.foundExact : fill(T.foundApprox, within(accuracy));
       update();
       showStreet(point);
     }, function () {
-      if (attempt === locating) failed("Your location isn’t available. Type an address instead.");
+      if (attempt === locating) failed(T.geoFailed);
     }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
   }
 
@@ -309,10 +318,10 @@ footer a { color: var(--muted); }
     });
   }
 
-  // A fix’s accuracy, in words: "±40 m", "±12 km", or "accuracy unknown".
+  // A fix’s accuracy, in words: "±40 m", "±12 km", or "accuracy unknown" (a no-break space before the unit).
   function within(metres) {
-    if (!isFinite(metres)) return "accuracy unknown";
-    return metres < 1000 ? "±" + Math.round(metres / 10) * 10 + " m" : "±" + Math.round(metres / 1000) + " km";
+    if (!isFinite(metres)) return T.unknown;
+    return metres < 1000 ? "±" + Math.round(metres / 10) * 10 + "\u00a0m" : "±" + Math.round(metres / 1000) + "\u00a0km";
   }
 
   locateButton.addEventListener("click", locate);
@@ -340,7 +349,7 @@ footer a { color: var(--muted); }
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(url).then(function () {
-        sent.textContent = "Copied. Paste it in your chat with " + organiser + ".";
+        sent.textContent = named(T.copied);
       }, fallback);
     } else {
       fallback();
@@ -360,7 +369,7 @@ footer a { color: var(--muted); }
     try {
       url = GroupLink.writeReply({ name: nameField.value, mode: mode, start: start });
     } catch (e) {
-      error.textContent = "This can’t be sent. Try writing the address differently.";
+      error.textContent = T.cantSend;
       return;
     }
     if (!relay) { share(url); return; }
@@ -445,8 +454,8 @@ footer a { color: var(--muted); }
     // It floats over the travel modes but stops above Send, so a click on Send is never a pick.
     list.style.maxHeight = Math.max(0, send.getBoundingClientRect().top - list.getBoundingClientRect().top - 8) + "px";
     address.setAttribute("aria-expanded", results.length ? "true" : "false");
-    listStatus.textContent = results.length === 0 ? "No address found. You can still send what you typed."
-      : results.length === 1 ? "1 address found." : results.length + " addresses found.";
+    listStatus.textContent = results.length === 0 ? T.noneFound
+      : results.length === 1 ? T.oneFound : fill(T.nFound, results.length);
   }
 
   function suggest() {
@@ -493,8 +502,8 @@ footer a { color: var(--muted); }
   document.addEventListener("pointerdown", function (event) { if (event.target !== address && !list.contains(event.target)) closeSuggestions(); });
 
   function useMapKit(on) {
-    search = on ? new mapkit.Search({ language: "en" }) : null;
-    geocoder = on ? new mapkit.Geocoder({ language: "en" }) : null;
+    search = on ? new mapkit.Search({ language: LANG }) : null;
+    geocoder = on ? new mapkit.Geocoder({ language: LANG }) : null;
     closeSuggestions();
     if (on) {
       address.setAttribute("role", "combobox");
@@ -515,7 +524,7 @@ footer a { color: var(--muted); }
         if (!search && (event.status === "Initialized" || event.status === "Refreshed")) useMapKit(true);
       });
       mapkit.addEventListener("error", function () { useMapKit(false); });
-      mapkit.init({ authorizationCallback: function (done) { done(MAPKIT_TOKEN); }, language: "en" });
+      mapkit.init({ authorizationCallback: function (done) { done(MAPKIT_TOKEN); }, language: LANG });
     } catch (e) {
       useMapKit(false);
     }

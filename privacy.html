@@ -138,7 +138,12 @@ footer a { color: var(--muted); }
         Store</em>: Apple’s privacy policy then applies.</span></li>
         <li><span><strong>To Apple, from the join page on the web</strong>: what you type in its
         address field, to suggest addresses, and your location if you share it, rounded to about 5 m, to show its street.</span></li>
-        <li><span>A friend’s starting point reaches you inside the link they send; Compromise has no server.</span></li>
+        <li><span><strong>To the developer, through Cloudflare</strong>, when a friend taps <em>Send</em> to answer
+        your invite: their reply, encrypted on their device with a key that only the invite link holds, so the
+        developer cannot read it. It is deleted once your app has collected it, or after 7 days at most. If you
+        allow notifications, your app also leaves its notification token there, for 7 days at most, so Apple can
+        tell you a reply has arrived.</span></li>
+        <li><span>Otherwise, a friend’s starting point reaches you inside the link they send.</span></li>
       </ul>
     </section>
 
@@ -156,8 +161,7 @@ footer a { color: var(--muted); }
       <p>Location and Contacts permissions can be refused or withdrawn in iOS
       Settings; the app then works with typed addresses and names.
       Notifications are asked for after you send an invite or join a group, never at launch.
-      They only tell you that a friend has joined; your phone shows them itself,
-      and nothing is sent for them.
+      They only tell you that a friend has joined or sent their start.
       Settings › Privacy › <em>Share anonymous usage</em> turns the usage counts off
       and deletes the install ID and any counts not yet sent.
       When you turn it off, the app sends one last anonymous notice saying so, without the install ID.</p>

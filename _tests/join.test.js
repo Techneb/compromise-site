@@ -65,4 +65,28 @@ assert.ok(/error\.textContent = named\(NOT_RELAYED\);\s*share\(url\);/.test(html
 assert.ok(/relayedTo\.textContent = named\(SENT_TO\);/.test(html) && /relayedAgain\.hidden = false;/.test(html));
 assert.ok(!/relay\.alephb\.uk/.test(html) && /"https:\/\/relay\.alephb\.uk\/v1\/box\/"/.test(fs.readFileSync(path.join(__dirname, "..", "grouplink.js"), "utf8")));
 assert.ok(/\.replace\(\/\^\\\/join\\\/\(fr\|es\|de\)\$\/, "\/join"\)/.test(html), "a language page reads the links /join reads");
+
+// Suggestions close on Escape, on blur, on a press outside (touch keeps focus) and on Send, even while an answer is
+// still on its way (closing bumps `asked`, so a late answer is dropped); the list floats, so closing never moves Send.
+assert.ok(/address\.addEventListener\("keydown", function \(event\) \{\s*if \(event\.key === "Escape"\)[^\n]*closeSuggestions\(\)/.test(html), "Escape closes first, open or not");
+assert.ok(/address\.addEventListener\("blur", closeSuggestions\);/.test(html), "blur always closes");
+assert.ok(/document\.addEventListener\("pointerdown", function \(event\) \{[^\n]*closeSuggestions\(\)/.test(html), "a press outside closes");
+assert.ok(/form\.addEventListener\("submit", function \(event\) \{\s*event\.preventDefault\(\);\s*closeSuggestions\(\);/.test(html), "Send closes");
+assert.ok(/\.suggestions \{[^}]*position: absolute[^}]*overflow-y: auto/.test(html), "the list floats over the page and scrolls");
+assert.ok(/list\.style\.maxHeight = Math\.max\(0, send\.getBoundingClientRect\(\)\.top - list\.getBoundingClientRect\(\)\.top - 8\) \+ "px";/.test(html), "the list ends above Send, never over it");
+// Only places: a query suggestion ("Search Nearby") has no coordinate and is dropped; a pick always has a point.
+assert.ok(/return r\.coordinate && r\.displayLines && r\.displayLines\.length;/.test(html), "only places are offered");
+assert.ok(!/search\.search\(/.test(html), "no lookup of a query suggestion");
+// The lede and the hint under Send: with r= Send sends, so they say Send; without, send the link back.
+for (const d of ["join", "join/fr", "join/es", "join/de"]) {
+  const page = fs.readFileSync(path.join(__dirname, "..", d, "index.html"), "utf8");
+  const v = (k) => (new RegExp("^" + k + ": \"([^\"]+)\"$", "m").exec(page) || [])[1];
+  for (const k of ["join_lede", "join_lede_relay", "join_why", "join_why_relay"]) assert.ok(v(k), d + ": no " + k);
+  assert.ok(v("join_lede") !== v("join_lede_relay") && v("join_why") !== v("join_why_relay"), d + ": relay copy is the same");
+  assert.ok(v("join_lede_relay").includes(v("join_send")) && v("join_why_relay").includes(v("join_send")), d + ": relay copy names the button");
+}
+const en = fs.readFileSync(path.join(__dirname, "..", "join", "index.html"), "utf8");
+assert.ok(en.includes('join_lede: "Say where you’re starting from and how you’ll get there, then send the link back."'));
+assert.ok(en.includes('join_why: "Add your first name and where you start, then send it back."'));
+assert.ok(/lede\.textContent = relay \? LEDE_RELAY : LEDE;/.test(html) && /why\.textContent = relay \? WHY_RELAY : WHY;/.test(html));
 console.log("join: ok");

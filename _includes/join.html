@@ -44,12 +44,12 @@ p { margin: 0; }
 .kicker { font: 600 13px/1 var(--font); text-transform: uppercase; letter-spacing: 0.09em; color: var(--tint); }
 .muted { color: var(--muted); }
 
-nav { display: flex; align-items: center; justify-content: space-between; padding-block: 18px; }
+nav { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; justify-content: space-between; padding-block: 18px; }
 .brand { display: flex; align-items: center; gap: 10px; font: 700 19px/1 var(--display); color: var(--fg); text-decoration: none; letter-spacing: -0.01em; }
 .brand-mark { width: 30px; height: 30px; border-radius: 8px; overflow: hidden; flex: none; }
 .brand-mark img { display: block; }
 nav .links { display: flex; gap: 22px; font-size: 15px; }
-nav .links a { color: var(--muted); text-decoration: none; }
+nav .links a { color: var(--muted); text-decoration: none; white-space: nowrap; } /* a longer language moves the links under the brand, whole */
 nav .links a:hover { color: var(--fg); }
 
 main { max-width: 34rem; margin: 0 auto; padding-block: 24px 64px; }

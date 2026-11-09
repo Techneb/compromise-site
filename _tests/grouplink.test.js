@@ -121,4 +121,54 @@ refused("v=1&k=top&w=Nino,L%C3%A9a&p1=48.85322,2.36912&t1=14,15", "badField");
 refused("v=1&k=pick&w=Nino,L%C3%A9a" + spot + "&s2=Bar&p2=1,2&t2=1,2", "badField");
 refused("v=1&k=top&w=Nino,L%C3%A9a&s1=" + "a".repeat(81) + "&p1=48.85322,2.36912&t1=14,15", "badField");
 
-console.log("grouplink: ok");
+// The reply relay's box: r=<box>.<key> on an invite (GROUP_SYNC.md §3.2), strict base64url, refused on a reply.
+const bytes = (from, n) => Uint8Array.from({ length: n }, (_, i) => from + i);
+const b64 = (u) => Buffer.from(u).toString("base64url");
+const r = b64(bytes(0, 16)) + "." + b64(bytes(100, 32));
+assert.strictEqual(r.length, 66);
+const invite = G.read("v=1&k=invite&n=Nino&r=" + r);
+assert.strictEqual(invite.organiser, "Nino");
+assert.strictEqual(invite.relay.box, b64(bytes(0, 16)));
+assert.deepStrictEqual(invite.relay.id, bytes(0, 16));
+assert.deepStrictEqual(invite.relay.key, bytes(100, 32));
+[r.slice(1), r + "A", r.replace(".", "-"), r.replace(".", "") + "A", "+" + r.slice(1), "/" + r.slice(1),
+  r.slice(0, 65) + "B", r.slice(0, 21) + "B" + r.slice(22), ".".repeat(66), ""]
+  .forEach((bad) => refused("v=1&k=invite&n=Nino&r=" + bad, "badField"));
+refused("v=1&k=invite&n=Nino&r=" + r.slice(0, 21) + "=" + r.slice(22), "malformed");
+refused("v=1&k=reply&m=walk&a=Bercy&r=" + r, "badField");
+
+// Sealing: AES-256-GCM, the box id as associated data, nonce ‖ ciphertext ‖ tag; fixtures shared with ReplyBoxTests.
+const relay = invite.relay;
+(async () => {
+  const fromPage = await G.seal(relay, "v=1&k=reply&n=Sam&m=walk&p=48.85,2.35", new Uint8Array(12));
+  assert.strictEqual(b64(fromPage), "AAAAAAAAAAAAAAAAKlrKtBuo3Rg3JiLuj8FjIpEFXz963zTxDxIWv3K1dpWapWvLvRNBGdKONmtzUWsHQcUnM2c");
+  const open = async (body) => new TextDecoder().decode(await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: body.slice(0, 12), additionalData: relay.id },
+    await crypto.subtle.importKey("raw", relay.key, "AES-GCM", false, ["decrypt"]), body.slice(12)));
+  const fromSwift = Buffer.from("AQEBAQEBAQEBAQEBABhb-yLc0xtQ0y4JMcK6FDTKFEeS4rJYkcqM57t28k1flW26jA6s_jPTOhiRc6rtcZFVYz0lbDheT7nEJ_Sk3cel1w", "base64url");
+  assert.strictEqual(await open(new Uint8Array(fromSwift)), "v=1&k=reply&n=L%C3%A9a&m=transit&a=Gare%20de%20Lyon");
+  const random = await G.seal(relay, "v=1&k=reply&m=walk&a=Bercy");
+  assert.notDeepStrictEqual(random.slice(0, 12), new Uint8Array(12), "a random nonce");
+  assert.strictEqual(await open(random), "v=1&k=reply&m=walk&a=Bercy");
+  assert.strictEqual(random.length, 12 + 26 + 16);
+  await assert.rejects(G.seal(relay, "a".repeat(4097)), G.Refused);
+
+  // Sending: the host is the code's, the body sealed, true only on 202; anything else is false, never a throw.
+  const calls = [];
+  const answer = (status) => (url, init) => { calls.push({ url, init }); return Promise.resolve({ status }); };
+  assert.strictEqual(await G.send(relay, "v=1&k=reply&m=walk&a=Bercy", answer(202)), true);
+  assert.strictEqual(calls[0].url, "https://relay.alephb.uk/v1/box/" + relay.box);
+  assert.strictEqual(calls[0].init.method, "POST");
+  assert.strictEqual(calls[0].init.headers["Content-Type"], "application/octet-stream");
+  assert.strictEqual(await open(calls[0].init.body), "v=1&k=reply&m=walk&a=Bercy");
+  for (const status of [200, 204, 404, 409, 413, 429, 500, 503]) {
+    assert.strictEqual(await G.send(relay, "v=1&k=reply&m=walk&a=Bercy", answer(status)), false, String(status));
+  }
+  assert.strictEqual(await G.send(relay, "v=1&k=reply&m=walk&a=Bercy", () => Promise.reject(new TypeError("offline"))), false);
+  assert.strictEqual(await G.send(relay, "v=1&k=reply&m=walk&a=Bercy", () => { throw new TypeError("no fetch"); }), false);
+  assert.strictEqual(G.Limit.relayTimeout, 10000);
+  G.Limit.relayTimeout = 20;
+  const hang = (url, init) => new Promise((_, reject) => init.signal.addEventListener("abort", () => reject(init.signal.reason)));
+  assert.strictEqual(await G.send(relay, "v=1&k=reply&m=walk&a=Bercy", hang), false, "no answer in time");
+  console.log("grouplink: ok");
+})().catch((e) => { console.error(e); process.exit(1); });

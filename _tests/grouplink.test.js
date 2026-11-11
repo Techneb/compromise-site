@@ -137,6 +137,28 @@ assert.deepStrictEqual(invite.relay.key, bytes(100, 32));
 refused("v=1&k=invite&n=Nino&r=" + r.slice(0, 21) + "=" + r.slice(22), "malformed");
 refused("v=1&k=reply&m=walk&a=Bercy&r=" + r, "badField");
 
+// The vote (GROUP_SYNC.md §4.4): b=<id>,<kind>,…: 2 to 4 kinds on an invite, 1 to 4 on a reply, each percent-encoded;
+// the codec checks the shape only. The same cases as GroupLinkTests' vote fixtures.
+const ballot = "b=Ab3_x9,Bar,Italian%20restaurant,Cinema";
+assert.deepStrictEqual(G.read("v=1&k=invite&n=Nino&" + ballot + "&r=" + r).vote, { id: "Ab3_x9", kinds: ["Bar", "Italian restaurant", "Cinema"] });
+assert.deepStrictEqual(G.read("v=1&k=invite&n=Nino&b=-_0aZz,Bar,A%2CB,C,D").vote.kinds, ["Bar", "A,B", "C", "D"], "4 kinds, a comma inside one");
+assert.strictEqual("vote" in G.read("v=1&k=invite&n=Nino"), false, "an old invite without b");
+assert.strictEqual("ticks" in G.read("v=1&k=reply&m=walk&a=Bercy"), false, "an old reply without b");
+assert.deepStrictEqual(G.read("v=1&k=reply&m=walk&a=Bercy&b=Ab3_x9,Cinema").ticks, { id: "Ab3_x9", kinds: ["Cinema"] });
+assert.deepStrictEqual(G.read("v=1&k=reply&m=walk&a=Bercy&b=Ab3_x9,Zz,Bar").ticks.kinds, ["Zz", "Bar"], "an unknown kind is the app's call");
+["Ab3_x,Bar,Cafe", "Ab3_x9a,Bar,Cafe", "Ab3+x9,Bar,Cafe", "Ab3%5Fx9,Bar,Cafe", "Ab3_x9,Bar", "Ab3_x9,A,B,C,D,E", "Ab3_x9,Bar,Bar",
+  "Ab3_x9,Bar,Bar%20", "Ab3_x9,Bar,", "Ab3_x9,Bar," + "a".repeat(41), "Ab3_x9,Bar,%E2%80%8B", "Ab3_x9", ""]
+  .forEach((b) => refused("v=1&k=invite&n=Nino&b=" + b, "badField"));
+["Ab3_x9", "Ab3_x9,", "Ab3_x9,A,B,C,D,E", "Ab3_x9,Bar,Bar", "Ab3!x9,Bar"].forEach((b) => refused("v=1&k=reply&m=walk&a=Bercy&b=" + b, "badField"));
+assert.ok(G.read("v=1&k=invite&n=Nino&b=Ab3_x9,Bar," + "é".repeat(40)), "40 characters, not bytes");
+// Written last, after the start; no tick, no b.
+assert.strictEqual(G.writeReply({ name: "Sam", mode: "walk", start: { address: "Bercy" }, ticks: { id: "Ab3_x9", kinds: ["Bar", "Italian restaurant"] } }),
+  "https://compromise.alephb.uk/join#v=1&k=reply&n=Sam&m=walk&a=Bercy&b=Ab3_x9,Bar,Italian%20restaurant");
+assert.strictEqual(G.writeReply({ name: "Sam", mode: "walk", start: { address: "Bercy" }, ticks: { id: "Ab3_x9", kinds: [] } }),
+  "https://compromise.alephb.uk/join#v=1&k=reply&n=Sam&m=walk&a=Bercy");
+assert.ok(G.writeReply({ name: null, mode: "walk", start: { address: "Bercy" }, ticks: { id: "Ab3_x9", kinds: ["A,B"] } }).endsWith("&b=Ab3_x9,A%2CB"));
+assert.throws(() => G.writeReply({ name: null, mode: "walk", start: { address: "Bercy" }, ticks: { id: "bad", kinds: ["Bar"] } }), G.Refused);
+
 // Sealing: AES-256-GCM, the box id as associated data, nonce ‖ ciphertext ‖ tag; fixtures shared with ReplyBoxTests.
 const relay = invite.relay;
 (async () => {

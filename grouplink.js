@@ -7,7 +7,7 @@
   var MODES = ["walk", "transit", "car", "bike"];
   var Limit = {
     fragment: 4000, pairs: 32, name: 30, address: 200, spotName: 80, spotAddress: 150,
-    people: 12, spots: 3, startDecimals: 5, startStep: 0.00005, spotDecimals: 5, scalarsPerCharacter: 4,
+    people: 12, spots: 3, kind: 40, ballot: 4, startDecimals: 5, startStep: 0.00005, spotDecimals: 5, scalarsPerCharacter: 4,
     relayPlaintext: 4096, relayTimeout: 10000
   };
 
@@ -90,6 +90,18 @@
     return items.map(function (item) { return decoded(item, max); });
   };
 
+  // b=<id>,<kind>,…: a vote (GROUP_SYNC.md §4.4), its 6-character id then `low` to 4 distinct kinds. Shape only:
+  // whether they match the open vote is the organiser's app's call.
+  Fields.prototype.vote = function (low) {
+    var raw = this.get("b");
+    if (raw === null) return null;
+    var items = raw.split(",");
+    if (!/^[A-Za-z0-9_-]{6}$/.test(items[0]) || items.length - 1 < low || items.length - 1 > Limit.ballot) throw new Refused("badField");
+    var kinds = items.slice(1).map(function (item) { return decoded(item, Limit.kind); });
+    if (new Set(kinds).size !== kinds.length) throw new Refused("badField");
+    return { id: items[0], kinds: kinds };
+  };
+
   function number(text, decimals) {
     var unsigned = text.charAt(0) === "-" ? text.slice(1) : text;
     var halves = unsigned.split(".");
@@ -130,7 +142,10 @@
     var start = hasPoint
       ? { point: fields.coordinate("p", Limit.startDecimals) }
       : { address: fields.text("a", Limit.address) };
-    return { kind: "reply", name: name, mode: mode, start: start };
+    var reply = { kind: "reply", name: name, mode: mode, start: start };
+    var ticks = fields.vote(1);
+    if (ticks) reply.ticks = ticks;
+    return reply;
   }
 
   // Strict base64url without padding: re-encoding must give the same text back.
@@ -146,6 +161,8 @@
   // r=<box>.<key>: the reply relay's box id (16 bytes) and reply key (32 bytes), both or neither (GROUP_SYNC.md §3.2).
   function readInvite(fields) {
     var invite = { kind: "invite", organiser: fields.text("n", Limit.name) };
+    var vote = fields.vote(2);
+    if (vote) invite.vote = vote;
     var raw = fields.get("r");
     if (raw === null) return invite;
     var parts = /^([A-Za-z0-9_-]{22})\.([A-Za-z0-9_-]{43})$/.exec(raw);
@@ -260,6 +277,10 @@
       pairs.push(["p", formatted(lat, Limit.startDecimals) + "," + formatted(lon, Limit.startDecimals)]);
     } else {
       pairs.push(["a", encoded(reply.start.address, Limit.address)]);
+    }
+    // The friend's ticks, after the start: { id, kinds } from the invite's vote; none, no b (not voted).
+    if (reply.ticks && reply.ticks.kinds.length) {
+      pairs.push(["b", [reply.ticks.id].concat(reply.ticks.kinds.map(function (k) { return encoded(k, Limit.kind); })).join(",")]);
     }
     var fragment = pairs.map(function (pair) { return pair[0] + "=" + pair[1]; }).join("&");
     readFragment(fragment);

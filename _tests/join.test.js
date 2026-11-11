@@ -117,4 +117,28 @@ for (const [, t] of markup.matchAll(/>([^<]*)</g)) assert.ok(/^\s*(\{\{ page\.\w
 for (const [, t] of markup.matchAll(/\s(?:alt|title|aria-label|placeholder)="([^"]+)"/g)) assert.ok(/^\{\{ page\.\w+ \}\}$/.test(t), "attribute text in the include: " + t);
 const script = html.slice(html.indexOf("(function () {"));
 for (const [str] of script.replace(/(^|\s)\/\/.*$/gm, "").matchAll(/"[^"\n]*"/g)) assert.ok(str === "\"use strict\"" || !/\p{L}{3,} \p{L}{3,}/u.test(str), "English in the script: " + str);
+// The ballot (GROUP_SYNC.md §4.5): above the name, a group with its question as legend, one checkbox per kind of the
+// invite's vote; the ticks go into the reply, none when there is no vote.
+assert.ok(html.indexOf('<legend>{{ page.join_kind_q }}</legend>') > 0 && html.indexOf('<legend>{{ page.join_kind_q }}</legend>') < order[0], "the ballot comes first");
+assert.ok(/<fieldset id="ballot" aria-describedby="ballot-hint" hidden>/.test(html), "hidden without a vote, its hint read with it");
+assert.ok(/ticks: vote && \{ id: vote\.id, kinds: ticked\(\) \}/.test(html));
+assert.ok(/var KINDS = \{% include kinds\.json %\};/.test(html), "the kinds table is the app's kinds.json, inlined");
+// The kinds table: the app's VenueCategoryOption in Filters' order, each with an emoji and a title in the four languages.
+const kindsPath = path.join(__dirname, "..", "_includes", "kinds.json"), kindsText = fs.readFileSync(kindsPath, "utf8");
+const kinds = JSON.parse(kindsText);
+assert.strictEqual(kinds.length, 50, "35 types and 15 restaurant subtypes");
+assert.strictEqual(new Set(kinds.map((k) => k.id)).size, kinds.length, "ids are unique");
+for (const k of kinds) {
+  assert.deepStrictEqual(Object.keys(k), ["id", "emoji", "en", "fr", "es", "de"], k.id);
+  for (const key of Object.keys(k)) assert.ok(typeof k[key] === "string" && k[key].trim() === k[key] && k[key], k.id + ": " + key);
+  assert.ok(k.id.length <= 40, k.id + " is over the link's 40 characters");
+  assert.ok(!/'/.test(k.fr + k.es + k.de + k.en), k.id + ": a straight apostrophe");
+}
+const subtypes = ["Italian", "French", "Greek", "Spanish", "Lebanese", "Turkish", "Indian", "Chinese", "Japanese", "Korean", "Thai",
+  "Vietnamese", "Mexican", "Burger", "Pizza"].map((c) => c + " restaurant");
+const at = kinds.findIndex((k) => k.id === "Restaurant");
+assert.deepStrictEqual(kinds.slice(at + 1, at + 16).map((k) => k.id), subtypes, "the subtypes follow Restaurant, in SCREEN.md's order");
+assert.deepStrictEqual(kinds.slice(at + 1, at + 16).map((k) => k.emoji).join(" "), "🍝 🥖 🫒 🥘 🧆 🥙 🍛 🥟 🍣 🍲 🌶️ 🍜 🌮 🍔 🍕");
+// Against the app's copy: COMPROMISE_KINDS=<the app repo's kinds.json> node _tests/join.test.js.
+if (process.env.COMPROMISE_KINDS) assert.deepStrictEqual(kinds, JSON.parse(fs.readFileSync(process.env.COMPROMISE_KINDS, "utf8")), "kinds.json drifted from the app's");
 console.log("join: ok");

@@ -126,7 +126,7 @@ assert.ok(/var KINDS = \{% include kinds\.json %\};/.test(html), "the kinds tabl
 // The kinds table: the app's VenueCategoryOption in Filters' order, each with an emoji and a title in the four languages.
 const kindsPath = path.join(__dirname, "..", "_includes", "kinds.json"), kindsText = fs.readFileSync(kindsPath, "utf8");
 const kinds = JSON.parse(kindsText);
-assert.strictEqual(kinds.length, 50, "35 types and 15 restaurant subtypes");
+assert.strictEqual(kinds.length, 53, "38 types (Nightlife's three since 1.0.4) and 15 restaurant subtypes");
 assert.strictEqual(new Set(kinds.map((k) => k.id)).size, kinds.length, "ids are unique");
 for (const k of kinds) {
   assert.deepStrictEqual(Object.keys(k), ["id", "emoji", "en", "fr", "es", "de"], k.id);

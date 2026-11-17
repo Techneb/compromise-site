@@ -1,4 +1,4 @@
-{%- comment -%} The join page; /join/ and /join/fr/, /join/es/, /join/de/ (their link previews in that language) set every line of copy in front matter: the same join_* keys on all four, the strings in that page's language (_tests/join.test.js compares them). {%- endcomment -%}
+{%- comment -%} The join page; /join and /join/fr, /join/es, /join/de (join.html, join/fr.html…: their link previews in that language), and the same four with a trailing slash (join/index.html, join/fr/index.html…: a vote's invite, its preview saying so; the host serves /join from join.html and /join/ from join/index.html, and every app reads both), set every line of copy in front matter: the same join_* keys on all eight, the strings in that page's language (_tests/join.test.js compares them). {%- endcomment -%}
 <!doctype html>
 <html lang="{{ page.join_lang }}">
 <head>
@@ -247,7 +247,7 @@ footer a { color: var(--muted); }
 
   function pagePath() {
     return location.pathname.replace(/index\.html$/, "").replace(/\.html$/, "").replace(/\/$/, "")
-      .replace(/^\/join\/(fr|es|de)$/, "/join"); // /join/fr: the same page, its preview in French
+      .replace(/^\/join\/(fr|es|de)$/, "/join"); // /join/fr: the same page, its preview in French; /join/: a vote's
   }
 
   function fill(text, value) { return text.replace("%@", function () { return value; }); }

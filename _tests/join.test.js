@@ -45,16 +45,21 @@ assert.ok(!/name="mode"[^>]*aria-label/.test(html), "a mode has one name, its vi
 const order = ['for="name">{{ page.join_name_q }}</label>', 'for="address">{{ page.join_start_q }}</label>', '<legend>{{ page.join_travel }}</legend>', '{{ page.join_privacy }}'].map((q) => html.indexOf(q));
 assert.ok(order.every((i, n) => i > 0 && (n === 0 || i > order[n - 1])), "questions out of order or missing: " + order);
 assert.ok(/<input[^>]*id="name"[^>]*required/.test(html) && !/id="name"[^>]*aria-label/.test(html), "the name field is required and named by its label only");
-// One page per language at /join/, /join/fr/, /join/es/, /join/de/: link previews show the head's copy in that language.
-for (const d of ["join", "join/fr", "join/es", "join/de"]) {
-  const page = fs.readFileSync(path.join(__dirname, "..", d, "index.html"), "utf8");
+// One page per language at /join, /join/fr, /join/es, /join/de (join.html, join/fr.html…): link previews show the
+// head's copy in that language. The same four with a trailing slash (join/index.html, join/fr/index.html…) for an invite
+// with a vote: the host never sees the fragment, so only the path can make its preview say it is a vote, and a released
+// app reads /join/ (it drops one trailing slash) where it refuses any other path. The host serves /join from join.html.
+const plain = ["join.html", "join/fr.html", "join/es.html", "join/de.html"];
+const votes = ["join/index.html", "join/fr/index.html", "join/es/index.html", "join/de/index.html"];
+for (const d of plain.concat(votes)) {
+  const page = fs.readFileSync(path.join(__dirname, "..", d), "utf8");
   assert.ok(page.startsWith("---\n") && page.includes("{% include join.html %}"), d + " is not the join page");
   for (const key of ["join_title", "join_og_title", "join_description", "join_image_alt", "join_send", "join_sent", "join_again", "join_failed"]) {
     assert.ok(new RegExp("^" + key + ": \"[^\"]+\"$", "m").test(page), d + ": no " + key);
   }
   for (const key of ["join_sent", "join_failed"]) assert.ok(new RegExp("^" + key + ": \"[^\"\n]*%@").test(page.split("\n").find((l) => l.startsWith(key))), d + ": " + key + " names no one");
 }
-assert.ok(/^join_send: "Envoyer"$/m.test(fs.readFileSync(path.join(__dirname, "..", "join/fr/index.html"), "utf8")));
+assert.ok(/^join_send: "Envoyer"$/m.test(fs.readFileSync(path.join(__dirname, "..", "join/fr.html"), "utf8")));
 
 // Send (GROUP_SYNC.md §3.1): one button; with r= the relay first, and any failure goes on to the reply link under one line;
 // without r= the reply link at once. The relay's host is in grouplink.js, never read from the link.
@@ -64,7 +69,14 @@ assert.ok(/if \(!relay\) \{ share\(url\); return; \}/.test(html));
 assert.ok(/error\.textContent = named\(NOT_RELAYED\);\s*share\(url\);/.test(html), "a failed post falls back to the reply link");
 assert.ok(/relayedTo\.textContent = named\(SENT_TO\);/.test(html) && /relayedAgain\.hidden = false;/.test(html));
 assert.ok(!/relay\.alephb\.uk/.test(html) && /"https:\/\/relay\.alephb\.uk\/v1\/box\/"/.test(fs.readFileSync(path.join(__dirname, "..", "grouplink.js"), "utf8")));
-assert.ok(/\.replace\(\/\^\\\/join\\\/\(fr\|es\|de\)\$\/, "\/join"\)/.test(html), "a language page reads the links /join reads");
+assert.ok(html.includes('.replace(/^\\/join\\/(fr|es|de)$/, "/join")'), "a language or vote page reads the links /join reads");
+plain.forEach((f, n) => {
+  const join = fs.readFileSync(path.join(__dirname, "..", f), "utf8"), vote = fs.readFileSync(path.join(__dirname, "..", votes[n]), "utf8");
+  assert.ok(new RegExp("^permalink: /" + f.replace(/\.html$/, "") + "$", "m").test(join), f + ": served at its path, no slash");
+  assert.ok(!/^permalink:/m.test(vote), votes[n] + ": served at the slash form");
+  const og = (page) => /^join_og_title: "(.*)"$/m.exec(page)[1];
+  assert.notStrictEqual(og(vote), og(join), votes[n] + ": its preview must say it is a vote");
+});
 
 // Suggestions close on Escape, on blur, on a press outside (touch keeps focus) and on Send, even while an answer is
 // still on its way (closing bumps `asked`, so a late answer is dropped); the list floats, so closing never moves Send.
@@ -78,21 +90,21 @@ assert.ok(/list\.style\.maxHeight = Math\.max\(0, send\.getBoundingClientRect\(\
 assert.ok(/return r\.coordinate && r\.displayLines && r\.displayLines\.length;/.test(html), "only places are offered");
 assert.ok(!/search\.search\(/.test(html), "no lookup of a query suggestion");
 // The lede and the hint under Send: with r= Send sends, so they say Send; without, send the link back.
-for (const d of ["join", "join/fr", "join/es", "join/de"]) {
-  const page = fs.readFileSync(path.join(__dirname, "..", d, "index.html"), "utf8");
+for (const d of plain.concat(votes)) {
+  const page = fs.readFileSync(path.join(__dirname, "..", d), "utf8");
   const v = (k) => (new RegExp("^" + k + ": \"([^\"]+)\"$", "m").exec(page) || [])[1];
   for (const k of ["join_lede", "join_lede_relay", "join_why", "join_why_relay"]) assert.ok(v(k), d + ": no " + k);
   assert.ok(v("join_lede") !== v("join_lede_relay") && v("join_why") !== v("join_why_relay"), d + ": relay copy is the same");
   assert.ok(v("join_lede_relay").includes(v("join_send")) && v("join_why_relay").includes(v("join_send")), d + ": relay copy names the button");
 }
-const en = fs.readFileSync(path.join(__dirname, "..", "join", "index.html"), "utf8");
+const en = fs.readFileSync(path.join(__dirname, "..", "join.html"), "utf8");
 assert.ok(en.includes('join_lede: "Say where you’re starting from and how you’ll get there, then send the link back."'));
 assert.ok(en.includes('join_why: "Add your first name and where you start, then send it back."'));
 assert.ok(/lede\.textContent = relay \? LEDE_RELAY : LEDE;/.test(html) && /why\.textContent = relay \? WHY_RELAY : WHY;/.test(html));
 // Every line of copy is in the four pages' front matter, in that page's language (owner, 2026-11-09): the same keys
 // on all four, every key the include reads, no English value on fr, es or de, and no text left in the include itself.
 const fm = (d) => {
-  const src = fs.readFileSync(path.join(__dirname, "..", d, "index.html"), "utf8").split("---\n")[1];
+  const src = fs.readFileSync(path.join(__dirname, "..", d + ".html"), "utf8").split("---\n")[1];
   return Object.fromEntries([...src.matchAll(/^(join_\w+): "(.*)"$/gm)].map((m) => [m[1], m[2]]));
 };
 const english = fm("join"), used = [...new Set([...html.matchAll(/page\.(join_\w+)/g)].map((m) => m[1]))];

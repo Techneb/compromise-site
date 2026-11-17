@@ -1,4 +1,4 @@
-{%- comment -%} The join page; /join/ and /join/fr/, /join/es/, /join/de/ (their link previews in that language) set every line of copy in front matter: the same join_* keys on all four, the strings in that page's language (_tests/join.test.js compares them). {%- endcomment -%}
+{%- comment -%} The join page; /join/ and /join/fr/, /join/es/, /join/de/ (their link previews in that language), and the same four under /join/vote/ (a vote's invite, its preview saying so), set every line of copy in front matter: the same join_* keys on all four, the strings in that page's language (_tests/join.test.js compares them). {%- endcomment -%}
 <!doctype html>
 <html lang="{{ page.join_lang }}">
 <head>
@@ -247,7 +247,7 @@ footer a { color: var(--muted); }
 
   function pagePath() {
     return location.pathname.replace(/index\.html$/, "").replace(/\.html$/, "").replace(/\/$/, "")
-      .replace(/^\/join\/(fr|es|de)$/, "/join"); // /join/fr: the same page, its preview in French
+      .replace(/^\/join(\/vote)?(\/(fr|es|de))?$/, "/join"); // /join/fr, /join/vote: the same page, its preview in French or a vote's
   }
 
   function fill(text, value) { return text.replace("%@", function () { return value; }); }

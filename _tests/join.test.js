@@ -46,7 +46,9 @@ const order = ['for="name">{{ page.join_name_q }}</label>', 'for="address">{{ pa
 assert.ok(order.every((i, n) => i > 0 && (n === 0 || i > order[n - 1])), "questions out of order or missing: " + order);
 assert.ok(/<input[^>]*id="name"[^>]*required/.test(html) && !/id="name"[^>]*aria-label/.test(html), "the name field is required and named by its label only");
 // One page per language at /join/, /join/fr/, /join/es/, /join/de/: link previews show the head's copy in that language.
-for (const d of ["join", "join/fr", "join/es", "join/de"]) {
+// The same four again under /join/vote/, for an invite with a vote: the host never sees the fragment, so only the path
+// can make its preview say it is a vote.
+for (const d of ["join", "join/fr", "join/es", "join/de", "join/vote", "join/vote/fr", "join/vote/es", "join/vote/de"]) {
   const page = fs.readFileSync(path.join(__dirname, "..", d, "index.html"), "utf8");
   assert.ok(page.startsWith("---\n") && page.includes("{% include join.html %}"), d + " is not the join page");
   for (const key of ["join_title", "join_og_title", "join_description", "join_image_alt", "join_send", "join_sent", "join_again", "join_failed"]) {
@@ -64,7 +66,12 @@ assert.ok(/if \(!relay\) \{ share\(url\); return; \}/.test(html));
 assert.ok(/error\.textContent = named\(NOT_RELAYED\);\s*share\(url\);/.test(html), "a failed post falls back to the reply link");
 assert.ok(/relayedTo\.textContent = named\(SENT_TO\);/.test(html) && /relayedAgain\.hidden = false;/.test(html));
 assert.ok(!/relay\.alephb\.uk/.test(html) && /"https:\/\/relay\.alephb\.uk\/v1\/box\/"/.test(fs.readFileSync(path.join(__dirname, "..", "grouplink.js"), "utf8")));
-assert.ok(/\.replace\(\/\^\\\/join\\\/\(fr\|es\|de\)\$\/, "\/join"\)/.test(html), "a language page reads the links /join reads");
+assert.ok(html.includes('.replace(/^\\/join(\\/vote)?(\\/(fr|es|de))?$/, "/join")'), "a language or vote page reads the links /join reads");
+for (const d of ["join/vote", "join/vote/fr", "join/vote/es", "join/vote/de"]) {
+  const vote = fs.readFileSync(path.join(__dirname, "..", d, "index.html"), "utf8"), join = fs.readFileSync(path.join(__dirname, "..", d.replace("/vote", ""), "index.html"), "utf8");
+  const og = (page) => /^join_og_title: "(.*)"$/m.exec(page)[1];
+  assert.notStrictEqual(og(vote), og(join), d + ": its preview must say it is a vote");
+}
 
 // Suggestions close on Escape, on blur, on a press outside (touch keeps focus) and on Send, even while an answer is
 // still on its way (closing bumps `asked`, so a late answer is dropped); the list floats, so closing never moves Send.

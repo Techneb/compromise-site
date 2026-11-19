@@ -62,7 +62,7 @@ layout: null
       <div class="phone">
         <div class="screen" role="img" aria-label="Illustration de l’app : une carte avec trois amis et un point de rendez-vous, et une liste d’adresses où Nino, Léa et toi mettez chacun environ 18 minutes.">
           <!-- Screenshot slot: img/fr/meet.jpg, 400 × 869 -->
-          <img class="shot" src="/img/fr/meet.jpg" width="400" height="869" alt="Compromise : la carte, le départ de chacun, et les adresses classées selon l’écart entre les temps de trajet" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
+          <img class="shot" src="/img/fr/meet.jpg" width="400" height="869" alt="Compromise : la carte, le départ de chacun, et les adresses classées" onload="this.parentNode.setAttribute('aria-label', this.alt)" onerror="this.remove()">
           <div class="island"></div>
           <svg class="map" viewBox="0 0 300 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <rect width="300" height="640" fill="var(--map)"/>
@@ -94,7 +94,7 @@ layout: null
               <span class="chip"><i style="background: var(--p3)"></i>Léa · <svg class="ico" aria-hidden="true"><use href="#m-bike"/></svg>vélo</span>
             </div>
             <div class="spot">
-              <div class="spot-head"><span class="rank">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 min d’écart</span></div>
+              <div class="spot-head"><span class="rank">1</span><span class="spot-name">Café Lumière</span><span class="gap">17–19 min</span></div>
               <div class="sun-cap">Au soleil jusqu’à 18:40</div>
               <div class="bars">
                 <div class="bar"><span>Toi</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 min</b></div>
@@ -103,10 +103,10 @@ layout: null
               </div>
             </div>
             <div class="spot">
-              <div class="spot-head"><span class="rank">2</span><span class="spot-name">Bar Mercure</span><span class="gap">≃ 4 min d’écart</span></div>
+              <div class="spot-head"><span class="rank">2</span><span class="spot-name">Bar Mercure</span><span class="gap">15–21 min</span></div>
               <div class="bars">
                 <div class="bar"><span>Toi</span><span class="track"><span class="fill" style="width: 50%; background: var(--p1)"></span></span><b>15 min</b></div>
-                <div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div>
+                <div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 70%; background: var(--p2)"></span></span><b>21 min</b></div>
                 <div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 57%; background: var(--p3)"></span></span><b>17 min</b></div>
               </div>
             </div>
@@ -131,7 +131,7 @@ layout: null
     <ol class="steps">
       <li><img class="step-shot" src="/img/fr/how-1.jpg" alt="Quatre personnes, chacune avec son point de départ, et de quoi ajouter quelqu’un ou inviter des amis" width="600" height="532" loading="lazy"><h3>Ajoute tout le monde</h3><p>Pars d’où tu es, ajoute tes amis ou <strong>invite-les avec un lien</strong>. À deux ou à dix, chacun avec son point de départ.</p></li>
       <li><img class="step-shot" src="/img/fr/how-2.jpg" alt="Le moyen de transport et le temps de trajet de chacun jusqu’à une adresse" width="600" height="532" loading="lazy"><h3>Dis comment chacun vient</h3><p>L’une vient à pied, l’autre en métro, le troisième à vélo. Le temps de chacun est calculé avec <strong>son vrai moyen de transport</strong>.</p></li>
-      <li><img class="step-shot" src="/img/fr/how-3.jpg" alt="Les adresses classées pour les quatre mêmes amis, chacune avec l’écart en minutes entre leurs temps de trajet" width="600" height="532" loading="lazy"><h3>Choisis parmi les adresses les plus justes</h3><p>Les bars, cafés et restaurants où <strong>les temps de trajet sont les plus proches</strong> arrivent en tête. Ouvre l’itinéraire ou partage l’adresse en un geste.</p></li>
+      <li><img class="step-shot" src="/img/fr/how-3.jpg" alt="Les adresses classées pour les quatre mêmes amis, avec le temps de trajet de chacun" width="600" height="532" loading="lazy"><h3>Choisis parmi les adresses les plus justes</h3><p>Classe les bars, cafés et restaurants pour que <strong>le trajet le plus long soit le plus court possible</strong>, ou pour que <strong>vos temps soient aussi proches que possible</strong>. Ouvre l’itinéraire ou partage l’adresse en un geste.</p></li>
     </ol>
   </section>
 
@@ -144,6 +144,7 @@ layout: null
         <ul>
           <li><span>À pied, en transports, en voiture ou à vélo : <strong>chacun à sa façon</strong>.</span></li>
           <li><span>En transports, tu vois <strong>quelles lignes prendre</strong>.</span></li>
+          <li><span>Choisis entre <strong>trajets les plus courts</strong> et <strong>trajets les plus égaux</strong>, et fixe un trajet maximum que personne ne dépasse.</span></li>
         </ul>
       </div>
       <div>
@@ -152,13 +153,13 @@ layout: null
             <div class="compare-title">À mi-chemin sur la carte <span>exemple</span></div>
             <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 88%; background: var(--p2)"></span></span><b>35 min</b></div>
             <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 30%; background: var(--p3)"></span></span><b>12 min</b></div>
-            <p class="verdict bad">23 minutes d’écart</p>
+            <p class="verdict bad">Trajet le plus long : 35 min</p>
           </div>
           <div class="compare-row">
             <div class="compare-title"><b>L’adresse choisie par <b class="brand-word">Compromise</b></b></div>
             <div class="cbar"><span>Nino</span><span class="track"><span class="fill" style="width: 45%; background: var(--p2)"></span></span><b>18 min</b></div>
             <div class="cbar"><span>Léa</span><span class="track"><span class="fill" style="width: 55%; background: var(--p3)"></span></span><b>22 min</b></div>
-            <p class="verdict good">4 minutes d’écart</p>
+            <p class="verdict good">Trajet le plus long : 22 min</p>
           </div>
         </div>
       </div>
@@ -218,7 +219,7 @@ layout: null
 <path d="M226 72c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--shade)" stroke="#fff" stroke-width="2"/><circle cx="226" cy="83" r="4" fill="#fff"/><path d="M104 68c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--sun)" stroke="#fff" stroke-width="2"/><circle cx="104" cy="79" r="4" fill="#fff"/><path d="M140 40c-7 0-12 5-12 11 0 8 12 19 12 19s12-11 12-19c0-6-5-11-12-11z" fill="var(--sun)" stroke="#fff" stroke-width="2"/><circle cx="140" cy="51" r="4" fill="#fff"/>
 <rect x="156" y="40" width="118" height="22" rx="11" fill="var(--surface)"/><circle cx="168" cy="51" r="4.5" fill="var(--sun)"/><text x="177" y="55" font-size="10.5" font-weight="650" fill="var(--fg)" font-family="-apple-system, Segoe UI, sans-serif">Soleil jusqu’à 18:40</text>
 </svg>
-<div class="spot"><div class="spot-head"><span class="rank r1">1</span><span class="spot-name">Café Lumière</span><span class="gap">≃ 2 min d’écart</span></div><div class="sun-cap">Au soleil jusqu’à 18:40</div><div class="bars"><div class="bar"><span>Toi</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 min</b></div><div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div><div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 min</b></div></div></div>
+<div class="spot"><div class="spot-head"><span class="rank r1">1</span><span class="spot-name">Café Lumière</span><span class="gap">17–19 min</span></div><div class="sun-cap">Au soleil jusqu’à 18:40</div><div class="bars"><div class="bar"><span>Toi</span><span class="track"><span class="fill" style="width: 57%; background: var(--p1)"></span></span><b>17 min</b></div><div class="bar"><span>Nino</span><span class="track"><span class="fill" style="width: 63%; background: var(--p2)"></span></span><b>19 min</b></div><div class="bar"><span>Léa</span><span class="track"><span class="fill" style="width: 60%; background: var(--p3)"></span></span><b>18 min</b></div></div></div>
 <div class="switch-row"><span>Terrasse au soleil</span><span class="ios-switch" aria-hidden="true"></span></div>
 </div>
       </div>

@@ -24,7 +24,7 @@ for (const lang of ["fr", "es", "de"]) {
 }
 assert.ok(/<html lang="\{\{ page\.spots_lang \}\}">/.test(html), "<html lang> is the page's");
 const markup = html.replace(/\{%-?\s*comment\s*-?%\}[\s\S]*?\{%-?\s*endcomment\s*-?%\}|<(script|style)[^>]*>[\s\S]*?<\/\1>/g, "");
-for (const [, t] of markup.matchAll(/>([^<]*)</g)) assert.ok(/^\s*(\{\{ page\.\w+ \}\}|Compromise)?\s*$/.test(t), "text in the include: " + t.trim());
+for (const [, t] of markup.matchAll(/>([^<]*)</g)) assert.ok(/^\s*(\{\{ page\.\w+ \}\}|Compromise|\{% include back-alephb\.html %\})?\s*$/.test(t), "text in the include: " + t.trim());
 for (const [, t] of markup.matchAll(/\s(?:alt|title|aria-label|placeholder|content)="([^"]+)"/g)) {
   if (/^(og|twitter|apple|width|light|noindex|no-referrer|website|Compromise|summary|https:\/\/compromise\.alephb\.uk\/img|\d)/.test(t) || !/\p{L}{3,} \p{L}{3,}/u.test(t)) continue;
   assert.ok(/^\{\{ page\.\w+ \}\}$/.test(t), "attribute text in the include: " + t);

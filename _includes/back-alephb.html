@@ -1,7 +1,10 @@
-{%- comment -%} The link back to alephb.uk, the same on every AlephB site: top left, above the nav, "← AlephB" in every language. Its own style so each page includes it once; --muted is every page's token, light and dark. Nunito's latin face as landing.css declares it (privacy, join and spots load no Nunito). {%- endcomment -%}
+{%- comment -%} The link back to alephb.uk, the same on every AlephB site: first in the nav, left of the brand, "← AlephB" in every language; on a narrow phone only "←", named by its aria-label. Its own style so each page includes it once; --muted is every page's token, light and dark. Nunito's latin face as landing.css declares it (privacy, join and spots load no Nunito). {%- endcomment -%}
 <style>
 @font-face { font-family: "Nunito"; font-style: normal; font-weight: 600 900; font-display: swap; src: url(/fonts/nunito-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-.back-alephb { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; margin-top: 4px; font: 600 15px/1 Nunito, ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; color: var(--muted); text-decoration: none; }
+.back-alephb { display: inline-flex; align-items: center; justify-content: center; gap: 0.3em; min-height: 44px; min-width: 44px; margin: -12px -6px -12px -12px; padding-inline: 12px; flex: none; font: 600 15px/1 Nunito, ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; color: var(--muted); text-decoration: none; white-space: nowrap; }
 .back-alephb:hover { color: var(--fg); }
+/* The brand keeps the link beside it: the nav's free space goes before the language pill or the links. */
+.back-alephb + .brand { margin-right: auto; }
+@media (max-width: 600px) { .back-alephb-name { display: none; } }
 </style>
-<a class="back-alephb" href="https://alephb.uk/">← AlephB</a>
+<a class="back-alephb" href="https://alephb.uk/" aria-label="AlephB">←<span class="back-alephb-name">AlephB</span></a>

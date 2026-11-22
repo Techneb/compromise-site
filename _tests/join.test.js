@@ -125,7 +125,7 @@ for (const lang of ["fr", "es", "de"]) {
 assert.ok(/<html lang="\{\{ page\.join_lang \}\}">/.test(html), "<html lang> is the page's");
 assert.ok(/language: LANG/.test(html) && !/language: "en"/.test(html), "MapKit answers in the page's language");
 const markup = html.replace(/\{%-?\s*comment\s*-?%\}[\s\S]*?\{%-?\s*endcomment\s*-?%\}|<(script|style)[^>]*>[\s\S]*?<\/\1>/g, "");
-for (const [, t] of markup.matchAll(/>([^<]*)</g)) assert.ok(/^\s*(\{\{ page\.\w+ \}\}|Compromise)?\s*$/.test(t), "text in the include: " + t.trim());
+for (const [, t] of markup.matchAll(/>([^<]*)</g)) assert.ok(/^\s*(\{\{ page\.\w+ \}\}|Compromise|\{% include back-alephb\.html %\})?\s*$/.test(t), "text in the include: " + t.trim());
 for (const [, t] of markup.matchAll(/\s(?:alt|title|aria-label|placeholder)="([^"]+)"/g)) assert.ok(/^\{\{ page\.\w+ \}\}$/.test(t), "attribute text in the include: " + t);
 const script = html.slice(html.indexOf("(function () {"));
 for (const [str] of script.replace(/(^|\s)\/\/.*$/gm, "").matchAll(/"[^"\n]*"/g)) assert.ok(str === "\"use strict\"" || !/\p{L}{3,} \p{L}{3,}/u.test(str), "English in the script: " + str);
